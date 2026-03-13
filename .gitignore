@@ -42,3 +42,25 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Java / Spring Boot / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven wrapper cache and logs
+.mvn/timing.properties
+dependency-reduced-pom.xml
+
+# Spring Boot runtime files
+*.log
+logs/
+
+# IntelliJ project build outputs
+out/
+
+# Environment files
+.env
+.env.*
