@@ -1,16 +1,24 @@
-<app-home *ngIf="showHome" [userName]="user.nombre" [userProfile]="user.userProfile" [userPhoto]="user.foto"></app-home>
+<div class="language-switcher" *ngIf="!showHome">
+  <label for="app-language">{{ 'APP.LANGUAGE' | translate }}</label>
+  <select id="app-language" name="app-language" [(ngModel)]="currentLanguage" (ngModelChange)="setLanguage($event)">
+    <option value="es">Español</option>
+    <option value="en">English</option>
+  </select>
+</div>
+
+<app-home *ngIf="showHome" [userName]="user.nombre" [userProfile]="user.userProfile" [userPhoto]="user.foto" [nationality]="user.nacionalidad"></app-home>
 
 <div *ngIf="!showHome" class="form-wrapper">
   <div class="form-container" [class.submitted]="submitted">
-    <h1 class="form-title">Registro de Usuario</h1>
+    <h1 class="form-title">{{ 'FORM.TITLE' | translate }}</h1>
     
     <form (ngSubmit)="onSubmit($event)" #userForm="ngForm">
       <app-photo-upload (photoSelected)="onPhotoSelected($event)"></app-photo-upload>
 
       <div class="form-group">
         <label for="nombre">
-          Nombre de Usuario
-          <span class="label-hint">Solo letras, números y guión bajo · 4–20 caracteres</span>
+          {{ 'FORM.USERNAME_LABEL' | translate }}
+          <span class="label-hint">{{ 'FORM.USERNAME_HINT' | translate }}</span>
         </label>
         <input 
           type="text" 
@@ -22,18 +30,18 @@
           maxlength="20"
           pattern="^[a-zA-Z0-9_]+$"
           #nombre="ngModel"
-          placeholder="ej. jugador_42">
+          [placeholder]="'FORM.USERNAME_PLACEHOLDER' | translate">
         <div class="error" *ngIf="nombre.invalid && nombre.touched">
-          <span *ngIf="nombre.errors?.['required']">El nombre de usuario es obligatorio.</span>
-          <span *ngIf="nombre.errors?.['minlength']">Mínimo 4 caracteres.</span>
-          <span *ngIf="nombre.errors?.['pattern']">Solo letras, números y guión bajo ( _ ).</span>
+          <span *ngIf="nombre.errors?.['required']">{{ 'FORM.ERRORS.USERNAME_REQUIRED' | translate }}</span>
+          <span *ngIf="nombre.errors?.['minlength']">{{ 'FORM.ERRORS.USERNAME_MIN' | translate }}</span>
+          <span *ngIf="nombre.errors?.['pattern']">{{ 'FORM.ERRORS.USERNAME_PATTERN' | translate }}</span>
         </div>
       </div>
 
       <div class="form-group">
         <label for="userProfile">
-          Nombre para Otros Jugadores
-          <span class="label-hint">Así te verán los demás · 2–30 caracteres</span>
+          {{ 'FORM.DISPLAY_NAME_LABEL' | translate }}
+          <span class="label-hint">{{ 'FORM.DISPLAY_NAME_HINT' | translate }}</span>
         </label>
         <input 
           type="text" 
@@ -42,22 +50,53 @@
           [(ngModel)]="user.userProfile" 
           required
           minlength="2"
-          maxlength="30"
-          pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$"
+          maxlength="15"
+          [pattern]="'.*\\S.*'"
           #userProfile="ngModel"
-          placeholder="ej. El Gran Jugador">
+          [placeholder]="'FORM.DISPLAY_NAME_PLACEHOLDER' | translate">
         <div class="error" *ngIf="userProfile.invalid && userProfile.touched">
-          <span *ngIf="userProfile.errors?.['required']">El nombre visible es obligatorio.</span>
-          <span *ngIf="userProfile.errors?.['minlength']">Mínimo 2 caracteres.</span>
-          <span *ngIf="userProfile.errors?.['maxlength']">Máximo 30 caracteres.</span>
-          <span *ngIf="userProfile.errors?.['pattern']">Solo se permiten letras y espacios.</span>
+          <span *ngIf="userProfile.errors?.['required']">{{ 'FORM.ERRORS.DISPLAY_REQUIRED' | translate }}</span>
+          <span *ngIf="userProfile.errors?.['minlength']">{{ 'FORM.ERRORS.DISPLAY_MIN' | translate }}</span>
+          <span *ngIf="userProfile.errors?.['maxlength']">{{ 'FORM.ERRORS.DISPLAY_MAX' | translate }}</span>
+          <span *ngIf="userProfile.errors?.['pattern']">{{ 'FORM.ERRORS.DISPLAY_PATTERN' | translate }}</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="nacionalidad">
+          {{ 'FORM.NATIONALITY_LABEL' | translate }}
+          <span class="label-hint">{{ 'FORM.NATIONALITY_HINT' | translate }}</span>
+        </label>
+        <select
+          id="nacionalidad"
+          name="nacionalidad"
+          [(ngModel)]="user.nacionalidad"
+          required
+          #nacionalidad="ngModel">
+          <option value="" disabled>{{ 'FORM.NATIONALITIES.SELECT' | translate }}</option>
+          <option value="ES">{{ 'FORM.NATIONALITIES.ES' | translate }}</option>
+          <option value="MX">{{ 'FORM.NATIONALITIES.MX' | translate }}</option>
+          <option value="AR">{{ 'FORM.NATIONALITIES.AR' | translate }}</option>
+          <option value="CO">{{ 'FORM.NATIONALITIES.CO' | translate }}</option>
+          <option value="CL">{{ 'FORM.NATIONALITIES.CL' | translate }}</option>
+          <option value="PE">{{ 'FORM.NATIONALITIES.PE' | translate }}</option>
+          <option value="US">{{ 'FORM.NATIONALITIES.US' | translate }}</option>
+          <option value="BR">{{ 'FORM.NATIONALITIES.BR' | translate }}</option>
+          <option value="FR">{{ 'FORM.NATIONALITIES.FR' | translate }}</option>
+          <option value="DE">{{ 'FORM.NATIONALITIES.DE' | translate }}</option>
+          <option value="IT">{{ 'FORM.NATIONALITIES.IT' | translate }}</option>
+          <option value="JP">{{ 'FORM.NATIONALITIES.JP' | translate }}</option>
+          <option value="OTRA">{{ 'FORM.NATIONALITIES.OTHER' | translate }}</option>
+        </select>
+        <div class="error" *ngIf="nacionalidad.invalid && nacionalidad.touched">
+          <span *ngIf="nacionalidad.errors?.['required']">{{ 'FORM.ERRORS.NATIONALITY_REQUIRED' | translate }}</span>
         </div>
       </div>
 
       <div class="form-group">
         <label for="edad">
-          Edad
-          <span class="label-hint">Debes tener entre 15 y 100 años</span>
+          {{ 'FORM.AGE_LABEL' | translate }}
+          <span class="label-hint">{{ 'FORM.AGE_HINT' | translate }}</span>
         </label>
         <input 
           type="number" 
@@ -68,21 +107,21 @@
           max="100"
           required
           #edad="ngModel"
-          placeholder="ej. 25">
+          [placeholder]="'FORM.AGE_PLACEHOLDER' | translate">
         <div class="error" *ngIf="edad.invalid && edad.touched">
-          <span *ngIf="edad.errors?.['required']">La edad es obligatoria.</span>
-          <span *ngIf="edad.errors?.['min']">Debes tener al menos 15 años.</span>
-          <span *ngIf="edad.errors?.['max']">La edad no puede superar los 100 años.</span>
+          <span *ngIf="edad.errors?.['required']">{{ 'FORM.ERRORS.AGE_REQUIRED' | translate }}</span>
+          <span *ngIf="edad.errors?.['min']">{{ 'FORM.ERRORS.AGE_MIN' | translate }}</span>
+          <span *ngIf="edad.errors?.['max']">{{ 'FORM.ERRORS.AGE_MAX' | translate }}</span>
         </div>
       </div>
 
       <button type="submit" class="submit-btn" [disabled]="!userForm.valid || registering">
-        <span *ngIf="!registering && !submitted">Registrar</span>
+        <span *ngIf="!registering && !submitted">{{ 'FORM.SUBMIT' | translate }}</span>
         <span *ngIf="registering" class="loading-text">
           <span class="spinner-small"></span>
-          Registrando...
+          {{ 'FORM.SUBMITTING' | translate }}
         </span>
-        <span *ngIf="submitted && !registering">✓ Registrado</span>
+        <span *ngIf="submitted && !registering">{{ 'FORM.SUBMITTED' | translate }}</span>
       </button>
     </form>
 
@@ -94,8 +133,8 @@
             <polyline points="22 4 12 14.01 9 11.01"></polyline>
           </svg>
         </div>
-        <h2>¡Registro Exitoso!</h2>
-        <p>Bienvenido, {{ user.nombre }}</p>
+        <h2>{{ 'FORM.SUCCESS_TITLE' | translate }}</h2>
+        <p>{{ 'FORM.SUCCESS_MESSAGE' | translate:{ name: user.nombre } }}</p>
       </div>
     </div>
   </div>

@@ -1,0 +1,125 @@
+{
+  "APP": {
+    "LANGUAGE": "Language"
+  },
+  "COMMON": {
+    "CANCEL": "Cancel",
+    "APPLY": "Apply"
+  },
+  "FORM": {
+    "TITLE": "User Registration",
+    "USERNAME_LABEL": "Username",
+    "USERNAME_HINT": "Letters, numbers and underscore only · 4-20 characters",
+    "USERNAME_PLACEHOLDER": "e.g. player_42",
+    "DISPLAY_NAME_LABEL": "Name Seen by Other Players",
+    "DISPLAY_NAME_HINT": "Special characters allowed · 2-15 characters",
+    "DISPLAY_NAME_PLACEHOLDER": "e.g. ★Gamer!_X",
+    "NATIONALITY_LABEL": "Nationality",
+    "NATIONALITY_HINT": "Choose your country or region",
+    "AGE_LABEL": "Age",
+    "AGE_HINT": "You must be between 15 and 100 years old",
+    "AGE_PLACEHOLDER": "e.g. 25",
+    "SUBMIT": "Register",
+    "SUBMITTING": "Registering...",
+    "SUBMITTED": "✓ Registered",
+    "SUCCESS_TITLE": "Registration Successful!",
+    "SUCCESS_MESSAGE": "Welcome, {{name}}",
+    "ERRORS": {
+      "USERNAME_REQUIRED": "Username is required.",
+      "USERNAME_MIN": "Minimum 4 characters.",
+      "USERNAME_PATTERN": "Only letters, numbers and underscore ( _ ).",
+      "DISPLAY_REQUIRED": "Display name is required.",
+      "DISPLAY_MIN": "Minimum 2 characters.",
+      "DISPLAY_MAX": "Maximum 15 characters.",
+      "DISPLAY_PATTERN": "It cannot be empty or only spaces.",
+      "NATIONALITY_REQUIRED": "Nationality is required.",
+      "AGE_REQUIRED": "Age is required.",
+      "AGE_MIN": "You must be at least 15 years old.",
+      "AGE_MAX": "Age cannot be greater than 100."
+    },
+    "NATIONALITIES": {
+      "SELECT": "Select a nationality",
+      "ES": "Spanish",
+      "MX": "Mexican",
+      "AR": "Argentinian",
+      "CO": "Colombian",
+      "CL": "Chilean",
+      "PE": "Peruvian",
+      "US": "American",
+      "BR": "Brazilian",
+      "FR": "French",
+      "DE": "German",
+      "IT": "Italian",
+      "JP": "Japanese",
+      "OTHER": "Other"
+    }
+  },
+  "HOME": {
+    "DEFAULT_STATUS": "Ready to play",
+    "CUSTOMIZE": "Customize",
+    "GAMES": "Games"
+  },
+  "GAMES": {
+    "BACK": "← Back",
+    "TITLE": "Game Library",
+    "GAME_OVER": "Game Over",
+    "RESTART": "Restart",
+    "BRICK_BREAKER": {
+      "TITLE": "Brick Breaker",
+      "DESCRIPTION": "Break all the bricks",
+      "SPEED": "Speed",
+      "BALLS": "Ball count",
+      "COLLISION_SOUND": "Collision sound"
+    },
+    "TETRIS": {
+      "DESCRIPTION": "Complete lines to win",
+      "SCORE": "Score",
+      "HIGH_SCORE": "High Score",
+      "DIFFICULTY": "Difficulty",
+      "CONTROLS": "Controls",
+      "MOVE": "← → Move",
+      "SOFT_DROP": "↓ Soft drop",
+      "ROTATE": "Space: Rotate",
+      "START": "Start Game"
+    },
+    "SNAKE": {
+      "DESCRIPTION": "Eat fruits and avoid your tail",
+      "SCORE": "Score",
+      "HIGH_SCORE": "High Score",
+      "DIFFICULTY": "Difficulty",
+      "SKIN": "Skin",
+      "USER_PHOTO": "User Photo",
+      "GREEN_SNAKE": "Green Snake",
+      "FRUITS": "Fruits",
+      "APPLE": "Apple",
+      "BANANA": "Banana",
+      "GRAPE": "Grape",
+      "ALFAJOR": "Alfajor",
+      "DOUBLE": "double",
+      "CONTROLS": "Controls",
+      "ARROWS_MOVE": "Arrow keys to move",
+      "START": "Start Game"
+    }
+  },
+  "CUSTOMIZATION": {
+    "TITLE": "Customize Profile",
+    "BACKGROUND": "Background Color",
+    "VISIBLE_PROFILE": "Visible Profile",
+    "LANGUAGE": "Language",
+    "PROFILE_STATUS": "Profile Status",
+    "PROFILE_STATUS_PLACEHOLDER": "e.g. Ready to play",
+    "NAME_COLOR": "Name Color",
+    "LEFT_IMAGE": "Left Image",
+    "RIGHT_IMAGE": "Right Image",
+    "LOADING": "Loading...",
+    "UPLOAD_IMAGE": "Upload Image",
+    "PROFILE_PHOTO": "Change Profile Photo (Optional)",
+    "NO_PHOTO": "No Photo",
+    "SELECT_PHOTO": "Select Photo",
+    "CLEAR": "Clear"
+  },
+  "PHOTO_UPLOAD": {
+    "PLACEHOLDER": "Upload your photo",
+    "BUTTON": "Select Photo or GIF"
+  }
+}

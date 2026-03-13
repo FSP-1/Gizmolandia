@@ -1,0 +1,125 @@
+{
+  "APP": {
+    "LANGUAGE": "Idioma"
+  },
+  "COMMON": {
+    "CANCEL": "Cancelar",
+    "APPLY": "Aplicar"
+  },
+  "FORM": {
+    "TITLE": "Registro de Usuario",
+    "USERNAME_LABEL": "Nombre de Usuario",
+    "USERNAME_HINT": "Solo letras, números y guión bajo · 4-20 caracteres",
+    "USERNAME_PLACEHOLDER": "ej. jugador_42",
+    "DISPLAY_NAME_LABEL": "Nombre para Otros Jugadores",
+    "DISPLAY_NAME_HINT": "Se permiten caracteres especiales · 2-15 caracteres",
+    "DISPLAY_NAME_PLACEHOLDER": "ej. ★Gamer!_X",
+    "NATIONALITY_LABEL": "Nacionalidad",
+    "NATIONALITY_HINT": "Selecciona tu país o región",
+    "AGE_LABEL": "Edad",
+    "AGE_HINT": "Debes tener entre 15 y 100 años",
+    "AGE_PLACEHOLDER": "ej. 25",
+    "SUBMIT": "Registrar",
+    "SUBMITTING": "Registrando...",
+    "SUBMITTED": "✓ Registrado",
+    "SUCCESS_TITLE": "¡Registro Exitoso!",
+    "SUCCESS_MESSAGE": "Bienvenido, {{name}}",
+    "ERRORS": {
+      "USERNAME_REQUIRED": "El nombre de usuario es obligatorio.",
+      "USERNAME_MIN": "Mínimo 4 caracteres.",
+      "USERNAME_PATTERN": "Solo letras, números y guión bajo ( _ ).",
+      "DISPLAY_REQUIRED": "El nombre visible es obligatorio.",
+      "DISPLAY_MIN": "Mínimo 2 caracteres.",
+      "DISPLAY_MAX": "Máximo 15 caracteres.",
+      "DISPLAY_PATTERN": "No puede estar vacío o con solo espacios.",
+      "NATIONALITY_REQUIRED": "La nacionalidad es obligatoria.",
+      "AGE_REQUIRED": "La edad es obligatoria.",
+      "AGE_MIN": "Debes tener al menos 15 años.",
+      "AGE_MAX": "La edad no puede superar los 100 años."
+    },
+    "NATIONALITIES": {
+      "SELECT": "Selecciona una nacionalidad",
+      "ES": "Española",
+      "MX": "Mexicana",
+      "AR": "Argentina",
+      "CO": "Colombiana",
+      "CL": "Chilena",
+      "PE": "Peruana",
+      "US": "Estadounidense",
+      "BR": "Brasileña",
+      "FR": "Francesa",
+      "DE": "Alemana",
+      "IT": "Italiana",
+      "JP": "Japonesa",
+      "OTHER": "Otra"
+    }
+  },
+  "HOME": {
+    "DEFAULT_STATUS": "Listo para jugar",
+    "CUSTOMIZE": "Personalizar",
+    "GAMES": "Juegos"
+  },
+  "GAMES": {
+    "BACK": "← Volver",
+    "TITLE": "Librería de Juegos",
+    "GAME_OVER": "Game Over",
+    "RESTART": "Reiniciar",
+    "BRICK_BREAKER": {
+      "TITLE": "Brick Breaker",
+      "DESCRIPTION": "Rompe todos los ladrillos",
+      "SPEED": "Velocidad",
+      "BALLS": "Cantidad de bolas",
+      "COLLISION_SOUND": "Sonido de colisión"
+    },
+    "TETRIS": {
+      "DESCRIPTION": "Completa líneas para ganar",
+      "SCORE": "Puntuación",
+      "HIGH_SCORE": "Récord",
+      "DIFFICULTY": "Dificultad",
+      "CONTROLS": "Controles",
+      "MOVE": "← → Mover",
+      "SOFT_DROP": "↓ Bajar rápido",
+      "ROTATE": "Espacio: Rotar",
+      "START": "Iniciar Juego"
+    },
+    "SNAKE": {
+      "DESCRIPTION": "Come frutas y esquiva tu cola",
+      "SCORE": "Puntuación",
+      "HIGH_SCORE": "Récord",
+      "DIFFICULTY": "Dificultad",
+      "SKIN": "Skin",
+      "USER_PHOTO": "Foto Usuario",
+      "GREEN_SNAKE": "Serpiente Verde",
+      "FRUITS": "Frutas",
+      "APPLE": "Manzana",
+      "BANANA": "Banana",
+      "GRAPE": "Uva",
+      "ALFAJOR": "Alfajor",
+      "DOUBLE": "doble",
+      "CONTROLS": "Controles",
+      "ARROWS_MOVE": "Flechas para mover",
+      "START": "Iniciar Juego"
+    }
+  },
+  "CUSTOMIZATION": {
+    "TITLE": "Personalizar Perfil",
+    "BACKGROUND": "Color de Fondo",
+    "VISIBLE_PROFILE": "Perfil Visible",
+    "LANGUAGE": "Idioma",
+    "PROFILE_STATUS": "Estado del Perfil",
+    "PROFILE_STATUS_PLACEHOLDER": "Ej: Ready para jugar",
+    "NAME_COLOR": "Color del Nombre",
+    "LEFT_IMAGE": "Imagen Izquierda",
+    "RIGHT_IMAGE": "Imagen Derecha",
+    "LOADING": "Cargando...",
+    "UPLOAD_IMAGE": "Subir Imagen",
+    "PROFILE_PHOTO": "Cambiar Foto de Perfil (Opcional)",
+    "NO_PHOTO": "Sin Foto",
+    "SELECT_PHOTO": "Seleccionar Foto",
+    "CLEAR": "Limpiar"
+  },
+  "PHOTO_UPLOAD": {
+    "PLACEHOLDER": "Sube tu foto",
+    "BUTTON": "Seleccionar Foto o GIF"
+  }
+}

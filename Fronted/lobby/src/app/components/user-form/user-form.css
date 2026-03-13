@@ -12,6 +12,38 @@
   padding: 2rem;
 }
 
+.language-switcher {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 0.9rem;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 999px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(8px);
+}
+
+.language-switcher label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.language-switcher select {
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: white;
+  color: #334155;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.42rem 0.9rem;
+}
+
 .form-container {
   background: #fff;
   padding: 3rem;
@@ -103,7 +135,8 @@
 /* =====================
    INPUTS
    ===================== */
-.form-group input {
+.form-group input,
+.form-group select {
   width: 100%;
   padding: 0.9rem 1.2rem;
   border: 2px solid #e5e7eb;
@@ -114,18 +147,32 @@
   transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
 
-.form-group input:focus {
+.form-group select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #667eea 50%), linear-gradient(135deg, #667eea 50%, transparent 50%);
+  background-position: calc(100% - 18px) calc(50% - 3px), calc(100% - 12px) calc(50% - 3px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+.form-group input:focus,
+.form-group select:focus {
   outline: none;
   border-color: #667eea;
   background: #fff;
   box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.12);
 }
 
-.form-group input:hover:not(:focus) {
+.form-group input:hover:not(:focus),
+.form-group select:hover:not(:focus) {
   border-color: #c4b5fd;
 }
 
-.form-group input.ng-invalid.ng-touched {
+.form-group input.ng-invalid.ng-touched,
+.form-group select.ng-invalid.ng-touched {
   border-color: #dc2626;
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08);
 }

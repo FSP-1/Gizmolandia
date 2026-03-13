@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, ElementRef, ViewChild, HostListener, ChangeDetectorRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 interface Shape {
   x: number;
@@ -13,7 +14,7 @@ interface Shape {
 @Component({
   selector: 'app-tetris',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './tetris.html',
   styleUrls: ['./tetris.css']
 })

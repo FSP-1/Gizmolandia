@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit, ElementRef, ViewChild, HostListener, Input, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 type Direction = 'up' | 'down' | 'left' | 'right';
 
@@ -19,7 +20,7 @@ interface Fruit {
 @Component({
   selector: 'app-snake',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './snake.html',
   styleUrls: ['./snake.css']
 })

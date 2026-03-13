@@ -1,11 +1,12 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-customization',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './customization.html',
   styleUrls: ['./customization.css', '../../../styles/photo-upload-shared.css']
 })
@@ -14,7 +15,10 @@ export class CustomizationComponent {
   @Output() configChange = new EventEmitter<any>();
   @Output() close = new EventEmitter<'cancel' | 'apply'>();
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private translate: TranslateService
+  ) {}
 
   backgroundColor = '#667eea';
   leftImage = '';
@@ -22,6 +26,7 @@ export class CustomizationComponent {
   profileImage = '';
   userStatus = 'Listo para jugar';
   nameColor = '#ffffff';
+  currentLanguage = 'es';
   loadingLeft = false;
   loadingRight = false;
   loadingProfile = false;
@@ -38,6 +43,7 @@ export class CustomizationComponent {
     this.profileImage = this.currentConfig.profileImage || '';
     this.userStatus = this.currentConfig.userStatus || 'Listo para jugar';
     this.nameColor = this.currentConfig.nameColor || '#ffffff';
+    this.currentLanguage = this.currentConfig.language || localStorage.getItem('appLanguage') || 'es';
   }
 
   selectColor(color: string) {
@@ -55,6 +61,12 @@ export class CustomizationComponent {
   }
 
   onNameColorChanged() {
+    this.emitPreview();
+  }
+
+  onLanguageChanged() {
+    localStorage.setItem('appLanguage', this.currentLanguage);
+    this.translate.use(this.currentLanguage);
     this.emitPreview();
   }
 
@@ -149,7 +161,8 @@ export class CustomizationComponent {
       rightImage: this.rightImage,
       profileImage: this.profileImage,
       userStatus: this.userStatus,
-      nameColor: this.nameColor
+      nameColor: this.nameColor,
+      language: this.currentLanguage
     });
   }
 }

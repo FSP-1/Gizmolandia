@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ElementRef, ViewChild, Input, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 
 interface Ball {
   x: number;
@@ -13,7 +14,7 @@ interface Ball {
 @Component({
   selector: 'app-brick-breaker',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './brick-breaker.html',
   styleUrls: ['./brick-breaker.css']
 })

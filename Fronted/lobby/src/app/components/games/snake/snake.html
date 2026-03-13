@@ -1,40 +1,40 @@
 <div class="snake-container">
   <div class="game-info">
     <h2>Snake</h2>
-    <div class="score">Puntuacion: {{ score }}</div>
-    <div class="high-score">Record: {{ highScore }}</div>
-    <div class="difficulty">Dificultad: {{ difficulty.toFixed(1) }}x</div>
+    <div class="score">{{ 'GAMES.SNAKE.SCORE' | translate }}: {{ score }}</div>
+    <div class="high-score">{{ 'GAMES.SNAKE.HIGH_SCORE' | translate }}: {{ highScore }}</div>
+    <div class="difficulty">{{ 'GAMES.SNAKE.DIFFICULTY' | translate }}: {{ difficulty.toFixed(1) }}x</div>
 
     <div class="user-block">
       <p><strong>{{ username }}</strong></p>
       <button class="skin-button" (click)="toggleSkin()">
-        Skin: {{ useUserSkin ? 'Foto Usuario' : 'Serpiente Verde' }}
+        {{ 'GAMES.SNAKE.SKIN' | translate }}: {{ useUserSkin ? ('GAMES.SNAKE.USER_PHOTO' | translate) : ('GAMES.SNAKE.GREEN_SNAKE' | translate) }}
       </button>
     </div>
 
     <div class="fruit-legend">
-      <p><strong>Frutas:</strong></p>
-      <p>Manzana: +1</p>
-      <p>Banana: +2</p>
-      <p>Uva: +3</p>
-      <p>Alfajor: +4 (doble)</p>
+      <p><strong>{{ 'GAMES.SNAKE.FRUITS' | translate }}:</strong></p>
+      <p>{{ 'GAMES.SNAKE.APPLE' | translate }}: +1</p>
+      <p>{{ 'GAMES.SNAKE.BANANA' | translate }}: +2</p>
+      <p>{{ 'GAMES.SNAKE.GRAPE' | translate }}: +3</p>
+      <p>{{ 'GAMES.SNAKE.ALFAJOR' | translate }}: +4 ({{ 'GAMES.SNAKE.DOUBLE' | translate }})</p>
     </div>
 
     <div class="controls-info">
-      <p><strong>Controles:</strong></p>
-      <p>Flechas para mover</p>
+      <p><strong>{{ 'GAMES.SNAKE.CONTROLS' | translate }}:</strong></p>
+      <p>{{ 'GAMES.SNAKE.ARROWS_MOVE' | translate }}</p>
     </div>
 
-    <button *ngIf="!isStarted && !gameOver" class="start-button" (click)="startGame()">Iniciar Juego</button>
+    <button *ngIf="!isStarted && !gameOver" class="start-button" (click)="startGame()">{{ 'GAMES.SNAKE.START' | translate }}</button>
   </div>
 
   <div class="game-area">
     <canvas #gameCanvas width="400" height="400" tabindex="0"></canvas>
     <div class="game-over-overlay" *ngIf="gameOver">
-      <h2>Game Over</h2>
-      <p>Puntuacion: {{ score }}</p>
-      <p>Record: {{ highScore }}</p>
-      <button (click)="restart()">Reiniciar</button>
+      <h2>{{ 'GAMES.GAME_OVER' | translate }}</h2>
+      <p>{{ 'GAMES.SNAKE.SCORE' | translate }}: {{ score }}</p>
+      <p>{{ 'GAMES.SNAKE.HIGH_SCORE' | translate }}: {{ highScore }}</p>
+      <button (click)="restart()">{{ 'GAMES.RESTART' | translate }}</button>
     </div>
   </div>
 </div>

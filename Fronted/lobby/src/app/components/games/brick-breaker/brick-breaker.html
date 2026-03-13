@@ -1,15 +1,15 @@
 <div class="game-container">
   <div class="controls">
     <div class="control-group">
-      <label>Velocidad: {{ speed }}</label>
+      <label>{{ 'GAMES.BRICK_BREAKER.SPEED' | translate }}: {{ speed }}</label>
       <input type="range" min="1" max="10" [(ngModel)]="speed" (input)="updateSpeed()">
     </div>
     <div class="control-group">
-      <label>Cantidad de bolas: {{ ballCount }}</label>
+      <label>{{ 'GAMES.BRICK_BREAKER.BALLS' | translate }}: {{ ballCount }}</label>
       <input type="range" min="1" max="10" [(ngModel)]="ballCount" (input)="updateBallCount()">
     </div>
     <div class="control-group">
-      <label>Sonido de colisión</label>
+      <label>{{ 'GAMES.BRICK_BREAKER.COLLISION_SOUND' | translate }}</label>
       <input type="file" accept="audio/*" (change)="onSoundUpload($event)">
     </div>
   </div>

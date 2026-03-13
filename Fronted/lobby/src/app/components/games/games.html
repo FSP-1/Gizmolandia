@@ -1,23 +1,23 @@
 <div class="games-wrapper">
-  <button class="back-btn" (click)="backToLibrary()">← Volver</button>
+  <button class="back-btn" (click)="backToLibrary()">{{ 'GAMES.BACK' | translate }}</button>
   
   <div class="games-library" *ngIf="!selectedGame">
-    <h1>Librería de Juegos</h1>
+    <h1>{{ 'GAMES.TITLE' | translate }}</h1>
     <div class="games-grid">
       <div class="game-card" (click)="selectGame('brick-breaker')">
         <div class="game-icon">🧱</div>
-        <h3>Brick Breaker</h3>
-        <p>Rompe todos los ladrillos</p>
+        <h3>{{ 'GAMES.BRICK_BREAKER.TITLE' | translate }}</h3>
+        <p>{{ 'GAMES.BRICK_BREAKER.DESCRIPTION' | translate }}</p>
       </div>
       <div class="game-card" (click)="selectGame('tetris')">
         <div class="game-icon">🟦</div>
         <h3>Tetris</h3>
-        <p>Completa líneas para ganar</p>
+        <p>{{ 'GAMES.TETRIS.DESCRIPTION' | translate }}</p>
       </div>
       <div class="game-card" (click)="selectGame('snake')">
         <div class="game-icon">🐍</div>
         <h3>Snake</h3>
-        <p>Come frutas y esquiva tu cola</p>
+        <p>{{ 'GAMES.SNAKE.DESCRIPTION' | translate }}</p>
       </div>
     </div>
   </div>

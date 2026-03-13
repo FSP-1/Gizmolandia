@@ -66,6 +66,20 @@
   margin: 0;
 }
 
+.user-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.user-flag {
+  font-size: 2rem;
+  line-height: 1;
+  filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.35));
+}
+
 .user-status {
   margin: 0.65rem 0 0;
   color: rgba(255, 255, 255, 0.92);
@@ -200,6 +214,10 @@
   .user-name {
     font-size: 2.4rem;
   }
+
+  .user-flag {
+    font-size: 1.7rem;
+  }
 }
 
 @media (max-width: 760px) {
@@ -214,5 +232,9 @@
 
   .user-name {
     font-size: 2rem;
+  }
+
+  .user-flag {
+    font-size: 1.5rem;
   }
 }
