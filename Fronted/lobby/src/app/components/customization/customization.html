@@ -1,0 +1,159 @@
+<div class="customization-overlay" (click)="cancel()">
+  <div class="customization-panel" (click)="$event.stopPropagation()">
+    <div class="panel-header">
+      <h2>Personalizar Perfil</h2>
+      <button class="close-btn" (click)="cancel()">×</button>
+    </div>
+
+    <div class="panel-content">
+      <section class="section section-color">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a10 10 0 0 0 0 20"></path>
+          </svg>
+          Color de Fondo
+        </h3>
+        <div class="color-picker">
+          <input type="color" [(ngModel)]="backgroundColor" (ngModelChange)="onBackgroundColorChanged()" class="color-input">
+          <div class="color-presets">
+            <button 
+              *ngFor="let color of predefinedColors"
+              class="color-preset"
+              [style.background-color]="color"
+              [class.active]="backgroundColor === color"
+              (click)="selectColor(color)">
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-profile-settings">
+        <h3>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          Perfil Visible
+        </h3>
+
+        <div class="profile-settings-grid">
+          <label class="field-group">
+            <span>Estado del Perfil</span>
+            <input
+              type="text"
+              [(ngModel)]="userStatus"
+              (ngModelChange)="onStatusChanged()"
+              maxlength="40"
+              placeholder="Ej: Ready para jugar"
+            >
+          </label>
+
+          <label class="field-group">
+            <span>Color del Nombre</span>
+            <input type="color" [(ngModel)]="nameColor" (ngModelChange)="onNameColorChanged()" class="color-input compact">
+          </label>
+        </div>
+      </section>
+
+      <div class="section-grid">
+        <section class="section section-compact">
+          <h3>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            Imagen Izquierda
+          </h3>
+          <div class="image-upload-area">
+            <div class="loading-spinner" *ngIf="loadingLeft">
+              <div class="spinner"></div>
+              <p>Cargando...</p>
+            </div>
+            <div class="image-preview image-preview-compact" *ngIf="leftImage && !loadingLeft">
+              <img [src]="leftImage" alt="Left preview">
+              <button class="clear-btn" (click)="clearLeftImage()">×</button>
+            </div>
+            <label class="upload-zone upload-zone-compact" *ngIf="!leftImage && !loadingLeft">
+              <input type="file" accept="image/*,image/gif" (change)="onLeftImageUpload($event)" hidden>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <p>Subir Imagen</p>
+            </label>
+          </div>
+        </section>
+
+        <section class="section section-compact">
+          <h3>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            Imagen Derecha
+          </h3>
+          <div class="image-upload-area">
+            <div class="loading-spinner" *ngIf="loadingRight">
+              <div class="spinner"></div>
+              <p>Cargando...</p>
+            </div>
+            <div class="image-preview image-preview-compact" *ngIf="rightImage && !loadingRight">
+              <img [src]="rightImage" alt="Right preview">
+              <button class="clear-btn" (click)="clearRightImage()">×</button>
+            </div>
+            <label class="upload-zone upload-zone-compact" *ngIf="!rightImage && !loadingRight">
+              <input type="file" accept="image/*,image/gif" (change)="onRightImageUpload($event)" hidden>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <p>Subir Imagen</p>
+            </label>
+          </div>
+        </section>
+      </div>
+
+      <section class="section section-profile">
+        <h3>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          Cambiar Foto de Perfil (Opcional)
+        </h3>
+        <div class="profile-upload-area">
+          <div class="profile-preview" [class.has-photo]="profileImage">
+            <img *ngIf="profileImage" [src]="profileImage" alt="Profile preview">
+            <div *ngIf="!profileImage" class="placeholder">
+              <svg class="camera-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+              <p>Sin Foto</p>
+            </div>
+          </div>
+          <input type="file" accept="image/*,image/gif" (change)="onProfileImageUpload($event)" id="profile-input" hidden>
+          <label for="profile-input" class="upload-btn-profile">
+            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            Seleccionar Foto
+          </label>
+          <button *ngIf="profileImage" class="clear-profile-btn" (click)="clearProfileImage()">Limpiar</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="panel-footer">
+      <button class="btn-cancel" (click)="cancel()">Cancelar</button>
+      <button class="btn-apply" (click)="apply()">Aplicar</button>
+    </div>
+  </div>
+</div>

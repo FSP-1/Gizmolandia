@@ -1,0 +1,40 @@
+<div class="snake-container">
+  <div class="game-info">
+    <h2>Snake</h2>
+    <div class="score">Puntuacion: {{ score }}</div>
+    <div class="high-score">Record: {{ highScore }}</div>
+    <div class="difficulty">Dificultad: {{ difficulty.toFixed(1) }}x</div>
+
+    <div class="user-block">
+      <p><strong>{{ username }}</strong></p>
+      <button class="skin-button" (click)="toggleSkin()">
+        Skin: {{ useUserSkin ? 'Foto Usuario' : 'Serpiente Verde' }}
+      </button>
+    </div>
+
+    <div class="fruit-legend">
+      <p><strong>Frutas:</strong></p>
+      <p>Manzana: +1</p>
+      <p>Banana: +2</p>
+      <p>Uva: +3</p>
+      <p>Alfajor: +4 (doble)</p>
+    </div>
+
+    <div class="controls-info">
+      <p><strong>Controles:</strong></p>
+      <p>Flechas para mover</p>
+    </div>
+
+    <button *ngIf="!isStarted && !gameOver" class="start-button" (click)="startGame()">Iniciar Juego</button>
+  </div>
+
+  <div class="game-area">
+    <canvas #gameCanvas width="400" height="400" tabindex="0"></canvas>
+    <div class="game-over-overlay" *ngIf="gameOver">
+      <h2>Game Over</h2>
+      <p>Puntuacion: {{ score }}</p>
+      <p>Record: {{ highScore }}</p>
+      <button (click)="restart()">Reiniciar</button>
+    </div>
+  </div>
+</div>

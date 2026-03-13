@@ -1,0 +1,218 @@
+.home-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: background-color 0.5s ease;
+  overflow: hidden;
+  padding-inline: 1rem;
+}
+
+.user-profile {
+  text-align: center;
+  z-index: 10;
+  animation: fadeInScale 0.8s ease;
+  background: rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  padding: 2rem 2.25rem;
+  max-width: min(92vw, 560px);
+}
+
+.profile-photo {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  margin: 0 auto 2rem;
+  overflow: hidden;
+  border: 5px solid white;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: photoFloat 3s ease-in-out infinite;
+}
+
+.profile-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholder-photo {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.placeholder-photo svg {
+  width: 100px;
+  height: 100px;
+  color: white;
+}
+
+.user-name {
+  font-size: 3rem;
+  font-weight: 900;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.user-status {
+  margin: 0.65rem 0 0;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 1.05rem;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+}
+
+.customize-btn {
+  margin-top: 2rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+.customize-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+}
+
+.customize-btn svg {
+  animation: rotate 2s linear infinite;
+}
+
+.side-image {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: clamp(180px, 22vw, 360px);
+  z-index: 4;
+  animation: fadeInSide 0.8s ease;
+  pointer-events: none;
+}
+
+.side-image.left {
+  left: 0;
+}
+
+.side-image.right {
+  right: 0;
+}
+
+.side-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.32);
+}
+
+.home-wrapper.has-left-image .side-image.left img {
+  border-right: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.home-wrapper.has-right-image .side-image.right img {
+  border-left: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes photoFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeInSide {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.games-btn {
+  margin-top: 1rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+}
+
+.games-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(245, 87, 108, 0.6);
+}
+
+@media (max-width: 1024px) {
+  .side-image {
+    width: clamp(110px, 18vw, 180px);
+    opacity: 0.75;
+  }
+
+  .user-name {
+    font-size: 2.4rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .side-image {
+    display: none;
+  }
+
+  .user-profile {
+    padding: 1.5rem 1.1rem;
+    width: min(94vw, 460px);
+  }
+
+  .user-name {
+    font-size: 2rem;
+  }
+}

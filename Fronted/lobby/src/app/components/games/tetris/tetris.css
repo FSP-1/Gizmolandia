@@ -1,0 +1,213 @@
+.tetris-container {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  overflow: hidden;
+}
+
+.game-info {
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  min-width: 200px;
+}
+
+.game-info h2 {
+  margin: 0 0 1rem 0;
+  color: #667eea;
+  font-size: 2rem;
+}
+
+.score {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.high-score {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #667eea;
+  margin-bottom: 1rem;
+}
+
+.difficulty-info {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #f0a000;
+  margin-bottom: 0.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #eee;
+}
+
+.combo-display {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ff6b6b;
+  margin-bottom: 1rem;
+  animation: comboFlash 0.6s ease-in-out;
+  text-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
+}
+
+@keyframes comboFlash {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.user-info {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.profile-image-container {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin: 0 auto 0.8rem;
+  overflow: hidden;
+  border: 3px solid #667eea;
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.profile-placeholder svg {
+  width: 60%;
+  height: 60%;
+  stroke: white;
+}
+
+.user-info p {
+  margin: 0.3rem 0;
+  color: #333;
+}
+
+.user-info p:first-of-type {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #667eea;
+}
+
+.controls-info {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 2px solid #eee;
+}
+
+.controls-info p {
+  margin: 0.5rem 0;
+  color: #666;
+}
+
+.start-button {
+  width: 100%;
+  padding: 1rem;
+  margin-top: 1.5rem;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.start-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+}
+
+.start-button:active {
+  transform: translateY(-1px);
+}
+
+.game-area {
+  position: relative;
+  overflow: hidden;
+}
+
+canvas {
+  background: #000;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  display: block;
+  cursor: none;
+  border: 3px solid transparent;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+canvas:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(102, 126, 234, 0.6);
+}
+
+.game-over-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.game-over-overlay h2 {
+  color: white;
+  font-size: 3rem;
+  margin: 0 0 1rem 0;
+}
+
+.game-over-overlay p {
+  color: white;
+  font-size: 1.5rem;
+  margin: 0 0 2rem 0;
+}
+
+.game-over-overlay button {
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.game-over-overlay button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+}

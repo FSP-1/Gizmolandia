@@ -1,0 +1,154 @@
+.photo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+
+.photo-preview {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 4px dashed transparent;
+  background: linear-gradient(white, white) padding-box,
+              linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f7b731) border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  animation: rotate-border 4s linear infinite, float 3s ease-in-out infinite;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.photo-preview::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  padding: 4px;
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f7b731);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: rotate-border 4s linear infinite reverse;
+}
+
+.photo-preview.has-photo {
+  border-style: solid;
+  animation: float 3s ease-in-out infinite;
+  transform: scale(1.1);
+}
+
+.photo-preview.has-photo::before {
+  background: linear-gradient(45deg, #00f260, #0575e6, #00f260);
+}
+
+.photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: zoomIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  filter: brightness(1.05) contrast(1.1);
+}
+
+.placeholder {
+  text-align: center;
+  color: #666;
+  position: relative;
+}
+
+.camera-icon {
+  width: 80px;
+  height: 80px;
+  color: #667eea;
+  animation: iconPulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 4px 10px rgba(102, 126, 234, 0.3));
+}
+
+.placeholder p {
+  margin: 0.8rem 0 0 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.upload-btn {
+  padding: 0.72rem 1.4rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background-size: 200% 200%;
+  color: white;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.82rem;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  transition: all 0.4s ease;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5),
+              inset 0 -3px 10px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+  animation: gradientMove 3s ease infinite;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.upload-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease;
+}
+
+.upload-btn:hover .upload-icon {
+  transform: translateY(-3px);
+  animation: iconBounce 0.6s ease infinite;
+}
+
+.upload-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.upload-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.upload-btn:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 15px 35px rgba(102, 126, 234, 0.7),
+              inset 0 -3px 10px rgba(0, 0, 0, 0.3);
+  background-position: 100% 50%;
+}
+
+.upload-btn:active {
+  transform: translateY(-2px) scale(1.02);
+}
+
+@keyframes iconBounce {
+  0%, 100% {
+    transform: translateY(-3px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}

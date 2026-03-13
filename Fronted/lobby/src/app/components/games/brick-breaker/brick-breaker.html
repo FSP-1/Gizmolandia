@@ -1,0 +1,17 @@
+<div class="game-container">
+  <div class="controls">
+    <div class="control-group">
+      <label>Velocidad: {{ speed }}</label>
+      <input type="range" min="1" max="10" [(ngModel)]="speed" (input)="updateSpeed()">
+    </div>
+    <div class="control-group">
+      <label>Cantidad de bolas: {{ ballCount }}</label>
+      <input type="range" min="1" max="10" [(ngModel)]="ballCount" (input)="updateBallCount()">
+    </div>
+    <div class="control-group">
+      <label>Sonido de colisión</label>
+      <input type="file" accept="audio/*" (change)="onSoundUpload($event)">
+    </div>
+  </div>
+  <canvas #gameCanvas width="480" height="320"></canvas>
+</div>

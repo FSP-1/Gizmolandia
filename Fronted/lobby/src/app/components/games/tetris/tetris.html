@@ -1,0 +1,37 @@
+<div class="tetris-container">
+  <div class="game-info">
+    <h2>Tetris</h2>
+    <div class="score">Puntuación: {{ score }}</div>
+    <div class="high-score">Record: {{ highScore }}</div>
+    <div class="difficulty-info">Dificultad: {{ difficulty.toFixed(1) }}x</div>
+    <div class="combo-display" *ngIf="combo > 0">{{ getComboDisplay() }}</div>
+    <div class="user-info">
+      <div class="profile-image-container">
+        <img *ngIf="userProfileImage" [src]="userProfileImage" alt="User Profile" class="profile-image">
+        <div *ngIf="!userProfileImage" class="profile-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+      </div>
+      <p><strong>{{ username }}</strong></p>
+    </div>
+    <div class="controls-info">
+      <p><strong>Controles:</strong></p>
+      <p>← → Mover</p>
+      <p>↓ Bajar rápido</p>
+      <p>Espacio: Rotar</p>
+    </div>
+    <button *ngIf="!isStarted" class="start-button" (click)="startGame()">Iniciar Juego</button>
+  </div>
+  
+  <div class="game-area">
+    <canvas #gameCanvas width="300" height="600" tabindex="0"></canvas>
+    <div class="game-over-overlay" *ngIf="gameOver">
+      <h2>Game Over</h2>
+      <p>Puntuación: {{ score }}</p>
+      <button (click)="restart()">Reiniciar</button>
+    </div>
+  </div>
+</div>

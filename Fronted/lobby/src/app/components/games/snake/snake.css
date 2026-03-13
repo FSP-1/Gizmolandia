@@ -1,0 +1,148 @@
+.snake-container {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+}
+
+.game-info {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  min-width: 260px;
+}
+
+.game-info h2 {
+  margin: 0 0 1rem;
+  color: #0f172a;
+  font-size: 2rem;
+}
+
+.score {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.high-score {
+  color: #334155;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.difficulty {
+  color: #ea580c;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.user-block {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.user-block p {
+  margin: 0 0 0.6rem;
+}
+
+.skin-button {
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.fruit-legend,
+.controls-info {
+  margin-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 0.8rem;
+}
+
+.fruit-legend p,
+.controls-info p {
+  margin: 0.35rem 0;
+  color: #334155;
+}
+
+.start-button {
+  margin-top: 1rem;
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 0.8rem 1rem;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.game-area {
+  position: relative;
+}
+
+canvas {
+  background: #0f172a;
+  border-radius: 12px;
+  border: 3px solid #1e293b;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+canvas:focus {
+  outline: none;
+  border-color: #38bdf8;
+}
+
+.game-over-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  background: rgba(2, 6, 23, 0.9);
+  color: white;
+  border-radius: 12px;
+}
+
+.game-over-overlay h2 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.game-over-overlay p {
+  margin: 0;
+}
+
+.game-over-overlay button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.75rem 1.2rem;
+  background: linear-gradient(135deg, #f97316, #f59e0b);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .snake-container {
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+  }
+
+  .game-info {
+    width: 100%;
+    max-width: 420px;
+  }
+}
