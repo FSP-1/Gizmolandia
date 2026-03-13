@@ -27,6 +27,22 @@ export class HomeComponent {
   nameColor = '#ffffff';
   currentLanguage = 'es';
 
+  private readonly nationalityEmojiMap: Record<string, string> = {
+    ES: '🇪🇸',
+    MX: '🇲🇽',
+    AR: '🇦🇷',
+    CO: '🇨🇴',
+    CL: '🇨🇱',
+    PE: '🇵🇪',
+    US: '🇺🇸',
+    BR: '🇧🇷',
+    FR: '🇫🇷',
+    DE: '🇩🇪',
+    IT: '🇮🇹',
+    JP: '🇯🇵',
+    OTRA: '🌍'
+  };
+
   private customizationSnapshot: any = null;
 
   constructor(private translate: TranslateService) {
@@ -38,16 +54,16 @@ export class HomeComponent {
       return '';
     }
 
-    if (this.nationality === 'OTRA') {
-      return '🌍';
+    return this.nationalityEmojiMap[this.nationality.toUpperCase()] || '🌐';
+  }
+
+  get nationalityFlagIconUrl(): string {
+    if (!this.nationality || this.nationality.toUpperCase() === 'OTRA') {
+      return '';
     }
 
-    return this.nationality
-      .toUpperCase()
-      .slice(0, 2)
-      .split('')
-      .map((char) => String.fromCodePoint(127397 + char.charCodeAt(0)))
-      .join('');
+    const code = this.nationality.toLowerCase().slice(0, 2);
+    return `https://flagcdn.com/w40/${code}.png`;
   }
 
   toggleCustomization() {

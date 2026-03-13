@@ -17,7 +17,16 @@
     </div>
     <div class="user-name-row">
       <h1 class="user-name" [style.color]="nameColor">{{ userProfile || userName || 'Usuario' }}</h1>
-      <span *ngIf="nationalityFlag" class="user-flag" [attr.aria-label]="nationality">{{ nationalityFlag }}</span>
+      <span *ngIf="nationalityFlag" class="user-flag-badge" [attr.aria-label]="nationality" [attr.title]="nationality">
+        <img
+          *ngIf="nationalityFlagIconUrl"
+          class="user-flag-icon"
+          [src]="nationalityFlagIconUrl"
+          [alt]="nationality"
+          loading="lazy"
+        >
+        <span *ngIf="!nationalityFlagIconUrl" class="user-flag">{{ nationalityFlag }}</span>
+      </span>
     </div>
     <p class="user-status">{{ userStatus || ('HOME.DEFAULT_STATUS' | translate) }}</p>
     
