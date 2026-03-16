@@ -1,8 +1,4 @@
 <div class="tetris-container">
-  <div class="leaderboard-slot">
-    <app-game-leaderboard juego="TETRIS"></app-game-leaderboard>
-  </div>
-
   <div class="game-info">
     <h2>Tetris</h2>
     <div class="score">{{ 'GAMES.TETRIS.SCORE' | translate }}: {{ score }}</div>
@@ -37,5 +33,9 @@
       <p>{{ 'GAMES.TETRIS.SCORE' | translate }}: {{ score }}</p>
       <button (click)="restart()">{{ 'GAMES.RESTART' | translate }}</button>
     </div>
+  </div>
+
+  <div class="leaderboard-slot">
+    <app-game-leaderboard juego="TETRIS"></app-game-leaderboard>
   </div>
 </div>

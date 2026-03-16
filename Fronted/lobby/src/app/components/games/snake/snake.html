@@ -1,8 +1,4 @@
 <div class="snake-container">
-  <div class="leaderboard-slot">
-    <app-game-leaderboard juego="SNAKE"></app-game-leaderboard>
-  </div>
-
   <div class="game-info">
     <h2>Snake</h2>
     <div class="score">{{ 'GAMES.SNAKE.SCORE' | translate }}: {{ score }}</div>
@@ -40,5 +36,9 @@
       <p>{{ 'GAMES.SNAKE.HIGH_SCORE' | translate }}: {{ highScore }}</p>
       <button (click)="restart()">{{ 'GAMES.RESTART' | translate }}</button>
     </div>
+  </div>
+
+  <div class="leaderboard-slot">
+    <app-game-leaderboard juego="SNAKE"></app-game-leaderboard>
   </div>
 </div>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { PuntuacionResponse } from '../../../services/api.models';
 import { PuntuacionApiService } from '../../../services/puntuacion-api.service';
@@ -18,7 +18,10 @@ export class GameLeaderboardComponent implements OnInit, OnChanges {
   loading = false;
   ranking: PuntuacionResponse[] = [];
 
-  constructor(private puntuacionApiService: PuntuacionApiService) {}
+  constructor(
+    private puntuacionApiService: PuntuacionApiService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.loadRanking();
@@ -44,10 +47,12 @@ export class GameLeaderboardComponent implements OnInit, OnChanges {
       next: (rows) => {
         this.ranking = rows.slice(0, this.top);
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.ranking = [];
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }

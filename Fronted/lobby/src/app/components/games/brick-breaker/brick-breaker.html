@@ -1,8 +1,4 @@
 <div class="game-container">
-  <div class="leaderboard-slot">
-    <app-game-leaderboard juego="BRICK_BREAKER"></app-game-leaderboard>
-  </div>
-
   <div class="controls">
     <div class="control-group">
       <label>{{ 'GAMES.BRICK_BREAKER.SPEED' | translate }}: {{ speed }}</label>
@@ -18,4 +14,8 @@
     </div>
   </div>
   <canvas #gameCanvas width="480" height="320"></canvas>
+
+  <div class="leaderboard-slot">
+    <app-game-leaderboard juego="BRICK_BREAKER"></app-game-leaderboard>
+  </div>
 </div>
