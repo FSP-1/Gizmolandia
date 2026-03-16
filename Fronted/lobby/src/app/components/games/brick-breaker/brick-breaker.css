@@ -1,9 +1,17 @@
 .game-container {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 2rem;
   gap: 2rem;
+}
+
+.leaderboard-slot {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 8;
 }
 
 .controls {
@@ -41,4 +49,10 @@ canvas {
   background: #eee;
   border-radius: 10px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 900px) {
+  .leaderboard-slot {
+    position: static;
+  }
 }

@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, ElementRef, ViewChild, HostListener, Input, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
+import { GameLeaderboardComponent } from '../game-leaderboard/game-leaderboard';
 import { PuntuacionApiService } from '../../../services/puntuacion-api.service';
 
 type Direction = 'up' | 'down' | 'left' | 'right';
@@ -21,7 +22,7 @@ interface Fruit {
 @Component({
   selector: 'app-snake',
   standalone: true,
-  imports: [CommonModule, TranslateModule],
+  imports: [CommonModule, TranslateModule, GameLeaderboardComponent],
   templateUrl: './snake.html',
   styleUrls: ['./snake.css']
 })

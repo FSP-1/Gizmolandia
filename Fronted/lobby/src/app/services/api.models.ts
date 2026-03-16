@@ -4,6 +4,7 @@ export interface UsuarioRequest {
   nacionalidad: string;
   edad: number;
   foto: string;
+  password: string;
 }
 
 export interface UsuarioResponse {
@@ -26,10 +27,18 @@ export interface PuntuacionResponse {
   id: number;
   usuarioId: number;
   nombreUsuario: string;
+  fotoUsuario: string;
   juego: string;
   puntuacion: number;
   fechaPartida: string;
 }
+
+export interface LoginRequest {
+  nombre: string;
+  password: string;
+}
+
+export type LoginResponse = UsuarioResponse;
 
 export interface ApiValidationError {
   timestamp?: string;

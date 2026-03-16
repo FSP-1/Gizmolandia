@@ -51,6 +51,7 @@ public class PuntuacionServiceImpl implements PuntuacionService {
     public List<PuntuacionResponseDTO> rankingPorJuego(String juego) {
         return puntuacionRepository.findTopByJuego(juego)
                 .stream()
+                .limit(10)
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
@@ -60,6 +61,7 @@ public class PuntuacionServiceImpl implements PuntuacionService {
                 .id(p.getId())
                 .usuarioId(p.getUsuario().getId())
                 .nombreUsuario(p.getUsuario().getNombre())
+            .fotoUsuario(p.getUsuario().getFoto())
                 .juego(p.getJuego())
                 .puntuacion(p.getPuntuacion())
                 .fechaPartida(p.getFechaPartida())

@@ -37,7 +37,7 @@ public class Usuario {
 
     @NotBlank
     @Size(max = 100)
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 100, unique = true)
     private String nombre;
 
     @NotBlank
@@ -58,6 +58,11 @@ public class Usuario {
 
     @Column(columnDefinition = "MEDIUMTEXT")
     private String foto;
+
+    @NotBlank
+    @Size(min = 8, max = 100)
+    @Column(nullable = false, length = 100)
+    private String password;
 
     @Column(name = "fecha_registro", updatable = false)
     private LocalDateTime fechaRegistro;

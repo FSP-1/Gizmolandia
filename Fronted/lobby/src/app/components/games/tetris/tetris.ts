@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ElementRef, ViewChild, HostListener, ChangeDetectorRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
+import { GameLeaderboardComponent } from '../game-leaderboard/game-leaderboard';
 import { PuntuacionApiService } from '../../../services/puntuacion-api.service';
 
 interface Shape {
@@ -15,7 +16,7 @@ interface Shape {
 @Component({
   selector: 'app-tetris',
   standalone: true,
-  imports: [CommonModule, TranslateModule],
+  imports: [CommonModule, TranslateModule, GameLeaderboardComponent],
   templateUrl: './tetris.html',
   styleUrls: ['./tetris.css']
 })

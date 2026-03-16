@@ -8,6 +8,9 @@
   },
   "FORM": {
     "TITLE": "Registro de Usuario",
+    "LOGIN_TITLE": "Iniciar Sesión",
+    "MODE_REGISTER": "Registro",
+    "MODE_LOGIN": "Login",
     "USERNAME_LABEL": "Nombre de Usuario",
     "USERNAME_HINT": "Solo letras, números y guión bajo · 4-20 caracteres",
     "USERNAME_PLACEHOLDER": "ej. jugador_42",
@@ -19,9 +22,17 @@
     "AGE_LABEL": "Edad",
     "AGE_HINT": "Debes tener entre 15 y 100 años",
     "AGE_PLACEHOLDER": "ej. 25",
+    "PASSWORD_LABEL": "Contraseña",
+    "PASSWORD_HINT": "Mínimo 8, con mayúscula, minúscula, número y símbolo",
+    "PASSWORD_PLACEHOLDER": "Tu contraseña",
+    "CONFIRM_PASSWORD_LABEL": "Confirmar Contraseña",
+    "CONFIRM_PASSWORD_PLACEHOLDER": "Repite tu contraseña",
     "SUBMIT": "Registrar",
     "SUBMITTING": "Registrando...",
     "SUBMITTED": "✓ Registrado",
+    "LOGIN_SUBMIT": "Entrar",
+    "LOGIN_SUBMITTING": "Validando...",
+    "LOGIN_SUCCESS": "✓ Acceso concedido",
     "SUCCESS_TITLE": "¡Registro Exitoso!",
     "SUCCESS_MESSAGE": "Bienvenido, {{name}}",
     "ERRORS": {
@@ -36,6 +47,9 @@
       "AGE_REQUIRED": "La edad es obligatoria.",
       "AGE_MIN": "Debes tener al menos 15 años.",
       "AGE_MAX": "La edad no puede superar los 100 años.",
+      "PASSWORD_REQUIRED": "La contraseña es obligatoria.",
+      "PASSWORD_PATTERN": "Debe incluir mayúscula, minúscula, número y símbolo.",
+      "PASSWORD_MISMATCH": "Las contraseñas no coinciden.",
       "BACKEND_GENERIC": "No se pudo completar el registro. Intenta nuevamente."
     },
     "NATIONALITIES": {
@@ -63,6 +77,9 @@
   "GAMES": {
     "BACK": "← Volver",
     "TITLE": "Librería de Juegos",
+    "TOP_TITLE": "Top Jugadores",
+    "TOP_EMPTY": "Sin puntuaciones aún",
+    "TOP_REFRESH": "Actualizar",
     "GAME_OVER": "Game Over",
     "RESTART": "Reiniciar",
     "BRICK_BREAKER": {

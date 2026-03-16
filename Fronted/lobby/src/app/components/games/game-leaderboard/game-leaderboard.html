@@ -1,0 +1,21 @@
+<aside class="leaderboard">
+  <div class="leaderboard-header">
+    <h3>{{ 'GAMES.TOP_TITLE' | translate }}</h3>
+    <button type="button" class="refresh-btn" (click)="refresh()">{{ 'GAMES.TOP_REFRESH' | translate }}</button>
+  </div>
+
+  <div class="leaderboard-state" *ngIf="loading">{{ 'CUSTOMIZATION.LOADING' | translate }}</div>
+  <div class="leaderboard-state" *ngIf="!loading && ranking.length === 0">{{ 'GAMES.TOP_EMPTY' | translate }}</div>
+
+  <ul *ngIf="!loading && ranking.length > 0">
+    <li *ngFor="let item of ranking; let i = index" class="rank-row">
+      <span class="rank">#{{ i + 1 }}</span>
+      <div class="player">
+        <img *ngIf="item.fotoUsuario" [src]="item.fotoUsuario" [alt]="item.nombreUsuario" class="avatar" loading="lazy" />
+        <span *ngIf="!item.fotoUsuario" class="avatar placeholder">{{ initials(item.nombreUsuario) }}</span>
+        <span class="name">{{ item.nombreUsuario }}</span>
+      </div>
+      <span class="points">{{ item.puntuacion }}</span>
+    </li>
+  </ul>
+</aside>

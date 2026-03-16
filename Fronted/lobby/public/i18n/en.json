@@ -8,6 +8,9 @@
   },
   "FORM": {
     "TITLE": "User Registration",
+    "LOGIN_TITLE": "Sign In",
+    "MODE_REGISTER": "Register",
+    "MODE_LOGIN": "Login",
     "USERNAME_LABEL": "Username",
     "USERNAME_HINT": "Letters, numbers and underscore only · 4-20 characters",
     "USERNAME_PLACEHOLDER": "e.g. player_42",
@@ -19,9 +22,17 @@
     "AGE_LABEL": "Age",
     "AGE_HINT": "You must be between 15 and 100 years old",
     "AGE_PLACEHOLDER": "e.g. 25",
+    "PASSWORD_LABEL": "Password",
+    "PASSWORD_HINT": "At least 8 chars, upper, lower, number and symbol",
+    "PASSWORD_PLACEHOLDER": "Your password",
+    "CONFIRM_PASSWORD_LABEL": "Confirm Password",
+    "CONFIRM_PASSWORD_PLACEHOLDER": "Repeat your password",
     "SUBMIT": "Register",
     "SUBMITTING": "Registering...",
     "SUBMITTED": "✓ Registered",
+    "LOGIN_SUBMIT": "Sign In",
+    "LOGIN_SUBMITTING": "Checking...",
+    "LOGIN_SUCCESS": "✓ Access granted",
     "SUCCESS_TITLE": "Registration Successful!",
     "SUCCESS_MESSAGE": "Welcome, {{name}}",
     "ERRORS": {
@@ -36,6 +47,9 @@
       "AGE_REQUIRED": "Age is required.",
       "AGE_MIN": "You must be at least 15 years old.",
       "AGE_MAX": "Age cannot be greater than 100.",
+      "PASSWORD_REQUIRED": "Password is required.",
+      "PASSWORD_PATTERN": "Must include uppercase, lowercase, number and symbol.",
+      "PASSWORD_MISMATCH": "Passwords do not match.",
       "BACKEND_GENERIC": "Could not complete the registration. Please try again."
     },
     "NATIONALITIES": {
@@ -63,6 +77,9 @@
   "GAMES": {
     "BACK": "← Back",
     "TITLE": "Game Library",
+    "TOP_TITLE": "Top Players",
+    "TOP_EMPTY": "No scores yet",
+    "TOP_REFRESH": "Refresh",
     "GAME_OVER": "Game Over",
     "RESTART": "Restart",
     "BRICK_BREAKER": {

@@ -1,9 +1,17 @@
 .snake-container {
+  position: relative;
   display: flex;
   gap: 2rem;
   justify-content: center;
   align-items: flex-start;
   padding: 2rem;
+}
+
+.leaderboard-slot {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 8;
 }
 
 .game-info {
@@ -139,6 +147,11 @@ canvas:focus {
     flex-direction: column;
     align-items: center;
     padding: 1rem;
+  }
+
+  .leaderboard-slot {
+    position: static;
+    margin-bottom: 0.6rem;
   }
 
   .game-info {

@@ -1,10 +1,18 @@
 .tetris-container {
+  position: relative;
   display: flex;
   gap: 2rem;
   justify-content: center;
   align-items: flex-start;
   padding: 2rem;
   overflow: hidden;
+}
+
+.leaderboard-slot {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 8;
 }
 
 .game-info {
@@ -210,4 +218,17 @@ canvas:focus {
 .game-over-overlay button:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+}
+
+@media (max-width: 900px) {
+  .leaderboard-slot {
+    position: static;
+    margin-bottom: 0.8rem;
+  }
+
+  .tetris-container {
+    flex-direction: column;
+    align-items: center;
+    overflow: visible;
+  }
 }

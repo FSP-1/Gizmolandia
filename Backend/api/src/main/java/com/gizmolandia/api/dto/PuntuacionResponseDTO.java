@@ -15,6 +15,7 @@ public class PuntuacionResponseDTO {
     private Long id;
     private Long usuarioId;
     private String nombreUsuario;
+    private String fotoUsuario;
     private String juego;
     private Integer puntuacion;
     private LocalDateTime fechaPartida;

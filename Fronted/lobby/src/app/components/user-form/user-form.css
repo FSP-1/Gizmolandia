@@ -55,6 +55,34 @@
   animation: fadeUp 0.45s ease both;
 }
 
+.auth-mode-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 0.35rem;
+  margin-bottom: 1.2rem;
+}
+
+.auth-mode-btn {
+  border: 0;
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.4px;
+  color: #334155;
+  background: transparent;
+  cursor: pointer;
+}
+
+.auth-mode-btn.active {
+  background: #ffffff;
+  color: #4338ca;
+  box-shadow: 0 2px 10px rgba(67, 56, 202, 0.16);
+}
+
 /* =====================
    TITLE
    ===================== */

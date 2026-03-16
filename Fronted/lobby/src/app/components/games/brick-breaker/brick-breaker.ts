@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ElementRef, ViewChild, Input, ChangeDetec
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
+import { GameLeaderboardComponent } from '../game-leaderboard/game-leaderboard';
 
 interface Ball {
   x: number;
@@ -14,7 +15,7 @@ interface Ball {
 @Component({
   selector: 'app-brick-breaker',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, TranslateModule, GameLeaderboardComponent],
   templateUrl: './brick-breaker.html',
   styleUrls: ['./brick-breaker.css']
 })

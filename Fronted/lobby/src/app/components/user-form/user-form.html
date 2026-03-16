@@ -10,10 +10,27 @@
 
 <div *ngIf="!showHome" class="form-wrapper">
   <div class="form-container" [class.submitted]="submitted">
-    <h1 class="form-title">{{ 'FORM.TITLE' | translate }}</h1>
+    <div class="auth-mode-switch">
+      <button
+        type="button"
+        class="auth-mode-btn"
+        [class.active]="authMode === 'register'"
+        (click)="setAuthMode('register')">
+        {{ 'FORM.MODE_REGISTER' | translate }}
+      </button>
+      <button
+        type="button"
+        class="auth-mode-btn"
+        [class.active]="authMode === 'login'"
+        (click)="setAuthMode('login')">
+        {{ 'FORM.MODE_LOGIN' | translate }}
+      </button>
+    </div>
+
+    <h1 class="form-title">{{ (isRegisterMode() ? 'FORM.TITLE' : 'FORM.LOGIN_TITLE') | translate }}</h1>
     
     <form (ngSubmit)="onSubmit($event)" #userForm="ngForm">
-      <app-photo-upload (photoSelected)="onPhotoSelected($event)"></app-photo-upload>
+      <app-photo-upload *ngIf="isRegisterMode()" (photoSelected)="onPhotoSelected($event)"></app-photo-upload>
 
       <div class="form-group">
         <label for="nombre">
@@ -38,7 +55,7 @@
         </div>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" *ngIf="isRegisterMode()">
         <label for="userProfile">
           {{ 'FORM.DISPLAY_NAME_LABEL' | translate }}
           <span class="label-hint">{{ 'FORM.DISPLAY_NAME_HINT' | translate }}</span>
@@ -62,7 +79,7 @@
         </div>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" *ngIf="isRegisterMode()">
         <label for="nacionalidad">
           {{ 'FORM.NATIONALITY_LABEL' | translate }}
           <span class="label-hint">{{ 'FORM.NATIONALITY_HINT' | translate }}</span>
@@ -93,7 +110,7 @@
         </div>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" *ngIf="isRegisterMode()">
         <label for="edad">
           {{ 'FORM.AGE_LABEL' | translate }}
           <span class="label-hint">{{ 'FORM.AGE_HINT' | translate }}</span>
@@ -115,19 +132,56 @@
         </div>
       </div>
 
+      <div class="form-group">
+        <label for="password">
+          {{ 'FORM.PASSWORD_LABEL' | translate }}
+          <span class="label-hint">{{ 'FORM.PASSWORD_HINT' | translate }}</span>
+        </label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          [(ngModel)]="user.password"
+          required
+          minlength="8"
+          maxlength="50"
+          pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,50}$"
+          #password="ngModel"
+          [placeholder]="'FORM.PASSWORD_PLACEHOLDER' | translate">
+        <div class="error" *ngIf="password.invalid && password.touched">
+          <span *ngIf="password.errors?.['required']">{{ 'FORM.ERRORS.PASSWORD_REQUIRED' | translate }}</span>
+          <span *ngIf="password.errors?.['pattern']">{{ 'FORM.ERRORS.PASSWORD_PATTERN' | translate }}</span>
+        </div>
+      </div>
+
+      <div class="form-group" *ngIf="isRegisterMode()">
+        <label for="confirmPassword">{{ 'FORM.CONFIRM_PASSWORD_LABEL' | translate }}</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          name="confirmPassword"
+          [(ngModel)]="user.confirmPassword"
+          required
+          #confirmPassword="ngModel"
+          [placeholder]="'FORM.CONFIRM_PASSWORD_PLACEHOLDER' | translate">
+        <div class="error" *ngIf="(confirmPassword.touched || password.touched) && passwordMismatch()">
+          {{ 'FORM.ERRORS.PASSWORD_MISMATCH' | translate }}
+        </div>
+      </div>
+
       <div class="error api-error" *ngIf="apiError">{{ apiError }}</div>
 
-      <button type="submit" class="submit-btn" [disabled]="!userForm.valid || registering">
-        <span *ngIf="!registering && !submitted">{{ 'FORM.SUBMIT' | translate }}</span>
+      <button type="submit" class="submit-btn" [disabled]="!userForm.valid || registering || passwordMismatch()">
+        <span *ngIf="!registering && !submitted">{{ (isRegisterMode() ? 'FORM.SUBMIT' : 'FORM.LOGIN_SUBMIT') | translate }}</span>
         <span *ngIf="registering" class="loading-text">
           <span class="spinner-small"></span>
-          {{ 'FORM.SUBMITTING' | translate }}
+          {{ (isRegisterMode() ? 'FORM.SUBMITTING' : 'FORM.LOGIN_SUBMITTING') | translate }}
         </span>
-        <span *ngIf="submitted && !registering">{{ 'FORM.SUBMITTED' | translate }}</span>
+        <span *ngIf="submitted && !registering">{{ (isRegisterMode() ? 'FORM.SUBMITTED' : 'FORM.LOGIN_SUCCESS') | translate }}</span>
       </button>
     </form>
 
-    <div class="success-overlay" *ngIf="submitted">
+    <div class="success-overlay" *ngIf="submitted && isRegisterMode()">
       <div class="success-card">
         <div class="success-icon">
           <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
