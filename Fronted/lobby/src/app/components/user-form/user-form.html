@@ -6,7 +6,20 @@
   </select>
 </div>
 
-<app-home *ngIf="showHome" [userName]="user.nombre" [userProfile]="user.userProfile" [userPhoto]="user.foto" [nationality]="user.nacionalidad"></app-home>
+<app-home
+  *ngIf="showHome"
+  [userId]="currentUserId"
+  [userName]="user.nombre"
+  [userProfile]="user.userProfile"
+  [userPhoto]="user.foto"
+  [nationality]="user.nacionalidad"
+  [initialBackgroundColor]="currentUser?.homeBackgroundColor || ''"
+  [initialLeftImage]="currentUser?.homeLeftImage || ''"
+  [initialRightImage]="currentUser?.homeRightImage || ''"
+  [initialUserStatus]="currentUser?.homeStatus || ''"
+  [initialNameColor]="currentUser?.homeNameColor || ''"
+  [initialLanguage]="currentUser?.preferredLanguage || ''">
+</app-home>
 
 <div *ngIf="!showHome" class="form-wrapper">
   <div class="form-container" [class.submitted]="submitted">

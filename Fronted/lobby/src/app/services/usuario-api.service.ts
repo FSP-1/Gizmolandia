@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from './api.config';
-import { UsuarioRequest, UsuarioResponse } from './api.models';
+import { UsuarioPersonalizacionRequest, UsuarioRequest, UsuarioResponse } from './api.models';
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioApiService {
@@ -20,5 +20,9 @@ export class UsuarioApiService {
 
   buscarPorPerfil(userProfile: string): Observable<UsuarioResponse> {
     return this.http.get<UsuarioResponse>(`${this.baseUrl}/perfil/${encodeURIComponent(userProfile)}`);
+  }
+
+  guardarPersonalizacion(usuarioId: number, payload: UsuarioPersonalizacionRequest): Observable<UsuarioResponse> {
+    return this.http.patch<UsuarioResponse>(`${this.baseUrl}/${usuarioId}/personalizacion`, payload);
   }
 }

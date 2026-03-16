@@ -5,7 +5,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PhotoUploadComponent } from '../photo-upload/photo-upload';
 import { HomeComponent } from '../home/home';
-import { ApiValidationError, UsuarioRequest } from '../../services/api.models';
+import { ApiValidationError, UsuarioRequest, UsuarioResponse } from '../../services/api.models';
 import { AuthApiService } from '../../services/auth-api.service';
 import { UsuarioApiService } from '../../services/usuario-api.service';
 
@@ -18,6 +18,8 @@ import { UsuarioApiService } from '../../services/usuario-api.service';
 })
 export class UserFormComponent {
   authMode: 'register' | 'login' = 'register';
+  currentUserId: number | null = null;
+  currentUser: UsuarioResponse | null = null;
 
   user = {
     nombre: '',
@@ -160,14 +162,9 @@ export class UserFormComponent {
     this.apiError = '';
   }
 
-  private persistUserSession(usuario: {
-    id: number;
-    nombre: string;
-    userProfile: string;
-    nacionalidad: string;
-    edad: number;
-    foto: string;
-  }) {
+  private persistUserSession(usuario: UsuarioResponse) {
+    this.currentUserId = usuario.id;
+    this.currentUser = usuario;
     localStorage.setItem('usuarioId', String(usuario.id));
     localStorage.setItem('tetrisUsername', usuario.nombre);
     localStorage.setItem('tetrisProfile', usuario.userProfile);

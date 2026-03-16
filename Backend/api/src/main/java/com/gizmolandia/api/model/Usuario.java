@@ -64,6 +64,24 @@ public class Usuario {
     @Column(nullable = false, length = 100)
     private String password;
 
+    @Column(name = "home_background_color", length = 20)
+    private String homeBackgroundColor;
+
+    @Column(name = "home_left_image", columnDefinition = "MEDIUMTEXT")
+    private String homeLeftImage;
+
+    @Column(name = "home_right_image", columnDefinition = "MEDIUMTEXT")
+    private String homeRightImage;
+
+    @Column(name = "home_status", length = 80)
+    private String homeStatus;
+
+    @Column(name = "home_name_color", length = 20)
+    private String homeNameColor;
+
+    @Column(name = "preferred_language", length = 5)
+    private String preferredLanguage;
+
     @Column(name = "fecha_registro", updatable = false)
     private LocalDateTime fechaRegistro;
 

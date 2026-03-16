@@ -18,5 +18,11 @@ public class UsuarioResponseDTO {
     private String nacionalidad;
     private Integer edad;
     private String foto;
+    private String homeBackgroundColor;
+    private String homeLeftImage;
+    private String homeRightImage;
+    private String homeStatus;
+    private String homeNameColor;
+    private String preferredLanguage;
     private LocalDateTime fechaRegistro;
 }

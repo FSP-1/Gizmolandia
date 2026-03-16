@@ -1,5 +1,6 @@
 package com.gizmolandia.api.controller;
 
+import com.gizmolandia.api.dto.UsuarioPersonalizacionDTO;
 import com.gizmolandia.api.dto.UsuarioRequestDTO;
 import com.gizmolandia.api.dto.UsuarioResponseDTO;
 import com.gizmolandia.api.service.UsuarioService;
@@ -48,6 +49,13 @@ public class UsuarioController {
             @PathVariable Long id,
             @Valid @RequestBody UsuarioRequestDTO dto) {
         return ResponseEntity.ok(usuarioService.actualizar(id, dto));
+    }
+
+    @PatchMapping("/{id}/personalizacion")
+    public ResponseEntity<UsuarioResponseDTO> actualizarPersonalizacion(
+            @PathVariable Long id,
+            @Valid @RequestBody UsuarioPersonalizacionDTO dto) {
+        return ResponseEntity.ok(usuarioService.actualizarPersonalizacion(id, dto));
     }
 
     // DELETE /api/usuarios/{id}  → eliminar usuario

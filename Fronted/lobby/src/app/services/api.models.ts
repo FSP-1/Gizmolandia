@@ -7,6 +7,16 @@ export interface UsuarioRequest {
   password: string;
 }
 
+export interface UsuarioPersonalizacionRequest {
+  backgroundColor: string;
+  leftImage: string;
+  rightImage: string;
+  userStatus: string;
+  nameColor: string;
+  language: 'es' | 'en';
+  profileImage: string;
+}
+
 export interface UsuarioResponse {
   id: number;
   nombre: string;
@@ -14,6 +24,12 @@ export interface UsuarioResponse {
   nacionalidad: string;
   edad: number;
   foto: string;
+  homeBackgroundColor?: string;
+  homeLeftImage?: string;
+  homeRightImage?: string;
+  homeStatus?: string;
+  homeNameColor?: string;
+  preferredLanguage?: 'es' | 'en';
   fechaRegistro: string;
 }
 

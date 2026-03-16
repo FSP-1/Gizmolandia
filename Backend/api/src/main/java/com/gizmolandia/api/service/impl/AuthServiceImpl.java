@@ -35,6 +35,12 @@ public class AuthServiceImpl implements AuthService {
                 .nacionalidad(usuario.getNacionalidad())
                 .edad(usuario.getEdad())
                 .foto(usuario.getFoto())
+            .homeBackgroundColor(usuario.getHomeBackgroundColor())
+            .homeLeftImage(usuario.getHomeLeftImage())
+            .homeRightImage(usuario.getHomeRightImage())
+            .homeStatus(usuario.getHomeStatus())
+            .homeNameColor(usuario.getHomeNameColor())
+            .preferredLanguage(usuario.getPreferredLanguage())
                 .fechaRegistro(usuario.getFechaRegistro())
                 .build();
     }

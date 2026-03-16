@@ -1,5 +1,6 @@
 package com.gizmolandia.api.service.impl;
 
+import com.gizmolandia.api.dto.UsuarioPersonalizacionDTO;
 import com.gizmolandia.api.dto.UsuarioRequestDTO;
 import com.gizmolandia.api.dto.UsuarioResponseDTO;
 import com.gizmolandia.api.exception.ResourceNotFoundException;
@@ -91,6 +92,31 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    public UsuarioResponseDTO actualizarPersonalizacion(Long id, UsuarioPersonalizacionDTO dto) {
+        String language = dto.getLanguage();
+        if (language == null || language.isBlank()) {
+            language = "es";
+        }
+
+        int updated = usuarioRepository.updatePersonalizacion(
+                id,
+                dto.getBackgroundColor(),
+                dto.getLeftImage(),
+                dto.getRightImage(),
+                dto.getUserStatus(),
+                dto.getNameColor(),
+                language,
+                dto.getProfileImage()
+        );
+
+        if (updated == 0) {
+            throw new ResourceNotFoundException("Usuario no encontrado con id: " + id);
+        }
+
+        return toDTO(findOrThrow(id));
+    }
+
+    @Override
     public void eliminar(Long id) {
         findOrThrow(id);
         usuarioRepository.deleteById(id);
@@ -110,6 +136,12 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .nacionalidad(u.getNacionalidad())
                 .edad(u.getEdad())
                 .foto(u.getFoto())
+                .homeBackgroundColor(u.getHomeBackgroundColor())
+                .homeLeftImage(u.getHomeLeftImage())
+                .homeRightImage(u.getHomeRightImage())
+                .homeStatus(u.getHomeStatus())
+                .homeNameColor(u.getHomeNameColor())
+                .preferredLanguage(u.getPreferredLanguage())
                 .fechaRegistro(u.getFechaRegistro())
                 .build();
     }
