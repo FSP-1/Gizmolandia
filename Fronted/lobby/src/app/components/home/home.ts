@@ -108,6 +108,24 @@ export class HomeComponent implements OnInit, OnChanges {
     return `https://flagcdn.com/w40/${code}.png`;
   }
 
+  get homeWrapperStyles(): Record<string, string> {
+    const theme = this.getButtonTheme(this.backgroundColor);
+
+    return {
+      'background-color': this.backgroundColor,
+      '--home-btn-text': theme.text,
+      '--home-btn-border': theme.border,
+      '--customize-btn-start': theme.customizeStart,
+      '--customize-btn-end': theme.customizeEnd,
+      '--customize-btn-shadow': theme.customizeShadow,
+      '--customize-btn-shadow-hover': theme.customizeShadowHover,
+      '--games-btn-start': theme.gamesStart,
+      '--games-btn-end': theme.gamesEnd,
+      '--games-btn-shadow': theme.gamesShadow,
+      '--games-btn-shadow-hover': theme.gamesShadowHover
+    };
+  }
+
   toggleCustomization() {
     if (!this.showCustomization) {
       this.customizationSnapshot = {
@@ -201,5 +219,110 @@ export class HomeComponent implements OnInit, OnChanges {
       localStorage.setItem('appLanguage', this.currentLanguage);
       this.translate.use(this.currentLanguage);
     }
+  }
+
+  private getButtonTheme(background: string): {
+    text: string;
+    border: string;
+    customizeStart: string;
+    customizeEnd: string;
+    customizeShadow: string;
+    customizeShadowHover: string;
+    gamesStart: string;
+    gamesEnd: string;
+    gamesShadow: string;
+    gamesShadowHover: string;
+  } {
+    const rgb = this.parseColor(background) ?? { r: 102, g: 126, b: 234 };
+    const luminance = this.relativeLuminance(rgb);
+    const isLightBackground = luminance > 0.55;
+
+    if (isLightBackground) {
+      return {
+        text: '#f8fafc',
+        border: 'rgba(255, 255, 255, 0.18)',
+        customizeStart: '#1f2937',
+        customizeEnd: '#0f172a',
+        customizeShadow: '0 5px 20px rgba(15, 23, 42, 0.45)',
+        customizeShadowHover: '0 8px 30px rgba(15, 23, 42, 0.62)',
+        gamesStart: '#374151',
+        gamesEnd: '#111827',
+        gamesShadow: '0 5px 20px rgba(17, 24, 39, 0.45)',
+        gamesShadowHover: '0 8px 30px rgba(17, 24, 39, 0.62)'
+      };
+    }
+
+    return {
+      text: '#0f172a',
+      border: 'rgba(15, 23, 42, 0.2)',
+      customizeStart: '#f8fafc',
+      customizeEnd: '#dbeafe',
+      customizeShadow: '0 5px 20px rgba(248, 250, 252, 0.32)',
+      customizeShadowHover: '0 8px 30px rgba(248, 250, 252, 0.46)',
+      gamesStart: '#fef3c7',
+      gamesEnd: '#fed7aa',
+      gamesShadow: '0 5px 20px rgba(254, 243, 199, 0.35)',
+      gamesShadowHover: '0 8px 30px rgba(254, 243, 199, 0.5)'
+    };
+  }
+
+  private parseColor(color: string): { r: number; g: number; b: number } | null {
+    const value = (color || '').trim();
+    if (!value) {
+      return null;
+    }
+
+    if (value.startsWith('#')) {
+      return this.parseHexColor(value);
+    }
+
+    const rgbMatch = value.match(/^rgba?\((\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*(?:\d*\.?\d+))?\)$/i);
+    if (!rgbMatch) {
+      return null;
+    }
+
+    return {
+      r: this.clampChannel(Number(rgbMatch[1])),
+      g: this.clampChannel(Number(rgbMatch[2])),
+      b: this.clampChannel(Number(rgbMatch[3]))
+    };
+  }
+
+  private parseHexColor(hex: string): { r: number; g: number; b: number } | null {
+    const normalized = hex.replace('#', '').trim();
+    if (normalized.length === 3) {
+      const r = Number.parseInt(normalized[0] + normalized[0], 16);
+      const g = Number.parseInt(normalized[1] + normalized[1], 16);
+      const b = Number.parseInt(normalized[2] + normalized[2], 16);
+      return { r, g, b };
+    }
+
+    if (normalized.length === 6) {
+      const r = Number.parseInt(normalized.slice(0, 2), 16);
+      const g = Number.parseInt(normalized.slice(2, 4), 16);
+      const b = Number.parseInt(normalized.slice(4, 6), 16);
+      return { r, g, b };
+    }
+
+    return null;
+  }
+
+  private clampChannel(value: number): number {
+    return Math.max(0, Math.min(255, Math.round(value)));
+  }
+
+  private relativeLuminance(rgb: { r: number; g: number; b: number }): number {
+    const r = this.channelToLinear(rgb.r);
+    const g = this.channelToLinear(rgb.g);
+    const b = this.channelToLinear(rgb.b);
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  }
+
+  private channelToLinear(channel: number): number {
+    const c = channel / 255;
+    if (c <= 0.03928) {
+      return c / 12.92;
+    }
+    return Math.pow((c + 0.055) / 1.055, 2.4);
   }
 }

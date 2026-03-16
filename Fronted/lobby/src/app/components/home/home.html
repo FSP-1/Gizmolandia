@@ -1,6 +1,6 @@
 <app-games *ngIf="showGames" [userPhoto]="userPhoto" (backToHome)="toggleGames()"></app-games>
 
-<div *ngIf="!showGames" class="home-wrapper" [style.background-color]="backgroundColor" [class.has-left-image]="!!leftImage" [class.has-right-image]="!!rightImage">
+<div *ngIf="!showGames" class="home-wrapper" [ngStyle]="homeWrapperStyles" [class.has-left-image]="!!leftImage" [class.has-right-image]="!!rightImage">
   <div class="side-image left" *ngIf="leftImage">
     <img [src]="leftImage" alt="Left decoration">
   </div>
