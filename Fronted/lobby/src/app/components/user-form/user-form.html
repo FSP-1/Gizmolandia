@@ -115,6 +115,8 @@
         </div>
       </div>
 
+      <div class="error api-error" *ngIf="apiError">{{ apiError }}</div>
+
       <button type="submit" class="submit-btn" [disabled]="!userForm.valid || registering">
         <span *ngIf="!registering && !submitted">{{ 'FORM.SUBMIT' | translate }}</span>
         <span *ngIf="registering" class="loading-text">

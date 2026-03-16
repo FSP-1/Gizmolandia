@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ElementRef, ViewChild, HostListener, ChangeDetectorRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
+import { PuntuacionApiService } from '../../../services/puntuacion-api.service';
 
 interface Shape {
   x: number;
@@ -34,6 +35,7 @@ export class TetrisComponent implements OnInit, OnDestroy {
   private lastMoveTime = 0;
   private lastComboTime = 0;
   private comboThreshold = 3000; // 3 segundos entre líneas para mantener combo
+  private scorePersisted = false;
   
   score = 0;
   gameOver = false;
@@ -59,7 +61,10 @@ export class TetrisComponent implements OnInit, OnDestroy {
 
   private colors = ['#000', '#00f0f0', '#0000f0', '#f0a000', '#f0f000', '#00f000', '#a000f0', '#f00000', '#808080', '#a05020', '#f0a0f0'];
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private puntuacionApiService: PuntuacionApiService
+  ) {}
 
   ngOnInit() {
     const canvas = this.canvasRef.nativeElement;
@@ -113,6 +118,7 @@ export class TetrisComponent implements OnInit, OnDestroy {
   startGame() {
     this.isStarted = true;
     this.gameOver = false;
+    this.scorePersisted = false;
     this.score = 0;
     this.combo = 0;
     this.linesCleared = 0;
@@ -297,6 +303,7 @@ export class TetrisComponent implements OnInit, OnDestroy {
       this.gameOver = true;
       this.isStarted = false;
       this.saveHighScore();
+      this.persistScoreIfPossible('TETRIS');
     }
     
     this.cdr.markForCheck();
@@ -412,6 +419,33 @@ export class TetrisComponent implements OnInit, OnDestroy {
       cancelAnimationFrame(this.animationId);
     }
     this.startGame();
+  }
+
+  private persistScoreIfPossible(juego: 'SNAKE' | 'TETRIS' | 'BRICK_BREAKER'): void {
+    if (this.scorePersisted || this.score <= 0) {
+      return;
+    }
+
+    const usuarioIdRaw = localStorage.getItem('usuarioId');
+    if (!usuarioIdRaw) {
+      return;
+    }
+
+    const usuarioId = Number(usuarioIdRaw);
+    if (!Number.isFinite(usuarioId) || usuarioId <= 0) {
+      return;
+    }
+
+    this.scorePersisted = true;
+    this.puntuacionApiService.guardarPuntuacion({
+      usuarioId,
+      juego,
+      puntuacion: this.score
+    }).subscribe({
+      error: () => {
+        this.scorePersisted = false;
+      }
+    });
   }
   
   getComboDisplay(): string {

@@ -1,9 +1,12 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PhotoUploadComponent } from '../photo-upload/photo-upload';
 import { HomeComponent } from '../home/home';
+import { ApiValidationError, UsuarioRequest } from '../../services/api.models';
+import { UsuarioApiService } from '../../services/usuario-api.service';
 
 @Component({
   selector: 'app-user-form',
@@ -25,10 +28,12 @@ export class UserFormComponent {
   showHome = false;
   registering = false;
   currentLanguage = 'es';
+  apiError = '';
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private usuarioApiService: UsuarioApiService
   ) {
     const browserLang = this.translate.getBrowserLang();
     const savedLang = localStorage.getItem('appLanguage');
@@ -52,24 +57,41 @@ export class UserFormComponent {
 
   onSubmit(event: Event) {
     event.preventDefault();
+    this.apiError = '';
     this.registering = true;
     this.cdr.detectChanges();
-    console.log('Usuario registrado:', this.user);
-    // Guardar usuario en localStorage
-    localStorage.setItem('tetrisUsername', this.user.nombre);
-    localStorage.setItem('tetrisProfile', this.user.userProfile);
-    localStorage.setItem('tetrisNationality', this.user.nacionalidad);
-    localStorage.setItem('tetrisAge', String(this.user.edad));
-    setTimeout(() => {
-      this.registering = false;
-      this.submitted = true;
-      this.cdr.detectChanges();
-      setTimeout(() => {
-        this.submitted = false;
-        this.showHome = true;
+
+    const payload: UsuarioRequest = {
+      nombre: this.user.nombre,
+      userProfile: this.user.userProfile,
+      nacionalidad: this.user.nacionalidad,
+      edad: this.user.edad ?? 0,
+      foto: this.user.foto || ''
+    };
+
+    this.usuarioApiService.crearUsuario(payload).subscribe({
+      next: (usuarioCreado) => {
+        localStorage.setItem('usuarioId', String(usuarioCreado.id));
+        localStorage.setItem('tetrisUsername', usuarioCreado.nombre);
+        localStorage.setItem('tetrisProfile', usuarioCreado.userProfile);
+        localStorage.setItem('tetrisNationality', usuarioCreado.nacionalidad);
+        localStorage.setItem('tetrisAge', String(usuarioCreado.edad));
+
+        this.registering = false;
+        this.submitted = true;
         this.cdr.detectChanges();
-      }, 2000);
-    }, 1500);
+        setTimeout(() => {
+          this.submitted = false;
+          this.showHome = true;
+          this.cdr.detectChanges();
+        }, 1400);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.registering = false;
+        this.apiError = this.buildApiErrorMessage(error);
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   resetForm() {
@@ -80,5 +102,26 @@ export class UserFormComponent {
       edad: null,
       foto: ''
     };
+    this.apiError = '';
+  }
+
+  private buildApiErrorMessage(error: HttpErrorResponse): string {
+    if (!error.error) {
+      return this.translate.instant('FORM.ERRORS.BACKEND_GENERIC');
+    }
+
+    const apiError = error.error as ApiValidationError;
+    if (apiError.errores) {
+      const firstKey = Object.keys(apiError.errores)[0];
+      if (firstKey && apiError.errores[firstKey]) {
+        return apiError.errores[firstKey];
+      }
+    }
+
+    if (apiError.mensaje) {
+      return apiError.mensaje;
+    }
+
+    return this.translate.instant('FORM.ERRORS.BACKEND_GENERIC');
   }
 }

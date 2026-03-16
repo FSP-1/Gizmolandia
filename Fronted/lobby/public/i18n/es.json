@@ -35,7 +35,8 @@
       "NATIONALITY_REQUIRED": "La nacionalidad es obligatoria.",
       "AGE_REQUIRED": "La edad es obligatoria.",
       "AGE_MIN": "Debes tener al menos 15 años.",
-      "AGE_MAX": "La edad no puede superar los 100 años."
+      "AGE_MAX": "La edad no puede superar los 100 años.",
+      "BACKEND_GENERIC": "No se pudo completar el registro. Intenta nuevamente."
     },
     "NATIONALITIES": {
       "SELECT": "Selecciona una nacionalidad",

@@ -35,7 +35,8 @@
       "NATIONALITY_REQUIRED": "Nationality is required.",
       "AGE_REQUIRED": "Age is required.",
       "AGE_MIN": "You must be at least 15 years old.",
-      "AGE_MAX": "Age cannot be greater than 100."
+      "AGE_MAX": "Age cannot be greater than 100.",
+      "BACKEND_GENERIC": "Could not complete the registration. Please try again."
     },
     "NATIONALITIES": {
       "SELECT": "Select a nationality",

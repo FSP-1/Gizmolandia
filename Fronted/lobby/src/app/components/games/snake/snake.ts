@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, ElementRef, ViewChild, HostListener, Input, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
+import { PuntuacionApiService } from '../../../services/puntuacion-api.service';
 
 type Direction = 'up' | 'down' | 'left' | 'right';
 
@@ -41,6 +42,7 @@ export class SnakeComponent implements OnInit, OnDestroy {
   private snake: Cell[] = [];
   private fruit!: Fruit;
   private profileImage: HTMLImageElement | null = null;
+  private scorePersisted = false;
 
   score = 0;
   highScore = 0;
@@ -61,7 +63,10 @@ export class SnakeComponent implements OnInit, OnDestroy {
     this.draw();
   }
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private puntuacionApiService: PuntuacionApiService
+  ) {}
 
   ngOnDestroy(): void {
     if (this.animationId) {
@@ -110,6 +115,7 @@ export class SnakeComponent implements OnInit, OnDestroy {
     this.resetState();
     this.isStarted = true;
     this.gameOver = false;
+    this.scorePersisted = false;
     this.lastTick = 0;
 
     setTimeout(() => {
@@ -214,6 +220,7 @@ export class SnakeComponent implements OnInit, OnDestroy {
       this.gameOver = true;
       this.isStarted = false;
       this.saveHighScore();
+      this.persistScoreIfPossible('SNAKE');
       this.cdr.markForCheck();
       return;
     }
@@ -283,6 +290,33 @@ export class SnakeComponent implements OnInit, OnDestroy {
     this.drawBoard();
     this.drawFruit();
     this.drawSnake();
+  }
+
+  private persistScoreIfPossible(juego: 'SNAKE' | 'TETRIS' | 'BRICK_BREAKER'): void {
+    if (this.scorePersisted || this.score <= 0) {
+      return;
+    }
+
+    const usuarioIdRaw = localStorage.getItem('usuarioId');
+    if (!usuarioIdRaw) {
+      return;
+    }
+
+    const usuarioId = Number(usuarioIdRaw);
+    if (!Number.isFinite(usuarioId) || usuarioId <= 0) {
+      return;
+    }
+
+    this.scorePersisted = true;
+    this.puntuacionApiService.guardarPuntuacion({
+      usuarioId,
+      juego,
+      puntuacion: this.score
+    }).subscribe({
+      error: () => {
+        this.scorePersisted = false;
+      }
+    });
   }
 
   private drawBoard(): void {
