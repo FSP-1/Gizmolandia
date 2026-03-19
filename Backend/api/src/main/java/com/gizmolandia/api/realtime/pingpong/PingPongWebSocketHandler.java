@@ -23,9 +23,8 @@ public class PingPongWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         URI uri = session.getUri();
-        String room = queryParam(uri, "room", "public");
         String player = queryParam(uri, "player", "Jugador");
-        pingPongRealtimeService.connect(session, room, player);
+        pingPongRealtimeService.connect(session, player);
     }
 
     @Override
@@ -39,7 +38,12 @@ public class PingPongWebSocketHandler extends TextWebSocketHandler {
         }
 
         if ("restart".equals(type)) {
-            pingPongRealtimeService.onRestart(session);
+            pingPongRealtimeService.onRematchDecision(session, true);
+            return;
+        }
+
+        if ("rematch".equals(type)) {
+            pingPongRealtimeService.onRematchDecision(session, node.path("accept").asBoolean(false));
         }
     }
 

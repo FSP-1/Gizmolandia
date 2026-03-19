@@ -125,18 +125,24 @@
       "MODE": "Modo",
       "VS_BOT": "Vs Bot",
       "VS_USER": "Vs Usuario",
+      "ROOMS_USED": "salas usadas",
+      "QUEUE": "en cola",
+      "QUEUE_POSITION": "Posicion en cola",
       "BOT_LEVEL": "Dificultad del bot",
       "EASY": "Facil",
       "MEDIUM": "Medio",
       "HARD": "Dificil",
       "START_BOT": "Iniciar vs Bot",
-      "ROOM": "Sala",
+      "FIND_MATCH": "Buscar partida",
       "CONNECT": "Conectar",
       "DISCONNECT": "Desconectar",
       "YOUR_SIDE": "Tu lado",
       "CONTROLS": "Controles",
       "CONTROLS_ARROWS": "Flechas arriba/abajo para mover",
-      "CONTROLS_MOUSE": "Mueve el mouse sobre la cancha"
+      "CONTROLS_MOUSE": "Mueve el mouse sobre la cancha",
+      "REMATCH_PROMPT": "Quieres revancha con este jugador?",
+      "REMATCH_YES": "Si, revancha",
+      "REMATCH_NO": "No, buscar otro"
     }
   },
   "CUSTOMIZATION": {

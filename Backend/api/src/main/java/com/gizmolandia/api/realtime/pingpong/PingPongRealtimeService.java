@@ -9,6 +9,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,6 +20,9 @@ import java.util.concurrent.ThreadLocalRandom;
 public class PingPongRealtimeService {
 
     private static final int TARGET_SCORE = 7;
+    private static final int TOTAL_ROOMS = 10;
+    private static final int MAX_QUEUE = 20;
+
     private static final double PADDLE_HALF_HEIGHT = 0.12;
     private static final double BALL_RADIUS = 0.015;
     private static final double LEFT_PADDLE_X = 0.03;
@@ -26,87 +30,62 @@ public class PingPongRealtimeService {
 
     private final ObjectMapper objectMapper;
 
-    private final Map<String, RoomState> rooms = new ConcurrentHashMap<>();
+    private final Object matchmakingLock = new Object();
+    private final Map<Integer, RoomState> rooms = new ConcurrentHashMap<>();
+    private final ArrayDeque<QueuedPlayer> waitingQueue = new ArrayDeque<>();
     private final Map<String, SessionRef> sessionsById = new ConcurrentHashMap<>();
     private final Map<String, WebSocketSession> rawSessions = new ConcurrentHashMap<>();
 
-    public void connect(WebSocketSession session, String roomId, String playerName) throws IOException {
-        String normalizedRoomId = normalizeRoomId(roomId);
+    public void connect(WebSocketSession session, String playerName) {
         String normalizedPlayerName = normalizePlayerName(playerName);
         rawSessions.put(session.getId(), session);
 
-        RoomState room = rooms.computeIfAbsent(normalizedRoomId, RoomState::new);
-        Side assignedSide;
+        synchronized (matchmakingLock) {
+            ensureRooms();
+            if (!assignSessionToAvailableSlot(session.getId(), normalizedPlayerName)) {
+                if (waitingQueue.size() >= MAX_QUEUE) {
+                    sendSimple(session.getId(), "queue_full", Map.of("maxQueue", MAX_QUEUE));
+                    closeSilently(session.getId());
+                    return;
+                }
 
-        synchronized (room.lock) {
-            if (room.leftSessionId == null) {
-                room.leftSessionId = session.getId();
-                room.leftPlayer = normalizedPlayerName;
-                assignedSide = Side.LEFT;
-            } else if (room.rightSessionId == null) {
-                room.rightSessionId = session.getId();
-                room.rightPlayer = normalizedPlayerName;
-                assignedSide = Side.RIGHT;
-            } else {
-                session.close();
-                rawSessions.remove(session.getId());
-                return;
+                waitingQueue.addLast(new QueuedPlayer(session.getId(), normalizedPlayerName));
+                sendQueuePosition(session.getId());
             }
 
-            sessionsById.put(session.getId(), new SessionRef(room.id, assignedSide));
-            room.lastTickNanos = System.nanoTime();
-
-            if (room.hasBothPlayers() && !"PLAYING".equals(room.status)) {
-                room.status = "PLAYING";
-                room.winner = "";
-                resetBall(room, randomDirection());
-            }
+            pushQueueUpdates();
+            broadcastLobbyToAll();
         }
-
-        broadcastRoom(room.id);
     }
 
     public void disconnect(WebSocketSession session) {
         rawSessions.remove(session.getId());
-        SessionRef ref = sessionsById.remove(session.getId());
-        if (ref == null) {
-            return;
-        }
 
-        RoomState room = rooms.get(ref.roomId());
-        if (room == null) {
-            return;
-        }
-
-        boolean deleteRoom = false;
-        synchronized (room.lock) {
-            if (ref.side() == Side.LEFT && session.getId().equals(room.leftSessionId)) {
-                room.leftSessionId = null;
-                room.leftPlayer = "";
-            }
-            if (ref.side() == Side.RIGHT && session.getId().equals(room.rightSessionId)) {
-                room.rightSessionId = null;
-                room.rightPlayer = "";
+        synchronized (matchmakingLock) {
+            if (removeQueuedSession(session.getId())) {
+                pushQueueUpdates();
+                broadcastLobbyToAll();
+                return;
             }
 
-            room.status = "WAITING";
-            room.winner = "";
-            room.ballX = 0.5;
-            room.ballY = 0.5;
-            room.ballVX = 0;
-            room.ballVY = 0;
-
-            if (!room.hasAnyPlayer()) {
-                deleteRoom = true;
+            SessionRef ref = sessionsById.remove(session.getId());
+            if (ref == null) {
+                broadcastLobbyToAll();
+                return;
             }
-        }
 
-        if (deleteRoom) {
-            rooms.remove(room.id);
-            return;
-        }
+            RoomState room = rooms.get(ref.roomIndex());
+            if (room == null) {
+                broadcastLobbyToAll();
+                return;
+            }
 
-        broadcastRoom(room.id);
+            removePlayerFromRoom(room, ref.side());
+            fillEmptySlotsFromQueue();
+            broadcastRoom(room.index);
+            pushQueueUpdates();
+            broadcastLobbyToAll();
+        }
     }
 
     public void onPaddle(WebSocketSession session, double y) {
@@ -115,52 +94,70 @@ public class PingPongRealtimeService {
             return;
         }
 
-        RoomState room = rooms.get(ref.roomId());
+        RoomState room = rooms.get(ref.roomIndex());
         if (room == null) {
             return;
         }
 
         double clamped = clamp(y, PADDLE_HALF_HEIGHT, 1 - PADDLE_HALF_HEIGHT);
+
         synchronized (room.lock) {
             if (ref.side() == Side.LEFT) {
                 room.leftPaddleY = clamped;
-            } else if (ref.side() == Side.RIGHT) {
+            } else {
                 room.rightPaddleY = clamped;
             }
         }
     }
 
-    public void onRestart(WebSocketSession session) {
+    public void onRematchDecision(WebSocketSession session, boolean accept) {
         SessionRef ref = sessionsById.get(session.getId());
         if (ref == null) {
             return;
         }
 
-        RoomState room = rooms.get(ref.roomId());
-        if (room == null) {
-            return;
-        }
-
-        synchronized (room.lock) {
-            if (!room.hasBothPlayers()) {
+        synchronized (matchmakingLock) {
+            RoomState room = rooms.get(ref.roomIndex());
+            if (room == null) {
                 return;
             }
 
-            room.leftScore = 0;
-            room.rightScore = 0;
-            room.winner = "";
-            room.status = "PLAYING";
-            resetBall(room, randomDirection());
-        }
+            synchronized (room.lock) {
+                if (!"FINISHED".equals(room.status)) {
+                    return;
+                }
 
-        broadcastRoom(room.id);
+                if (!accept) {
+                    String kickedSessionId = ref.side() == Side.LEFT ? room.leftSessionId : room.rightSessionId;
+                    removePlayerFromRoom(room, ref.side());
+                    sendSimple(kickedSessionId, "kicked", Map.of("reason", "rematch_declined"));
+                    closeSilently(kickedSessionId);
+                    sessionsById.remove(kickedSessionId);
+                } else {
+                    if (ref.side() == Side.LEFT) {
+                        room.leftRematch = true;
+                    } else {
+                        room.rightRematch = true;
+                    }
+
+                    if (Boolean.TRUE.equals(room.leftRematch) && Boolean.TRUE.equals(room.rightRematch)) {
+                        startNewMatch(room);
+                    }
+                }
+            }
+
+            fillEmptySlotsFromQueue();
+            broadcastRoom(room.index);
+            pushQueueUpdates();
+            broadcastLobbyToAll();
+        }
     }
 
     @Scheduled(fixedRate = 16)
     public void tickRooms() {
         for (RoomState room : rooms.values()) {
             tickRoom(room);
-            broadcastRoom(room.id);
+            broadcastRoom(room.index);
         }
     }
 
@@ -178,6 +175,7 @@ public class PingPongRealtimeService {
 
             if (!room.hasBothPlayers()) {
                 room.status = "WAITING";
+                room.winner = "";
                 room.ballX = 0.5;
                 room.ballY = 0.5;
                 room.ballVX = 0;
@@ -239,6 +237,8 @@ public class PingPongRealtimeService {
         if (room.leftScore >= TARGET_SCORE) {
             room.status = "FINISHED";
             room.winner = "LEFT";
+            room.leftRematch = false;
+            room.rightRematch = false;
             room.ballVX = 0;
             room.ballVY = 0;
             room.ballX = 0.5;
@@ -249,6 +249,8 @@ public class PingPongRealtimeService {
         if (room.rightScore >= TARGET_SCORE) {
             room.status = "FINISHED";
             room.winner = "RIGHT";
+            room.leftRematch = false;
+            room.rightRematch = false;
             room.ballVX = 0;
             room.ballVY = 0;
             room.ballX = 0.5;
@@ -257,6 +259,274 @@ public class PingPongRealtimeService {
         }
 
         resetBall(room, directionForServe);
+    }
+
+    private void startNewMatch(RoomState room) {
+        room.leftScore = 0;
+        room.rightScore = 0;
+        room.winner = "";
+        room.leftRematch = null;
+        room.rightRematch = null;
+        room.status = "PLAYING";
+        resetBall(room, randomDirection());
+    }
+
+    private void fillEmptySlotsFromQueue() {
+        ensureRooms();
+        while (!waitingQueue.isEmpty()) {
+            QueuedPlayer next = waitingQueue.peekFirst();
+            if (next == null || !rawSessionIsOpen(next.sessionId())) {
+                waitingQueue.pollFirst();
+                continue;
+            }
+
+            if (!assignSessionToAvailableSlot(next.sessionId(), next.playerName())) {
+                break;
+            }
+
+            waitingQueue.pollFirst();
+        }
+    }
+
+    private boolean assignSessionToAvailableSlot(String sessionId, String playerName) {
+        RoomState room = findRoomWithSinglePlayer();
+        if (room == null) {
+            room = findEmptyRoom();
+        }
+        if (room == null) {
+            return false;
+        }
+
+        synchronized (room.lock) {
+            Side side;
+            if (room.leftSessionId == null) {
+                room.leftSessionId = sessionId;
+                room.leftPlayer = playerName;
+                side = Side.LEFT;
+            } else if (room.rightSessionId == null) {
+                room.rightSessionId = sessionId;
+                room.rightPlayer = playerName;
+                side = Side.RIGHT;
+            } else {
+                return false;
+            }
+
+            sessionsById.put(sessionId, new SessionRef(room.index, side));
+            room.lastTickNanos = System.nanoTime();
+
+            if (room.hasBothPlayers()) {
+                startNewMatch(room);
+            } else {
+                room.status = "WAITING";
+            }
+        }
+
+        return true;
+    }
+
+    private RoomState findRoomWithSinglePlayer() {
+        for (int i = 1; i <= TOTAL_ROOMS; i++) {
+            RoomState room = rooms.get(i);
+            if (room == null) {
+                continue;
+            }
+            synchronized (room.lock) {
+                if (room.hasAnyPlayer() && !room.hasBothPlayers()) {
+                    return room;
+                }
+            }
+        }
+        return null;
+    }
+
+    private RoomState findEmptyRoom() {
+        for (int i = 1; i <= TOTAL_ROOMS; i++) {
+            RoomState room = rooms.get(i);
+            if (room == null) {
+                continue;
+            }
+            synchronized (room.lock) {
+                if (!room.hasAnyPlayer()) {
+                    return room;
+                }
+            }
+        }
+        return null;
+    }
+
+    private void removePlayerFromRoom(RoomState room, Side side) {
+        if (side == Side.LEFT) {
+            room.leftSessionId = null;
+            room.leftPlayer = "";
+            room.leftPaddleY = 0.5;
+            room.leftRematch = null;
+        } else {
+            room.rightSessionId = null;
+            room.rightPlayer = "";
+            room.rightPaddleY = 0.5;
+            room.rightRematch = null;
+        }
+
+        room.status = "WAITING";
+        room.winner = "";
+        room.leftScore = 0;
+        room.rightScore = 0;
+        room.ballX = 0.5;
+        room.ballY = 0.5;
+        room.ballVX = 0;
+        room.ballVY = 0;
+    }
+
+    private boolean removeQueuedSession(String sessionId) {
+        return waitingQueue.removeIf(q -> q.sessionId().equals(sessionId));
+    }
+
+    private void sendQueuePosition(String sessionId) {
+        int position = 1;
+        for (QueuedPlayer queued : waitingQueue) {
+            if (queued.sessionId().equals(sessionId)) {
+                sendSimple(sessionId, "queue", Map.of(
+                        "position", position,
+                        "queueSize", waitingQueue.size(),
+                        "maxQueue", MAX_QUEUE));
+                return;
+            }
+            position++;
+        }
+    }
+
+    private void pushQueueUpdates() {
+        int position = 1;
+        for (QueuedPlayer queued : waitingQueue) {
+            sendSimple(queued.sessionId(), "queue", Map.of(
+                    "position", position,
+                    "queueSize", waitingQueue.size(),
+                    "maxQueue", MAX_QUEUE));
+            position++;
+        }
+    }
+
+    private void broadcastLobbyToAll() {
+        int usedRooms = calculateUsedRooms();
+        int queueSize = waitingQueue.size();
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("type", "lobby");
+        payload.put("usedRooms", usedRooms);
+        payload.put("totalRooms", TOTAL_ROOMS);
+        payload.put("queueSize", queueSize);
+        payload.put("maxQueue", MAX_QUEUE);
+
+        for (String sessionId : rawSessions.keySet()) {
+            sendMessage(sessionId, payload);
+        }
+    }
+
+    private int calculateUsedRooms() {
+        int used = 0;
+        for (RoomState room : rooms.values()) {
+            synchronized (room.lock) {
+                if (room.hasAnyPlayer()) {
+                    used++;
+                }
+            }
+        }
+        return used;
+    }
+
+    private void broadcastRoom(int roomIndex) {
+        RoomState room = rooms.get(roomIndex);
+        if (room == null) {
+            return;
+        }
+
+        String leftSession;
+        String rightSession;
+        Map<String, Object> baseState;
+
+        synchronized (room.lock) {
+            leftSession = room.leftSessionId;
+            rightSession = room.rightSessionId;
+            baseState = createBaseState(room);
+        }
+
+        if (leftSession != null) {
+            Map<String, Object> leftPayload = new HashMap<>(baseState);
+            leftPayload.put("yourSide", "LEFT");
+            sendMessage(leftSession, leftPayload);
+        }
+
+        if (rightSession != null) {
+            Map<String, Object> rightPayload = new HashMap<>(baseState);
+            rightPayload.put("yourSide", "RIGHT");
+            sendMessage(rightSession, rightPayload);
+        }
+    }
+
+    private Map<String, Object> createBaseState(RoomState room) {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("type", "state");
+        payload.put("roomId", "ROOM-" + room.index);
+        payload.put("status", room.status);
+        payload.put("winner", room.winner);
+        payload.put("targetScore", TARGET_SCORE);
+        payload.put("playersConnected", room.playersConnected());
+        payload.put("leftPlayer", room.leftPlayer);
+        payload.put("rightPlayer", room.rightPlayer);
+        payload.put("scoreLeft", room.leftScore);
+        payload.put("scoreRight", room.rightScore);
+        payload.put("leftPaddleY", room.leftPaddleY);
+        payload.put("rightPaddleY", room.rightPaddleY);
+        payload.put("ballX", room.ballX);
+        payload.put("ballY", room.ballY);
+        payload.put("leftRematch", room.leftRematch != null && room.leftRematch);
+        payload.put("rightRematch", room.rightRematch != null && room.rightRematch);
+        payload.put("usedRooms", calculateUsedRooms());
+        payload.put("totalRooms", TOTAL_ROOMS);
+        payload.put("queueSize", waitingQueue.size());
+        payload.put("maxQueue", MAX_QUEUE);
+        return payload;
+    }
+
+    private void sendSimple(String sessionId, String type, Map<String, Object> values) {
+        Map<String, Object> payload = new HashMap<>(values);
+        payload.put("type", type);
+        sendMessage(sessionId, payload);
+    }
+
+    private void sendMessage(String sessionId, Map<String, Object> payload) {
+        WebSocketSession session = rawSessions.get(sessionId);
+        if (session == null || !session.isOpen()) {
+            return;
+        }
+
+        try {
+            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(payload)));
+        } catch (JsonProcessingException ignored) {
+            // Ignore serialization errors for transient events.
+        } catch (IOException ignored) {
+            // Ignore broken sockets.
+        }
+    }
+
+    private void closeSilently(String sessionId) {
+        WebSocketSession session = rawSessions.get(sessionId);
+        if (session == null) {
+            return;
+        }
+
+        try {
+            session.close();
+        } catch (IOException ignored) {
+            // Ignore close errors.
+        } finally {
+            rawSessions.remove(sessionId);
+        }
+    }
+
+    private boolean rawSessionIsOpen(String sessionId) {
+        WebSocketSession session = rawSessions.get(sessionId);
+        return session != null && session.isOpen();
     }
 
     private void resetBall(RoomState room, int xDirection) {
@@ -272,83 +542,8 @@ public class PingPongRealtimeService {
         return ThreadLocalRandom.current().nextBoolean() ? 1 : -1;
     }
 
-    private void broadcastRoom(String roomId) {
-        RoomState room = rooms.get(roomId);
-        if (room == null) {
-            return;
-        }
-
-        String leftSessionId;
-        String rightSessionId;
-        Map<String, Object> baseState;
-
-        synchronized (room.lock) {
-            leftSessionId = room.leftSessionId;
-            rightSessionId = room.rightSessionId;
-            baseState = createBaseState(room);
-        }
-
-        if (leftSessionId != null) {
-            sendToSession(leftSessionId, baseState, "LEFT");
-        }
-        if (rightSessionId != null) {
-            sendToSession(rightSessionId, baseState, "RIGHT");
-        }
-    }
-
-    private Map<String, Object> createBaseState(RoomState room) {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("type", "state");
-        payload.put("roomId", room.id);
-        payload.put("status", room.status);
-        payload.put("winner", room.winner);
-        payload.put("targetScore", TARGET_SCORE);
-        payload.put("playersConnected", room.playersConnected());
-        payload.put("leftPlayer", room.leftPlayer);
-        payload.put("rightPlayer", room.rightPlayer);
-        payload.put("scoreLeft", room.leftScore);
-        payload.put("scoreRight", room.rightScore);
-        payload.put("leftPaddleY", room.leftPaddleY);
-        payload.put("rightPaddleY", room.rightPaddleY);
-        payload.put("ballX", room.ballX);
-        payload.put("ballY", room.ballY);
-        return payload;
-    }
-
-    private void sendToSession(String sessionId, Map<String, Object> baseState, String side) {
-        WebSocketSession session = rawSessions.get(sessionId);
-        if (session == null || !session.isOpen()) {
-            return;
-        }
-
-        Map<String, Object> payload = new HashMap<>(baseState);
-        payload.put("yourSide", side);
-
-        try {
-            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(payload)));
-        } catch (JsonProcessingException ignored) {
-            // Ignore malformed serialization for this tick.
-        } catch (IOException ignored) {
-            // Ignore broken socket writes.
-        }
-    }
-
     private double clamp(double value, double min, double max) {
         return Math.max(min, Math.min(max, value));
-    }
-
-    private String normalizeRoomId(String roomId) {
-        if (roomId == null) {
-            return "public";
-        }
-        String trimmed = roomId.trim();
-        if (trimmed.isEmpty()) {
-            return "public";
-        }
-        if (trimmed.length() > 40) {
-            return trimmed.substring(0, 40);
-        }
-        return trimmed;
     }
 
     private String normalizePlayerName(String playerName) {
@@ -365,7 +560,16 @@ public class PingPongRealtimeService {
         return trimmed;
     }
 
-    private record SessionRef(String roomId, Side side) {
+    private void ensureRooms() {
+        for (int i = 1; i <= TOTAL_ROOMS; i++) {
+            rooms.computeIfAbsent(i, RoomState::new);
+        }
+    }
+
+    private record SessionRef(int roomIndex, Side side) {
+    }
+
+    private record QueuedPlayer(String sessionId, String playerName) {
     }
 
     private enum Side {
@@ -375,7 +579,7 @@ public class PingPongRealtimeService {
 
     private static class RoomState {
         private final Object lock = new Object();
-        private final String id;
+        private final int index;
 
         private String leftSessionId;
         private String rightSessionId;
@@ -396,9 +600,11 @@ public class PingPongRealtimeService {
         private String status = "WAITING";
         private String winner = "";
         private long lastTickNanos = System.nanoTime();
+        private Boolean leftRematch;
+        private Boolean rightRematch;
 
-        private RoomState(String id) {
-            this.id = id;
+        private RoomState(int index) {
+            this.index = index;
         }
 
         private boolean hasBothPlayers() {

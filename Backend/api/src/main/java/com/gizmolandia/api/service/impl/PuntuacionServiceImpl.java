@@ -49,6 +49,22 @@ public class PuntuacionServiceImpl implements PuntuacionService {
     @Override
     @Transactional(readOnly = true)
     public List<PuntuacionResponseDTO> rankingPorJuego(String juego) {
+        if ("PING_PONG".equalsIgnoreCase(juego)) {
+            return puntuacionRepository.findPingPongWinsRanking()
+                .stream()
+                .limit(10)
+                .map(row -> PuntuacionResponseDTO.builder()
+                    .id(null)
+                    .usuarioId((Long) row[0])
+                    .nombreUsuario((String) row[1])
+                    .fotoUsuario((String) row[2])
+                    .juego("PING_PONG")
+                    .puntuacion(((Long) row[3]).intValue())
+                    .fechaPartida(null)
+                    .build())
+                .collect(Collectors.toList());
+        }
+
         return puntuacionRepository.findTopByJuego(juego)
                 .stream()
                 .limit(10)

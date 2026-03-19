@@ -16,4 +16,13 @@ public interface PuntuacionRepository extends JpaRepository<Puntuacion, Long> {
 
     @Query("SELECT p FROM Puntuacion p WHERE p.juego = :juego ORDER BY p.puntuacion DESC")
     List<Puntuacion> findTopByJuego(String juego);
+
+    @Query("""
+            SELECT p.usuario.id, p.usuario.nombre, p.usuario.foto, COUNT(p.id)
+            FROM Puntuacion p
+            WHERE p.juego = 'PING_PONG'
+            GROUP BY p.usuario.id, p.usuario.nombre, p.usuario.foto
+            ORDER BY COUNT(p.id) DESC
+            """)
+    List<Object[]> findPingPongWinsRanking();
 }

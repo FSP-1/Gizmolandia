@@ -10,11 +10,19 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
+import { TranslateModule } from '@ngx-translate/core';
 import { GameLeaderboardComponent } from '../game-leaderboard/game-leaderboard';
 import { PuntuacionApiService } from '../../../services/puntuacion-api.service';
-import { PingPongRealtimeService, PingPongRealtimeState } from '../../../services/ping-pong-realtime.service';
+import {
+  PingPongKickedEvent,
+  PingPongLobbyEvent,
+  PingPongQueueEvent,
+  PingPongQueueFullEvent,
+  PingPongRealtimeEvent,
+  PingPongRealtimeService,
+  PingPongRealtimeState
+} from '../../../services/ping-pong-realtime.service';
 
 interface LocalMatchState {
   leftPaddleY: number;
@@ -42,12 +50,15 @@ export class PingPongComponent implements OnInit, OnDestroy {
 
   mode: 'bot' | 'online' | null = null;
   botDifficulty: 'easy' | 'medium' | 'hard' = 'medium';
-  roomId = 'public';
   username = 'Jugador';
 
   targetScore = 7;
   statusText = '';
-  scorePersisted = false;
+  queuePosition: number | null = null;
+  usedRooms = 0;
+  totalRooms = 10;
+  queueSize = 0;
+  maxQueue = 20;
 
   private readonly paddleHalf = 0.12;
   private readonly ballRadius = 0.015;
@@ -62,6 +73,7 @@ export class PingPongComponent implements OnInit, OnDestroy {
 
   private realtimeSub?: Subscription;
   private realtimeState: PingPongRealtimeState | null = null;
+  private scorePersisted = false;
 
   private localState: LocalMatchState = {
     leftPaddleY: 0.5,
@@ -103,13 +115,16 @@ export class PingPongComponent implements OnInit, OnDestroy {
   selectMode(mode: 'bot' | 'online'): void {
     this.mode = mode;
     this.statusText = '';
-    this.scorePersisted = false;
+    this.queuePosition = null;
 
     if (mode === 'bot') {
-      this.realtimeSub?.unsubscribe();
-      this.realtimeService.disconnect();
-      this.realtimeState = null;
-      this.startBotMatch();
+      this.disconnectOnline();
+      this.localState.status = 'WAITING';
+      this.localState.scoreLeft = 0;
+      this.localState.scoreRight = 0;
+      this.localState.winner = '';
+      this.localState.ballX = 0.5;
+      this.localState.ballY = 0.5;
       return;
     }
 
@@ -121,28 +136,29 @@ export class PingPongComponent implements OnInit, OnDestroy {
     this.localState.ballY = 0.5;
   }
 
+  startBotMatch(): void {
+    this.scorePersisted = false;
+    this.localState.leftPaddleY = 0.5;
+    this.localState.rightPaddleY = 0.5;
+    this.localState.scoreLeft = 0;
+    this.localState.scoreRight = 0;
+    this.localState.winner = '';
+    this.localState.status = 'PLAYING';
+    this.statusText = '';
+
+    this.resetBall(Math.random() > 0.5 ? 1 : -1);
+  }
+
   connectOnline(): void {
     this.realtimeSub?.unsubscribe();
     this.scorePersisted = false;
+    this.queuePosition = null;
+    this.statusText = 'Conectando matchmaking...';
 
-    this.realtimeSub = this.realtimeService
-      .connect(this.roomId, this.username)
-      .subscribe((state) => {
-        this.realtimeState = state;
-        this.targetScore = state.targetScore;
-        this.desiredPaddleY = state.yourSide === 'LEFT' ? state.leftPaddleY : state.rightPaddleY;
-
-        if (state.status === 'WAITING') {
-          this.statusText = 'Esperando rival...';
-        } else if (state.status === 'PLAYING') {
-          this.statusText = '';
-        } else if (state.status === 'FINISHED') {
-          this.statusText = state.winner === state.yourSide ? 'Ganaste la partida' : 'Perdiste la partida';
-          this.persistOnlineWinIfNeeded(state);
-        }
-
-        this.cdr.markForCheck();
-      });
+    this.realtimeSub = this.realtimeService.connect(this.username).subscribe((event) => {
+      this.handleRealtimeEvent(event);
+      this.cdr.markForCheck();
+    });
   }
 
   disconnectOnline(): void {
@@ -150,18 +166,22 @@ export class PingPongComponent implements OnInit, OnDestroy {
     this.realtimeSub = undefined;
     this.realtimeState = null;
     this.realtimeService.disconnect();
-    this.statusText = 'Desconectado';
   }
 
-  restartLocalMatch(): void {
-    if (this.mode === 'bot') {
-      this.startBotMatch();
+  acceptRematch(): void {
+    if (this.mode !== 'online') {
       return;
     }
+    this.realtimeService.sendRematchDecision(true);
+    this.statusText = 'Esperando respuesta del rival...';
+  }
 
-    if (this.mode === 'online') {
-      this.realtimeService.sendRestart();
+  declineRematch(): void {
+    if (this.mode !== 'online') {
+      return;
     }
+    this.realtimeService.sendRematchDecision(false);
+    this.statusText = 'Buscando nuevo rival...';
   }
 
   onMouseMove(event: MouseEvent): void {
@@ -193,6 +213,10 @@ export class PingPongComponent implements OnInit, OnDestroy {
     return this.realtimeState?.yourSide || '-';
   }
 
+  get canShowRematch(): boolean {
+    return this.mode === 'online' && this.realtimeState?.status === 'FINISHED';
+  }
+
   @HostListener('window:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent): void {
     if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
@@ -214,16 +238,86 @@ export class PingPongComponent implements OnInit, OnDestroy {
     }
   }
 
-  startBotMatch(): void {
-    this.localState.leftPaddleY = 0.5;
-    this.localState.rightPaddleY = 0.5;
-    this.localState.scoreLeft = 0;
-    this.localState.scoreRight = 0;
-    this.localState.winner = '';
-    this.localState.status = 'PLAYING';
-    this.statusText = '';
+  private handleRealtimeEvent(event: PingPongRealtimeEvent): void {
+    if (event.type === 'state') {
+      this.handleStateEvent(event);
+      return;
+    }
 
-    this.resetBall(Math.random() > 0.5 ? 1 : -1);
+    if (event.type === 'queue') {
+      this.handleQueueEvent(event);
+      return;
+    }
+
+    if (event.type === 'lobby') {
+      this.handleLobbyEvent(event);
+      return;
+    }
+
+    if (event.type === 'queue_full') {
+      this.handleQueueFullEvent(event);
+      return;
+    }
+
+    if (event.type === 'kicked') {
+      this.handleKickedEvent(event);
+    }
+  }
+
+  private handleStateEvent(state: PingPongRealtimeState): void {
+    this.realtimeState = state;
+    this.targetScore = state.targetScore;
+    this.usedRooms = state.usedRooms;
+    this.totalRooms = state.totalRooms;
+    this.queueSize = state.queueSize;
+    this.maxQueue = state.maxQueue;
+    this.queuePosition = null;
+
+    this.desiredPaddleY = state.yourSide === 'LEFT' ? state.leftPaddleY : state.rightPaddleY;
+
+    if (state.status === 'WAITING') {
+      this.statusText = 'Esperando rival en sala ' + state.roomId;
+      this.scorePersisted = false;
+      return;
+    }
+
+    if (state.status === 'PLAYING') {
+      this.statusText = 'Jugando en sala ' + state.roomId;
+      this.scorePersisted = false;
+      return;
+    }
+
+    if (state.status === 'FINISHED') {
+      if (state.winner === state.yourSide) {
+        this.statusText = 'Ganaste. ¿Quieres revancha?';
+        this.persistOnlineWinIfNeeded();
+      } else {
+        this.statusText = 'Perdiste. ¿Quieres revancha?';
+      }
+    }
+  }
+
+  private handleQueueEvent(event: PingPongQueueEvent): void {
+    this.queuePosition = event.position;
+    this.queueSize = event.queueSize;
+    this.maxQueue = event.maxQueue;
+    this.statusText = `Salas llenas. En cola: ${event.position}/${event.maxQueue}`;
+  }
+
+  private handleLobbyEvent(event: PingPongLobbyEvent): void {
+    this.usedRooms = event.usedRooms;
+    this.totalRooms = event.totalRooms;
+    this.queueSize = event.queueSize;
+    this.maxQueue = event.maxQueue;
+  }
+
+  private handleQueueFullEvent(event: PingPongQueueFullEvent): void {
+    this.maxQueue = event.maxQueue;
+    this.statusText = 'No hay lugar en cola en este momento.';
+  }
+
+  private handleKickedEvent(_event: PingPongKickedEvent): void {
+    this.statusText = 'Saliste de la sala. Buscando nueva partida...';
   }
 
   private startRenderLoop(): void {
@@ -341,8 +435,7 @@ export class PingPongComponent implements OnInit, OnDestroy {
     if (this.localState.scoreLeft >= this.targetScore) {
       this.localState.status = 'FINISHED';
       this.localState.winner = 'LEFT';
-      this.statusText = 'Ganaste la partida';
-      this.persistLocalScore();
+      this.statusText = 'Ganaste al bot';
       return;
     }
 
@@ -350,7 +443,6 @@ export class PingPongComponent implements OnInit, OnDestroy {
       this.localState.status = 'FINISHED';
       this.localState.winner = 'RIGHT';
       this.statusText = 'El bot ganó';
-      this.persistLocalScore();
       return;
     }
 
@@ -374,7 +466,7 @@ export class PingPongComponent implements OnInit, OnDestroy {
     return { speed: 0.8, noise: 0.18 };
   }
 
-  private persistLocalScore(): void {
+  private persistOnlineWinIfNeeded(): void {
     if (this.scorePersisted) {
       return;
     }
@@ -393,36 +485,7 @@ export class PingPongComponent implements OnInit, OnDestroy {
     this.puntuacionApiService.guardarPuntuacion({
       usuarioId,
       juego: 'PING_PONG',
-      puntuacion: this.localState.scoreLeft
-    }).subscribe({
-      error: () => {
-        this.scorePersisted = false;
-      }
-    });
-  }
-
-  private persistOnlineWinIfNeeded(state: PingPongRealtimeState): void {
-    if (this.scorePersisted || state.winner !== state.yourSide) {
-      return;
-    }
-
-    const usuarioIdRaw = localStorage.getItem('usuarioId');
-    if (!usuarioIdRaw) {
-      return;
-    }
-
-    const usuarioId = Number(usuarioIdRaw);
-    if (!Number.isFinite(usuarioId) || usuarioId <= 0) {
-      return;
-    }
-
-    const points = state.yourSide === 'LEFT' ? state.scoreLeft : state.scoreRight;
-
-    this.scorePersisted = true;
-    this.puntuacionApiService.guardarPuntuacion({
-      usuarioId,
-      juego: 'PING_PONG',
-      puntuacion: points
+      puntuacion: 1
     }).subscribe({
       error: () => {
         this.scorePersisted = false;
@@ -456,7 +519,7 @@ export class PingPongComponent implements OnInit, OnDestroy {
     ctx.setLineDash([]);
 
     const paddleHeight = this.paddleHalf * 2 * height;
-    const paddleWidth = 12;
+    const paddleWidth = 14;
 
     ctx.fillStyle = '#60a5fa';
     ctx.fillRect(this.leftPaddleX * width, state.leftPaddleY * height - paddleHeight / 2, paddleWidth, paddleHeight);
@@ -470,15 +533,15 @@ export class PingPongComponent implements OnInit, OnDestroy {
     ctx.fill();
 
     ctx.fillStyle = '#f8fafc';
-    ctx.font = '700 36px Arial';
-    ctx.fillText(String(state.scoreLeft), width * 0.36, 50);
-    ctx.fillText(String(state.scoreRight), width * 0.62, 50);
+    ctx.font = '700 40px Arial';
+    ctx.fillText(String(state.scoreLeft), width * 0.38, 56);
+    ctx.fillText(String(state.scoreRight), width * 0.58, 56);
 
     if (state.status !== 'PLAYING') {
       ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
       ctx.fillRect(0, 0, width, height);
       ctx.fillStyle = '#f8fafc';
-      ctx.font = '700 26px Arial';
+      ctx.font = '700 30px Arial';
       const text = state.status === 'WAITING' ? 'Esperando jugador...' : 'Partida finalizada';
       const textWidth = ctx.measureText(text).width;
       ctx.fillText(text, (width - textWidth) / 2, height / 2);

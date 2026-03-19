@@ -18,24 +18,62 @@ export interface PingPongRealtimeState {
   rightPaddleY: number;
   ballX: number;
   ballY: number;
+  leftRematch: boolean;
+  rightRematch: boolean;
+  usedRooms: number;
+  totalRooms: number;
+  queueSize: number;
+  maxQueue: number;
 }
+
+export interface PingPongQueueEvent {
+  type: 'queue';
+  position: number;
+  queueSize: number;
+  maxQueue: number;
+}
+
+export interface PingPongLobbyEvent {
+  type: 'lobby';
+  usedRooms: number;
+  totalRooms: number;
+  queueSize: number;
+  maxQueue: number;
+}
+
+export interface PingPongQueueFullEvent {
+  type: 'queue_full';
+  maxQueue: number;
+}
+
+export interface PingPongKickedEvent {
+  type: 'kicked';
+  reason: string;
+}
+
+export type PingPongRealtimeEvent =
+  | PingPongRealtimeState
+  | PingPongQueueEvent
+  | PingPongLobbyEvent
+  | PingPongQueueFullEvent
+  | PingPongKickedEvent;
 
 @Injectable({ providedIn: 'root' })
 export class PingPongRealtimeService {
   private socket: WebSocket | null = null;
-  private stateSubject = new Subject<PingPongRealtimeState>();
+  private eventSubject = new Subject<PingPongRealtimeEvent>();
 
-  connect(roomId: string, playerName: string): Observable<PingPongRealtimeState> {
+  connect(playerName: string): Observable<PingPongRealtimeEvent> {
     this.disconnect();
 
-    const wsUrl = this.buildWsUrl(roomId, playerName);
+    const wsUrl = this.buildWsUrl(playerName);
     this.socket = new WebSocket(wsUrl);
 
     this.socket.onmessage = (event: MessageEvent<string>) => {
       try {
-        const parsed = JSON.parse(event.data) as PingPongRealtimeState;
-        if (parsed.type === 'state') {
-          this.stateSubject.next(parsed);
+        const parsed = JSON.parse(event.data) as PingPongRealtimeEvent;
+        if (parsed && typeof parsed === 'object' && 'type' in parsed) {
+          this.eventSubject.next(parsed);
         }
       } catch {
         // Ignore malformed messages to keep the game alive.
@@ -46,7 +84,7 @@ export class PingPongRealtimeService {
       this.socket = null;
     };
 
-    return this.stateSubject.asObservable();
+    return this.eventSubject.asObservable();
   }
 
   sendPaddle(y: number): void {
@@ -56,8 +94,11 @@ export class PingPongRealtimeService {
     });
   }
 
-  sendRestart(): void {
-    this.send({ type: 'restart' });
+  sendRematchDecision(accept: boolean): void {
+    this.send({
+      type: 'rematch',
+      accept
+    });
   }
 
   disconnect(): void {
@@ -80,13 +121,11 @@ export class PingPongRealtimeService {
     this.socket.send(JSON.stringify(payload));
   }
 
-  private buildWsUrl(roomId: string, playerName: string): string {
+  private buildWsUrl(playerName: string): string {
     const apiUrl = new URL(API_BASE_URL);
     const protocol = apiUrl.protocol === 'https:' ? 'wss:' : 'ws:';
-
-    const room = encodeURIComponent((roomId || 'public').trim() || 'public');
     const player = encodeURIComponent((playerName || 'Jugador').trim() || 'Jugador');
 
-    return `${protocol}//${apiUrl.host}/ws/ping-pong?room=${room}&player=${player}`;
+    return `${protocol}//${apiUrl.host}/ws/ping-pong?player=${player}`;
   }
 }

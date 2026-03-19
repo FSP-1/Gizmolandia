@@ -26,6 +26,13 @@
   font-size: 2rem;
 }
 
+.capacity {
+  margin: 0.35rem 0 0;
+  color: #334155;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
 .scoreline {
   margin-top: 0.4rem;
   font-size: 1.8rem;
@@ -121,13 +128,30 @@
   color: #ffffff;
 }
 
+.rematch-box {
+  margin-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 0.9rem;
+}
+
+.rematch-box p {
+  margin: 0 0 0.6rem;
+  color: #334155;
+  font-weight: 700;
+}
+
+.rematch-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .game-area {
   position: relative;
 }
 
 canvas {
   display: block;
-  width: 720px;
+  width: 860px;
   max-width: 100%;
   height: auto;
   background: #020617;

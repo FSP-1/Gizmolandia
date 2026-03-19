@@ -125,18 +125,24 @@
       "MODE": "Mode",
       "VS_BOT": "Vs Bot",
       "VS_USER": "Vs User",
+      "ROOMS_USED": "rooms in use",
+      "QUEUE": "in queue",
+      "QUEUE_POSITION": "Queue position",
       "BOT_LEVEL": "Bot difficulty",
       "EASY": "Easy",
       "MEDIUM": "Medium",
       "HARD": "Hard",
       "START_BOT": "Start vs Bot",
-      "ROOM": "Room",
+      "FIND_MATCH": "Find match",
       "CONNECT": "Connect",
       "DISCONNECT": "Disconnect",
       "YOUR_SIDE": "Your side",
       "CONTROLS": "Controls",
       "CONTROLS_ARROWS": "Up/down arrows to move",
-      "CONTROLS_MOUSE": "Move the mouse over the court"
+      "CONTROLS_MOUSE": "Move the mouse over the court",
+      "REMATCH_PROMPT": "Want a rematch with this player?",
+      "REMATCH_YES": "Yes, rematch",
+      "REMATCH_NO": "No, find another"
     }
   },
   "CUSTOMIZATION": {
