@@ -17,7 +17,7 @@ public class PuntuacionRequestDTO {
     private Long usuarioId;
 
     @NotBlank(message = "El juego es obligatorio")
-    @Pattern(regexp = "TETRIS|SNAKE|BRICK_BREAKER", message = "Juego no válido. Use: TETRIS, SNAKE o BRICK_BREAKER")
+    @Pattern(regexp = "TETRIS|SNAKE|BRICK_BREAKER|PING_PONG", message = "Juego no valido. Use: TETRIS, SNAKE, BRICK_BREAKER o PING_PONG")
     private String juego;
 
     @NotNull(message = "La puntuación es obligatoria")

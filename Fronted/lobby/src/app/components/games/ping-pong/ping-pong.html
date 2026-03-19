@@ -1,0 +1,56 @@
+<div class="ping-pong-container">
+  <section class="game-info">
+    <h2>Ping Pong</h2>
+    <div class="scoreline">{{ scoreLeft }} - {{ scoreRight }}</div>
+
+    <div class="mode-box">
+      <p><strong>{{ 'GAMES.PING_PONG.MODE' | translate }}:</strong></p>
+      <div class="mode-actions">
+        <button type="button" [class.active]="mode === 'bot'" (click)="selectMode('bot')">
+          {{ 'GAMES.PING_PONG.VS_BOT' | translate }}
+        </button>
+        <button type="button" [class.active]="mode === 'online'" (click)="selectMode('online')">
+          {{ 'GAMES.PING_PONG.VS_USER' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <div class="bot-config" *ngIf="mode === 'bot'">
+      <label for="botDifficulty">{{ 'GAMES.PING_PONG.BOT_LEVEL' | translate }}</label>
+      <select id="botDifficulty" [(ngModel)]="botDifficulty">
+        <option value="easy">{{ 'GAMES.PING_PONG.EASY' | translate }}</option>
+        <option value="medium">{{ 'GAMES.PING_PONG.MEDIUM' | translate }}</option>
+        <option value="hard">{{ 'GAMES.PING_PONG.HARD' | translate }}</option>
+      </select>
+      <button type="button" class="start-btn" (click)="startBotMatch()">{{ 'GAMES.PING_PONG.START_BOT' | translate }}</button>
+    </div>
+
+    <div class="online-config" *ngIf="mode === 'online'">
+      <label for="roomId">{{ 'GAMES.PING_PONG.ROOM' | translate }}</label>
+      <input id="roomId" [(ngModel)]="roomId" maxlength="40" />
+      <div class="online-actions">
+        <button type="button" class="start-btn" (click)="connectOnline()">{{ 'GAMES.PING_PONG.CONNECT' | translate }}</button>
+        <button type="button" class="secondary-btn" (click)="disconnectOnline()">{{ 'GAMES.PING_PONG.DISCONNECT' | translate }}</button>
+      </div>
+      <p class="meta">{{ 'GAMES.PING_PONG.YOUR_SIDE' | translate }}: {{ onlineSide }}</p>
+    </div>
+
+    <div class="controls">
+      <p><strong>{{ 'GAMES.PING_PONG.CONTROLS' | translate }}</strong></p>
+      <p>{{ 'GAMES.PING_PONG.CONTROLS_ARROWS' | translate }}</p>
+      <p>{{ 'GAMES.PING_PONG.CONTROLS_MOUSE' | translate }}</p>
+    </div>
+
+    <div class="status" *ngIf="statusText">{{ statusText }}</div>
+
+    <button type="button" class="restart-btn" (click)="restartLocalMatch()">{{ 'GAMES.RESTART' | translate }}</button>
+  </section>
+
+  <section class="game-area">
+    <canvas #gameCanvas width="720" height="420" (mousemove)="onMouseMove($event)"></canvas>
+  </section>
+
+  <div class="leaderboard-slot">
+    <app-game-leaderboard juego="PING_PONG"></app-game-leaderboard>
+  </div>
+</div>

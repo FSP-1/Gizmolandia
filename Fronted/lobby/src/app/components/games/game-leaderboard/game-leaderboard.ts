@@ -12,7 +12,7 @@ import { PuntuacionApiService } from '../../../services/puntuacion-api.service';
   styleUrls: ['./game-leaderboard.css']
 })
 export class GameLeaderboardComponent implements OnInit, OnChanges {
-  @Input() juego: 'TETRIS' | 'SNAKE' | 'BRICK_BREAKER' = 'TETRIS';
+  @Input() juego: 'TETRIS' | 'SNAKE' | 'BRICK_BREAKER' | 'PING_PONG' = 'TETRIS';
   @Input() top = 5;
 
   loading = false;

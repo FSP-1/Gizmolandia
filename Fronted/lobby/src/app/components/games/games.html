@@ -19,6 +19,11 @@
         <h3>Snake</h3>
         <p>{{ 'GAMES.SNAKE.DESCRIPTION' | translate }}</p>
       </div>
+      <div class="game-card" (click)="selectGame('ping-pong')">
+        <div class="game-icon">🏓</div>
+        <h3>Ping Pong</h3>
+        <p>{{ 'GAMES.PING_PONG.DESCRIPTION' | translate }}</p>
+      </div>
     </div>
   </div>
 
@@ -26,5 +31,6 @@
     <app-brick-breaker *ngIf="selectedGame === 'brick-breaker'" [userPhoto]="userPhoto"></app-brick-breaker>
     <app-tetris *ngIf="selectedGame === 'tetris'" [userPhoto]="userPhoto"></app-tetris>
     <app-snake *ngIf="selectedGame === 'snake'" [userPhoto]="userPhoto"></app-snake>
+    <app-ping-pong *ngIf="selectedGame === 'ping-pong'" [userPhoto]="userPhoto"></app-ping-pong>
   </div>
 </div>

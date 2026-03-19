@@ -118,6 +118,25 @@
       "CONTROLS": "Controls",
       "ARROWS_MOVE": "Arrow keys to move",
       "START": "Start Game"
+    },
+    "PING_PONG": {
+      "TITLE": "Ping Pong",
+      "DESCRIPTION": "Play against bot or real-time users",
+      "MODE": "Mode",
+      "VS_BOT": "Vs Bot",
+      "VS_USER": "Vs User",
+      "BOT_LEVEL": "Bot difficulty",
+      "EASY": "Easy",
+      "MEDIUM": "Medium",
+      "HARD": "Hard",
+      "START_BOT": "Start vs Bot",
+      "ROOM": "Room",
+      "CONNECT": "Connect",
+      "DISCONNECT": "Disconnect",
+      "YOUR_SIDE": "Your side",
+      "CONTROLS": "Controls",
+      "CONTROLS_ARROWS": "Up/down arrows to move",
+      "CONTROLS_MOUSE": "Move the mouse over the court"
     }
   },
   "CUSTOMIZATION": {

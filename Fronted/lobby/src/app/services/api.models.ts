@@ -35,7 +35,7 @@ export interface UsuarioResponse {
 
 export interface PuntuacionRequest {
   usuarioId: number;
-  juego: 'TETRIS' | 'SNAKE' | 'BRICK_BREAKER';
+  juego: 'TETRIS' | 'SNAKE' | 'BRICK_BREAKER' | 'PING_PONG';
   puntuacion: number;
 }
 

@@ -18,7 +18,7 @@ export class PuntuacionApiService {
     return this.http.get<PuntuacionResponse[]>(`${this.baseUrl}/usuario/${usuarioId}`);
   }
 
-  rankingPorJuego(juego: 'TETRIS' | 'SNAKE' | 'BRICK_BREAKER'): Observable<PuntuacionResponse[]> {
+  rankingPorJuego(juego: 'TETRIS' | 'SNAKE' | 'BRICK_BREAKER' | 'PING_PONG'): Observable<PuntuacionResponse[]> {
     return this.http.get<PuntuacionResponse[]>(`${this.baseUrl}/ranking/${juego}`);
   }
 }
