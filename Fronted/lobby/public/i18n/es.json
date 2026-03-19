@@ -72,7 +72,8 @@
   "HOME": {
     "DEFAULT_STATUS": "Listo para jugar",
     "CUSTOMIZE": "Personalizar",
-    "GAMES": "Juegos"
+    "GAMES": "Juegos",
+    "LOGOUT": "Cerrar sesion"
   },
   "GAMES": {
     "BACK": "← Volver",

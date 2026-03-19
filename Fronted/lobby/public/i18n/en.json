@@ -72,7 +72,8 @@
   "HOME": {
     "DEFAULT_STATUS": "Ready to play",
     "CUSTOMIZE": "Customize",
-    "GAMES": "Games"
+    "GAMES": "Games",
+    "LOGOUT": "Log out"
   },
   "GAMES": {
     "BACK": "← Back",

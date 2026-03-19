@@ -151,6 +151,16 @@ export class HomeComponent implements OnInit, OnChanges {
     this.showGames = !this.showGames;
   }
 
+  logout(): void {
+    this.showCustomization = false;
+    this.showGames = false;
+
+    this.sessionStateService.clear();
+    this.clearLegacySessionKeys();
+
+    this.router.navigate(['/auth']);
+  }
+
   onCustomizationChange(config: any) {
     this.backgroundColor = config.backgroundColor;
     this.leftImage = config.leftImage;
@@ -268,6 +278,15 @@ export class HomeComponent implements OnInit, OnChanges {
         this.applyCustomizationFromInputs();
       }
     });
+  }
+
+  private clearLegacySessionKeys(): void {
+    localStorage.removeItem('usuarioId');
+    localStorage.removeItem('tetrisUsername');
+    localStorage.removeItem('tetrisProfile');
+    localStorage.removeItem('tetrisNationality');
+    localStorage.removeItem('tetrisAge');
+    localStorage.removeItem('tetrisPhoto');
   }
 
   private applyCustomizationFromInputs(): void {
