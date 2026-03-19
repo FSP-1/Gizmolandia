@@ -4,15 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PhotoUploadComponent } from '../photo-upload/photo-upload';
-import { HomeComponent } from '../home/home';
 import { ApiValidationError, UsuarioRequest, UsuarioResponse } from '../../services/api.models';
 import { AuthApiService } from '../../services/auth-api.service';
 import { UsuarioApiService } from '../../services/usuario-api.service';
+import { SessionStateService } from '../../services/session-state.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule, PhotoUploadComponent, HomeComponent],
+  imports: [CommonModule, FormsModule, TranslateModule, PhotoUploadComponent],
   templateUrl: './user-form.html',
   styleUrls: ['./user-form.css']
 })
@@ -32,7 +33,6 @@ export class UserFormComponent {
   };
 
   submitted = false;
-  showHome = false;
   registering = false;
   currentLanguage = 'es';
   apiError = '';
@@ -41,7 +41,9 @@ export class UserFormComponent {
     private cdr: ChangeDetectorRef,
     private translate: TranslateService,
     private authApiService: AuthApiService,
-    private usuarioApiService: UsuarioApiService
+    private usuarioApiService: UsuarioApiService,
+    private sessionStateService: SessionStateService,
+    private router: Router
   ) {
     const browserLang = this.translate.getBrowserLang();
     const savedLang = localStorage.getItem('appLanguage');
@@ -51,6 +53,10 @@ export class UserFormComponent {
     this.translate.setDefaultLang('es');
     this.currentLanguage = initialLang;
     this.translate.use(initialLang);
+
+    if (this.sessionStateService.hasUserSession()) {
+      this.router.navigate(['/home']);
+    }
   }
 
   setLanguage(lang: string) {
@@ -112,13 +118,14 @@ export class UserFormComponent {
     this.usuarioApiService.crearUsuario(payload).subscribe({
       next: (usuarioCreado) => {
         this.persistUserSession(usuarioCreado);
+        this.sessionStateService.saveUser(usuarioCreado);
 
         this.registering = false;
         this.submitted = true;
         this.cdr.detectChanges();
         setTimeout(() => {
           this.submitted = false;
-          this.showHome = true;
+          this.router.navigate(['/home']);
           this.cdr.detectChanges();
         }, 1400);
       },
@@ -137,8 +144,9 @@ export class UserFormComponent {
     }).subscribe({
       next: (usuario) => {
         this.persistUserSession(usuario);
+        this.sessionStateService.saveUser(usuario);
         this.registering = false;
-        this.showHome = true;
+        this.router.navigate(['/home']);
         this.cdr.detectChanges();
       },
       error: (error: HttpErrorResponse) => {

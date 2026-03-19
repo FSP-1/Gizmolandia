@@ -4,7 +4,9 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CustomizationComponent } from '../customization/customization';
 import { GamesComponent } from '../games/games';
 import { UsuarioApiService } from '../../services/usuario-api.service';
-import { UsuarioPersonalizacionRequest } from '../../services/api.models';
+import { UsuarioPersonalizacionRequest, UsuarioResponse } from '../../services/api.models';
+import { SessionStateService } from '../../services/session-state.service';
+import { Router } from '@angular/router';
 
 interface HomeCustomizationConfig {
   backgroundColor: string;
@@ -63,16 +65,20 @@ export class HomeComponent implements OnInit, OnChanges {
   };
 
   private customizationSnapshot: HomeCustomizationConfig | null = null;
+  private sessionUser: UsuarioResponse | null = null;
 
   constructor(
     private translate: TranslateService,
-    private usuarioApiService: UsuarioApiService
+    private usuarioApiService: UsuarioApiService,
+    private sessionStateService: SessionStateService,
+    private router: Router
   ) {
     const savedLanguage = localStorage.getItem('appLanguage');
     this.currentLanguage = savedLanguage === 'en' ? 'en' : 'es';
   }
 
   ngOnInit(): void {
+    this.hydrateFromSession();
     this.applyCustomizationFromInputs();
   }
 
@@ -203,8 +209,36 @@ export class HomeComponent implements OnInit, OnChanges {
     this.usuarioApiService.guardarPersonalizacion(this.userId, payload).subscribe({
       next: (usuarioActualizado) => {
         this.userPhoto = usuarioActualizado.foto || this.userPhoto;
+        const previous = this.sessionStateService.getUser();
+        if (previous) {
+          this.sessionStateService.saveUser({
+            ...previous,
+            ...usuarioActualizado
+          });
+        }
       }
     });
+  }
+
+  private hydrateFromSession(): void {
+    this.sessionUser = this.sessionStateService.getUser();
+    if (!this.sessionUser) {
+      this.router.navigate(['/auth']);
+      return;
+    }
+
+    this.userId = this.userId || this.sessionUser.id;
+    this.userName = this.userName || this.sessionUser.nombre;
+    this.userProfile = this.userProfile || this.sessionUser.userProfile;
+    this.userPhoto = this.userPhoto || this.sessionUser.foto || '';
+    this.nationality = this.nationality || this.sessionUser.nacionalidad;
+
+    this.initialBackgroundColor = this.initialBackgroundColor || this.sessionUser.homeBackgroundColor || '';
+    this.initialLeftImage = this.initialLeftImage || this.sessionUser.homeLeftImage || '';
+    this.initialRightImage = this.initialRightImage || this.sessionUser.homeRightImage || '';
+    this.initialUserStatus = this.initialUserStatus || this.sessionUser.homeStatus || '';
+    this.initialNameColor = this.initialNameColor || this.sessionUser.homeNameColor || '';
+    this.initialLanguage = this.initialLanguage || this.sessionUser.preferredLanguage || '';
   }
 
   private applyCustomizationFromInputs(): void {

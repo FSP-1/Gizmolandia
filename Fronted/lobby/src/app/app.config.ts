@@ -2,6 +2,8 @@ import { ApplicationConfig, importProvidersFrom, provideBrowserGlobalErrorListen
 import { HttpClient, provideHttpClient } from '@angular/common/http';
 import { TranslateLoader, TranslateModule, TranslationObject } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
+import { provideRouter } from '@angular/router';
+import { routes } from './app.routes';
 
 function createTranslateLoader(http: HttpClient): TranslateLoader {
   return {
@@ -14,6 +16,7 @@ function createTranslateLoader(http: HttpClient): TranslateLoader {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideRouter(routes),
     provideHttpClient(),
     importProvidersFrom(
       TranslateModule.forRoot({

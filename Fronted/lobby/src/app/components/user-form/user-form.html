@@ -1,27 +1,11 @@
-<div class="language-switcher" *ngIf="!showHome">
+<div class="language-switcher">
   <label for="app-language">{{ 'APP.LANGUAGE' | translate }}</label>
   <select id="app-language" name="app-language" [(ngModel)]="currentLanguage" (ngModelChange)="setLanguage($event)">
     <option value="es">Español</option>
     <option value="en">English</option>
   </select>
 </div>
-
-<app-home
-  *ngIf="showHome"
-  [userId]="currentUserId"
-  [userName]="user.nombre"
-  [userProfile]="user.userProfile"
-  [userPhoto]="user.foto"
-  [nationality]="user.nacionalidad"
-  [initialBackgroundColor]="currentUser?.homeBackgroundColor || ''"
-  [initialLeftImage]="currentUser?.homeLeftImage || ''"
-  [initialRightImage]="currentUser?.homeRightImage || ''"
-  [initialUserStatus]="currentUser?.homeStatus || ''"
-  [initialNameColor]="currentUser?.homeNameColor || ''"
-  [initialLanguage]="currentUser?.preferredLanguage || ''">
-</app-home>
-
-<div *ngIf="!showHome" class="form-wrapper">
+<div class="form-wrapper">
   <div class="form-container" [class.submitted]="submitted">
     <div class="auth-mode-switch">
       <button

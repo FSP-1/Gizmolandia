@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
-import { UserFormComponent } from './components/user-form/user-form';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [UserFormComponent],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
 export class AppComponent {
-  title = 'formulario-animado';
+  title = 'gizmolandia-lobby';
 }
