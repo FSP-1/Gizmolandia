@@ -18,6 +18,8 @@ import { Router } from '@angular/router';
   styleUrls: ['./user-form.css']
 })
 export class UserFormComponent {
+  private readonly maxStoredPhotoLength = 120_000;
+
   authMode: 'register' | 'login' = 'register';
   currentUserId: number | null = null;
   currentUser: UsuarioResponse | null = null;
@@ -173,12 +175,18 @@ export class UserFormComponent {
   private persistUserSession(usuario: UsuarioResponse) {
     this.currentUserId = usuario.id;
     this.currentUser = usuario;
-    localStorage.setItem('usuarioId', String(usuario.id));
-    localStorage.setItem('tetrisUsername', usuario.nombre);
-    localStorage.setItem('tetrisProfile', usuario.userProfile);
-    localStorage.setItem('tetrisNationality', usuario.nacionalidad);
-    localStorage.setItem('tetrisAge', String(usuario.edad));
-    localStorage.setItem('tetrisPhoto', usuario.foto || '');
+    this.safeSetItem('usuarioId', String(usuario.id));
+    this.safeSetItem('tetrisUsername', usuario.nombre);
+    this.safeSetItem('tetrisProfile', usuario.userProfile);
+    this.safeSetItem('tetrisNationality', usuario.nacionalidad);
+    this.safeSetItem('tetrisAge', String(usuario.edad));
+
+    const photo = usuario.foto || '';
+    if (photo.length <= this.maxStoredPhotoLength) {
+      this.safeSetItem('tetrisPhoto', photo);
+    } else {
+      localStorage.removeItem('tetrisPhoto');
+    }
 
     this.user.nombre = usuario.nombre;
     this.user.userProfile = usuario.userProfile;
@@ -187,6 +195,17 @@ export class UserFormComponent {
     this.user.foto = usuario.foto || '';
     this.user.password = '';
     this.user.confirmPassword = '';
+  }
+
+  private safeSetItem(key: string, value: string): void {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // Preserve app flow even when browser storage quota is full.
+      if (key !== 'usuarioId') {
+        localStorage.removeItem(key);
+      }
+    }
   }
 
   private buildApiErrorMessage(error: HttpErrorResponse): string {

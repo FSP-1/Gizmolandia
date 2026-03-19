@@ -18,6 +18,10 @@ export class UsuarioApiService {
     return this.http.get<UsuarioResponse[]>(this.baseUrl);
   }
 
+  buscarPorId(id: number): Observable<UsuarioResponse> {
+    return this.http.get<UsuarioResponse>(`${this.baseUrl}/${id}`);
+  }
+
   buscarPorPerfil(userProfile: string): Observable<UsuarioResponse> {
     return this.http.get<UsuarioResponse>(`${this.baseUrl}/perfil/${encodeURIComponent(userProfile)}`);
   }

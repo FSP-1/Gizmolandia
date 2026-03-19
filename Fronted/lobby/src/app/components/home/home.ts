@@ -239,6 +239,35 @@ export class HomeComponent implements OnInit, OnChanges {
     this.initialUserStatus = this.initialUserStatus || this.sessionUser.homeStatus || '';
     this.initialNameColor = this.initialNameColor || this.sessionUser.homeNameColor || '';
     this.initialLanguage = this.initialLanguage || this.sessionUser.preferredLanguage || '';
+
+    this.loadFullUserFromApiIfNeeded();
+  }
+
+  private loadFullUserFromApiIfNeeded(): void {
+    if (!this.userId) {
+      return;
+    }
+
+    const needsRefresh = !this.userPhoto || !this.initialLeftImage || !this.initialRightImage;
+    if (!needsRefresh) {
+      return;
+    }
+
+    this.usuarioApiService.buscarPorId(this.userId).subscribe({
+      next: (usuarioActualizado) => {
+        this.sessionStateService.saveUser(usuarioActualizado);
+
+        this.userPhoto = usuarioActualizado.foto || this.userPhoto;
+        this.initialBackgroundColor = usuarioActualizado.homeBackgroundColor || this.initialBackgroundColor;
+        this.initialLeftImage = usuarioActualizado.homeLeftImage || this.initialLeftImage;
+        this.initialRightImage = usuarioActualizado.homeRightImage || this.initialRightImage;
+        this.initialUserStatus = usuarioActualizado.homeStatus || this.initialUserStatus;
+        this.initialNameColor = usuarioActualizado.homeNameColor || this.initialNameColor;
+        this.initialLanguage = (usuarioActualizado.preferredLanguage || this.initialLanguage) as 'es' | 'en' | '';
+
+        this.applyCustomizationFromInputs();
+      }
+    });
   }
 
   private applyCustomizationFromInputs(): void {
