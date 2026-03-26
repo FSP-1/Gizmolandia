@@ -45,14 +45,6 @@
     <div class="status" *ngIf="statusText">{{ statusText }}</div>
 
     <button type="button" class="restart-btn" *ngIf="mode === 'bot'" (click)="startBotMatch()">{{ 'GAMES.RESTART' | translate }}</button>
-
-    <div class="rematch-box" *ngIf="canShowRematch">
-      <p>{{ 'GAMES.PING_PONG.REMATCH_PROMPT' | translate }}</p>
-      <div class="rematch-actions">
-        <button type="button" class="start-btn" (click)="acceptRematch()">{{ 'GAMES.PING_PONG.REMATCH_YES' | translate }}</button>
-        <button type="button" class="secondary-btn" (click)="declineRematch()">{{ 'GAMES.PING_PONG.REMATCH_NO' | translate }}</button>
-      </div>
-    </div>
   </section>
 
   <section class="game-area">
@@ -61,5 +53,73 @@
 
   <div class="leaderboard-slot">
     <app-game-leaderboard juego="PING_PONG"></app-game-leaderboard>
+  </div>
+
+  <!-- Match Preview Modal -->
+  <div class="modal-overlay" *ngIf="showPreview">
+    <div class="modal-dialog preview-dialog">
+      <div class="modal-header">
+        <h3>{{ 'GAMES.PING_PONG.FOUND_MATCH' | translate }}</h3>
+      </div>
+      <div class="modal-body preview-body">
+        <div class="opponent-card">
+          <img [src]="previewOpponentPhotoSrc" alt="Opponent" class="opponent-photo">
+          <p class="opponent-name">{{ previewOpponentUsername }}</p>
+          <p class="preview-timeout">{{ 'GAMES.PING_PONG.ACCEPT_IN' | translate }}: {{ previewTimeout }}s</p>
+        </div>
+      </div>
+      <div class="modal-actions preview-actions">
+        <button type="button" class="modal-btn accept-btn" (click)="acceptPreview()" title="Aceptar">
+          ✓
+        </button>
+        <button type="button" class="modal-btn reject-btn" (click)="declinePreview()" title="Rechazar">
+          ✗
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rematch Modal -->
+  <div class="modal-overlay" *ngIf="canShowRematch">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>{{ 'GAMES.PING_PONG.REMATCH_PROMPT' | translate }}</h3>
+      </div>
+      <div class="modal-body">
+        <p *ngIf="rematchWon">
+           {{ 'GAMES.PING_PONG.YOU_WON' | translate }}
+        </p>
+        <p *ngIf="!rematchWon">
+           {{ 'GAMES.PING_PONG.YOU_LOST' | translate }}
+        </p>
+        <p class="score-display">{{ scoreLeft }} - {{ scoreRight }}</p>
+
+        <div class="rematch-players">
+          <div class="rematch-player">
+            <img [src]="rematchLeftPhotoSrc" alt="Left player" class="rematch-avatar">
+            <div class="rematch-meta">
+              <div class="rematch-name">{{ rematchLeftName }}</div>
+              <div class="rematch-decision">{{ rematchLeftDecisionLabel }}</div>
+            </div>
+          </div>
+
+          <div class="rematch-player">
+            <img [src]="rematchRightPhotoSrc" alt="Right player" class="rematch-avatar">
+            <div class="rematch-meta">
+              <div class="rematch-name">{{ rematchRightName }}</div>
+              <div class="rematch-decision">{{ rematchRightDecisionLabel }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="modal-btn yes-btn" (click)="acceptRematch()">
+          {{ 'GAMES.PING_PONG.REMATCH_YES' | translate }}
+        </button>
+        <button type="button" class="modal-btn no-btn" (click)="declineRematch()">
+          {{ 'GAMES.PING_PONG.REMATCH_NO' | translate }}
+        </button>
+      </div>
+    </div>
   </div>
 </div>

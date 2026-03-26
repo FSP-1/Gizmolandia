@@ -44,6 +44,11 @@ public class PingPongWebSocketHandler extends TextWebSocketHandler {
 
         if ("rematch".equals(type)) {
             pingPongRealtimeService.onRematchDecision(session, node.path("accept").asBoolean(false));
+            return;
+        }
+
+        if ("preview_decision".equals(type)) {
+            pingPongRealtimeService.onPreviewDecision(session, node.path("accept").asBoolean(false));
         }
     }
 

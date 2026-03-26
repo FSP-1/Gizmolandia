@@ -11,6 +11,8 @@ export interface PingPongRealtimeState {
   playersConnected: number;
   leftPlayer: string;
   rightPlayer: string;
+  leftPlayerPhoto: string;
+  rightPlayerPhoto: string;
   yourSide: 'LEFT' | 'RIGHT';
   scoreLeft: number;
   scoreRight: number;
@@ -51,12 +53,20 @@ export interface PingPongKickedEvent {
   reason: string;
 }
 
+export interface PingPongMatchPreviewEvent {
+  type: 'match_preview';
+  opponentUsername: string;
+  opponentPhoto: string;
+  timeoutSeconds: number;
+}
+
 export type PingPongRealtimeEvent =
   | PingPongRealtimeState
   | PingPongQueueEvent
   | PingPongLobbyEvent
   | PingPongQueueFullEvent
-  | PingPongKickedEvent;
+  | PingPongKickedEvent
+  | PingPongMatchPreviewEvent;
 
 @Injectable({ providedIn: 'root' })
 export class PingPongRealtimeService {
@@ -97,6 +107,13 @@ export class PingPongRealtimeService {
   sendRematchDecision(accept: boolean): void {
     this.send({
       type: 'rematch',
+      accept
+    });
+  }
+
+  sendPreviewDecision(accept: boolean): void {
+    this.send({
+      type: 'preview_decision',
       accept
     });
   }

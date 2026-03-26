@@ -142,7 +142,11 @@
       "CONTROLS_MOUSE": "Mueve el mouse sobre la cancha",
       "REMATCH_PROMPT": "Quieres revancha con este jugador?",
       "REMATCH_YES": "Si, revancha",
-      "REMATCH_NO": "No, buscar otro"
+      "REMATCH_NO": "No, buscar otro",
+      "YOU_WON": "¡Ganaste!",
+      "YOU_LOST": "Perdiste esta ronda",
+      "FOUND_MATCH": "¡Se encontró rival!",
+      "ACCEPT_IN": "Acepta en"
     }
   },
   "CUSTOMIZATION": {

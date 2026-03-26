@@ -142,7 +142,11 @@
       "CONTROLS_MOUSE": "Move the mouse over the court",
       "REMATCH_PROMPT": "Want a rematch with this player?",
       "REMATCH_YES": "Yes, rematch",
-      "REMATCH_NO": "No, find another"
+      "REMATCH_NO": "No, find another",
+      "YOU_WON": "You won!",
+      "YOU_LOST": "You lost this round",
+      "FOUND_MATCH": "Match found!",
+      "ACCEPT_IN": "Accept in"
     }
   },
   "CUSTOMIZATION": {

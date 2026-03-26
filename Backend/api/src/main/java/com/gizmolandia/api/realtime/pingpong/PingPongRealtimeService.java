@@ -2,6 +2,7 @@ package com.gizmolandia.api.realtime.pingpong;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gizmolandia.api.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -29,27 +30,41 @@ public class PingPongRealtimeService {
     private static final double RIGHT_PADDLE_X = 0.97;
 
     private final ObjectMapper objectMapper;
+    private final UsuarioRepository usuarioRepository;
 
     private final Object matchmakingLock = new Object();
     private final Map<Integer, RoomState> rooms = new ConcurrentHashMap<>();
     private final ArrayDeque<QueuedPlayer> waitingQueue = new ArrayDeque<>();
     private final Map<String, SessionRef> sessionsById = new ConcurrentHashMap<>();
     private final Map<String, WebSocketSession> rawSessions = new ConcurrentHashMap<>();
+    private final Map<String, Object> sendLocksBySessionId = new ConcurrentHashMap<>();
+    private final Map<String, String> sessionIdByPlayerName = new ConcurrentHashMap<>();
 
     public void connect(WebSocketSession session, String playerName) {
         String normalizedPlayerName = normalizePlayerName(playerName);
-        rawSessions.put(session.getId(), session);
+        String normalizedPlayerPhoto = normalizePlayerPhoto(resolvePlayerPhoto(normalizedPlayerName));
 
         synchronized (matchmakingLock) {
+            String previousSessionId = sessionIdByPlayerName.get(normalizedPlayerName);
+            if (previousSessionId != null && !previousSessionId.equals(session.getId())) {
+                // Kick the previous connection for this player and remove it from queue/rooms.
+                sendSimple(previousSessionId, "kicked", Map.of("reason", "duplicate_login"));
+                disconnectBySessionId(previousSessionId);
+                closeSilently(previousSessionId);
+            }
+
+            rawSessions.put(session.getId(), session);
+            sessionIdByPlayerName.put(normalizedPlayerName, session.getId());
+
             ensureRooms();
-            if (!assignSessionToAvailableSlot(session.getId(), normalizedPlayerName)) {
+            if (!assignSessionToAvailableSlot(session.getId(), normalizedPlayerName, normalizedPlayerPhoto)) {
                 if (waitingQueue.size() >= MAX_QUEUE) {
                     sendSimple(session.getId(), "queue_full", Map.of("maxQueue", MAX_QUEUE));
                     closeSilently(session.getId());
                     return;
                 }
 
-                waitingQueue.addLast(new QueuedPlayer(session.getId(), normalizedPlayerName));
+                waitingQueue.addLast(new QueuedPlayer(session.getId(), normalizedPlayerName, normalizedPlayerPhoto));
                 sendQueuePosition(session.getId());
             }
 
@@ -58,8 +73,54 @@ public class PingPongRealtimeService {
         }
     }
 
+    private void disconnectBySessionId(String sessionId) {
+        if (removeQueuedSession(sessionId)) {
+            sessionsById.remove(sessionId);
+            rawSessions.remove(sessionId);
+            sendLocksBySessionId.remove(sessionId);
+            return;
+        }
+
+        SessionRef ref = sessionsById.remove(sessionId);
+        if (ref == null) {
+            rawSessions.remove(sessionId);
+            sendLocksBySessionId.remove(sessionId);
+            return;
+        }
+
+        RoomState room = rooms.get(ref.roomIndex());
+        if (room != null) {
+            removePlayerFromRoom(room, ref.side());
+            fillEmptySlotsFromQueue();
+            broadcastRoom(room.index);
+        }
+
+        rawSessions.remove(sessionId);
+        sendLocksBySessionId.remove(sessionId);
+        pushQueueUpdates();
+        broadcastLobbyToAll();
+    }
+
+    private String resolvePlayerPhoto(String normalizedPlayerName) {
+        if (normalizedPlayerName == null || normalizedPlayerName.isBlank()) {
+            return "";
+        }
+
+        try {
+            return usuarioRepository.findByNombre(normalizedPlayerName)
+                    .map(u -> u.getFoto() == null ? "" : u.getFoto())
+                    .orElse("");
+        } catch (Exception ignored) {
+            return "";
+        }
+    }
+
     public void disconnect(WebSocketSession session) {
         rawSessions.remove(session.getId());
+        sendLocksBySessionId.remove(session.getId());
+
+        // Remove reverse mapping if it points to this session.
+        sessionIdByPlayerName.entrySet().removeIf(e -> e.getValue().equals(session.getId()));
 
         synchronized (matchmakingLock) {
             if (removeQueuedSession(session.getId())) {
@@ -145,6 +206,61 @@ public class PingPongRealtimeService {
                     }
                 }
             }
+        }
+    }
+
+    public void onPreviewDecision(WebSocketSession session, boolean accept) {
+        SessionRef ref = sessionsById.get(session.getId());
+        if (ref == null) {
+            return;
+        }
+
+        synchronized (matchmakingLock) {
+            RoomState room = rooms.get(ref.roomIndex());
+            if (room == null) {
+                return;
+            }
+
+            synchronized (room.lock) {
+                if (!"PREVIEW".equals(room.status)) {
+                    return;
+                }
+
+                // Register the player's decision
+                if (ref.side() == Side.LEFT) {
+                    room.previewLeftAccepted = accept;
+                } else {
+                    room.previewRightAccepted = accept;
+                }
+
+                // Check if either player rejected
+                if (!accept) {
+                    // Player rejected, remove them and put back in queue
+                    String rejectedSessionId = ref.side() == Side.LEFT ? room.leftSessionId : room.rightSessionId;
+                    removePlayerFromRoom(room, ref.side());
+                    sessionsById.remove(rejectedSessionId);
+                    closeSilently(rejectedSessionId);
+
+                    // Put other player back in queue
+                    String otherSessionId = ref.side() == Side.LEFT ? room.rightSessionId : room.leftSessionId;
+                    String otherPlayerName = ref.side() == Side.LEFT ? room.rightPlayer : room.leftPlayer;
+                    String otherPlayerPhoto = ref.side() == Side.LEFT ? room.rightPlayerPhoto : room.leftPlayerPhoto;
+                    if (otherSessionId != null) {
+                        removePlayerFromRoom(room, ref.side() == Side.LEFT ? Side.RIGHT : Side.LEFT);
+                        sessionsById.remove(otherSessionId);
+                        waitingQueue.addFirst(new QueuedPlayer(otherSessionId, otherPlayerName, otherPlayerPhoto));
+                    }
+                } else {
+                    // Both players accepted - start the match
+                    if (Boolean.TRUE.equals(room.previewLeftAccepted)
+                            && Boolean.TRUE.equals(room.previewRightAccepted)) {
+                        room.status = "PLAYING";
+                        room.previewLeftAccepted = null;
+                        room.previewRightAccepted = null;
+                        resetBall(room, randomDirection());
+                    }
+                }
+            }
 
             fillEmptySlotsFromQueue();
             broadcastRoom(room.index);
@@ -180,6 +296,29 @@ public class PingPongRealtimeService {
                 room.ballY = 0.5;
                 room.ballVX = 0;
                 room.ballVY = 0;
+                return;
+            }
+
+            // Handle preview timeout
+            if ("PREVIEW".equals(room.status)) {
+                long previewElapsedNanos = now - room.previewTimestampNanos;
+                if (previewElapsedNanos > 10_000_000_000L) { // 10 seconds
+                    // Timeout: auto-decline both players, put back in queue
+                    if (room.leftSessionId != null) {
+                        waitingQueue
+                                .addLast(new QueuedPlayer(room.leftSessionId, room.leftPlayer, room.leftPlayerPhoto));
+                    }
+                    if (room.rightSessionId != null) {
+                        waitingQueue.addLast(
+                                new QueuedPlayer(room.rightSessionId, room.rightPlayer, room.rightPlayerPhoto));
+                    }
+                    removePlayerFromRoom(room, Side.LEFT);
+                    removePlayerFromRoom(room, Side.RIGHT);
+                    sessionsById.remove(room.leftSessionId);
+                    sessionsById.remove(room.rightSessionId);
+                    room.leftSessionId = null;
+                    room.rightSessionId = null;
+                }
                 return;
             }
 
@@ -267,8 +406,14 @@ public class PingPongRealtimeService {
         room.winner = "";
         room.leftRematch = null;
         room.rightRematch = null;
-        room.status = "PLAYING";
-        resetBall(room, randomDirection());
+        room.previewLeftAccepted = null;
+        room.previewRightAccepted = null;
+        room.previewTimestampNanos = System.nanoTime();
+        room.status = "PREVIEW";
+
+        // Send preview events to both players
+        sendMatchPreview(room.leftSessionId, room.rightPlayer, room.rightPlayerPhoto);
+        sendMatchPreview(room.rightSessionId, room.leftPlayer, room.leftPlayerPhoto);
     }
 
     private void fillEmptySlotsFromQueue() {
@@ -280,7 +425,7 @@ public class PingPongRealtimeService {
                 continue;
             }
 
-            if (!assignSessionToAvailableSlot(next.sessionId(), next.playerName())) {
+            if (!assignSessionToAvailableSlot(next.sessionId(), next.playerName(), next.playerPhoto())) {
                 break;
             }
 
@@ -288,7 +433,7 @@ public class PingPongRealtimeService {
         }
     }
 
-    private boolean assignSessionToAvailableSlot(String sessionId, String playerName) {
+    private boolean assignSessionToAvailableSlot(String sessionId, String playerName, String playerPhoto) {
         RoomState room = findRoomWithSinglePlayer();
         if (room == null) {
             room = findEmptyRoom();
@@ -302,10 +447,12 @@ public class PingPongRealtimeService {
             if (room.leftSessionId == null) {
                 room.leftSessionId = sessionId;
                 room.leftPlayer = playerName;
+                room.leftPlayerPhoto = playerPhoto;
                 side = Side.LEFT;
             } else if (room.rightSessionId == null) {
                 room.rightSessionId = sessionId;
                 room.rightPlayer = playerName;
+                room.rightPlayerPhoto = playerPhoto;
                 side = Side.RIGHT;
             } else {
                 return false;
@@ -379,6 +526,13 @@ public class PingPongRealtimeService {
 
     private boolean removeQueuedSession(String sessionId) {
         return waitingQueue.removeIf(q -> q.sessionId().equals(sessionId));
+    }
+
+    private void sendMatchPreview(String sessionId, String opponentName, String opponentPhoto) {
+        sendSimple(sessionId, "match_preview", Map.of(
+                "opponentUsername", opponentName,
+                "opponentPhoto", opponentPhoto == null ? "" : opponentPhoto,
+                "timeoutSeconds", 10));
     }
 
     private void sendQueuePosition(String sessionId) {
@@ -473,6 +627,8 @@ public class PingPongRealtimeService {
         payload.put("playersConnected", room.playersConnected());
         payload.put("leftPlayer", room.leftPlayer);
         payload.put("rightPlayer", room.rightPlayer);
+        payload.put("leftPlayerPhoto", room.leftPlayerPhoto);
+        payload.put("rightPlayerPhoto", room.rightPlayerPhoto);
         payload.put("scoreLeft", room.leftScore);
         payload.put("scoreRight", room.rightScore);
         payload.put("leftPaddleY", room.leftPaddleY);
@@ -500,12 +656,25 @@ public class PingPongRealtimeService {
             return;
         }
 
-        try {
-            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(payload)));
-        } catch (JsonProcessingException ignored) {
-            // Ignore serialization errors for transient events.
-        } catch (IOException ignored) {
-            // Ignore broken sockets.
+        Object lock = sendLocksBySessionId.computeIfAbsent(sessionId, ignored -> new Object());
+        synchronized (lock) {
+            // Re-check under lock: session may have been closed while waiting.
+            WebSocketSession current = rawSessions.get(sessionId);
+            if (current == null || !current.isOpen()) {
+                return;
+            }
+
+            try {
+                current.sendMessage(new TextMessage(objectMapper.writeValueAsString(payload)));
+            } catch (JsonProcessingException ignored) {
+                // Ignore serialization errors for transient events.
+            } catch (IOException ignored) {
+                // Ignore broken sockets.
+            } catch (IllegalStateException ignored) {
+                // Session can close between isOpen() and sendMessage() under load/ticks.
+                rawSessions.remove(sessionId);
+                sendLocksBySessionId.remove(sessionId);
+            }
         }
     }
 
@@ -521,6 +690,7 @@ public class PingPongRealtimeService {
             // Ignore close errors.
         } finally {
             rawSessions.remove(sessionId);
+            sendLocksBySessionId.remove(sessionId);
         }
     }
 
@@ -560,6 +730,53 @@ public class PingPongRealtimeService {
         return trimmed;
     }
 
+    private String normalizePlayerPhoto(String playerPhoto) {
+        if (playerPhoto == null) {
+            return "";
+        }
+
+        String trimmed = playerPhoto.trim();
+        if (trimmed.isEmpty()) {
+            return "";
+        }
+
+        // Accept full data URIs as-is.
+        if (trimmed.regionMatches(true, 0, "data:image/", 0, "data:image/".length())) {
+            return capPhoto(trimmed);
+        }
+
+        // If DB stores raw base64 (no prefix), wrap it into a valid data URI.
+        // We default to jpeg to match the common case used in the app.
+        String maybeBase64 = trimmed;
+        if (maybeBase64.startsWith("/9j/")) {
+            return capPhoto("data:image/jpeg;base64," + maybeBase64);
+        }
+
+        // Allow http(s) URLs if you ever store them.
+        if (trimmed.regionMatches(true, 0, "http://", 0, "http://".length())
+                || trimmed.regionMatches(true, 0, "https://", 0, "https://".length())) {
+            return capPhoto(trimmed);
+        }
+
+        // Unknown format -> don't send it (avoids invalid URL requests on the client).
+        return "";
+    }
+
+    private String capPhoto(String photo) {
+        if (photo == null) {
+            return "";
+        }
+
+        String trimmed = photo.trim();
+        // Allow bigger than before (data URIs can be larger) but still cap to avoid
+        // abuse.
+        int max = 200_000;
+        if (trimmed.length() > max) {
+            return trimmed.substring(0, max);
+        }
+        return trimmed;
+    }
+
     private void ensureRooms() {
         for (int i = 1; i <= TOTAL_ROOMS; i++) {
             rooms.computeIfAbsent(i, RoomState::new);
@@ -569,7 +786,7 @@ public class PingPongRealtimeService {
     private record SessionRef(int roomIndex, Side side) {
     }
 
-    private record QueuedPlayer(String sessionId, String playerName) {
+    private record QueuedPlayer(String sessionId, String playerName, String playerPhoto) {
     }
 
     private enum Side {
@@ -587,6 +804,9 @@ public class PingPongRealtimeService {
         private String leftPlayer = "";
         private String rightPlayer = "";
 
+        private String leftPlayerPhoto = "";
+        private String rightPlayerPhoto = "";
+
         private double leftPaddleY = 0.5;
         private double rightPaddleY = 0.5;
 
@@ -602,6 +822,11 @@ public class PingPongRealtimeService {
         private long lastTickNanos = System.nanoTime();
         private Boolean leftRematch;
         private Boolean rightRematch;
+
+        // Preview-related fields
+        private Boolean previewLeftAccepted;
+        private Boolean previewRightAccepted;
+        private long previewTimestampNanos;
 
         private RoomState(int index) {
             this.index = index;

@@ -52,8 +52,8 @@ export class TetrisComponent implements OnInit, OnDestroy {
     [[1, 1], [1, 1]], // square
     [[1, 1, 1, 1]], // horizontal line
     [[1], [1], [1], [1]], // vertical line
-    [[1, 0, 0, 0], [1, 1, 1, 1]], // left L
-    [[0, 0, 0, 1], [1, 1, 1, 1]], // right L
+    [[1, 0, 0], [1, 1, 1]], // left L
+    [[0, 0, 1], [1, 1, 1]], // right L
     [[1, 1, 0], [0, 1, 1]], // left S
     [[0, 1, 1], [1, 1, 0]], // right S
     [[0, 1, 0], [1, 1, 1]], // T

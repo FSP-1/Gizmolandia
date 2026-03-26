@@ -75,6 +75,13 @@ export class PingPongComponent implements OnInit, OnDestroy {
   private realtimeState: PingPongRealtimeState | null = null;
   private scorePersisted = false;
 
+  // Match preview state
+  showPreview = false;
+  previewOpponentUsername = '';
+  previewOpponentPhoto = '';
+  previewTimeout = 0;
+  private previewTimeoutId: number | null = null;
+
   private localState: LocalMatchState = {
     leftPaddleY: 0.5,
     rightPaddleY: 0.5,
@@ -161,6 +168,19 @@ export class PingPongComponent implements OnInit, OnDestroy {
     });
   }
 
+  get previewOpponentPhotoSrc(): string {
+    const photo = (this.previewOpponentPhoto || '').trim();
+    if (!photo) {
+      return '/assets/default-avatar.png';
+    }
+    const lower = photo.toLowerCase();
+    if (lower.startsWith('data:image/') || lower.startsWith('http://') || lower.startsWith('https://')) {
+      return photo;
+    }
+    // Prevent invalid URL fetches like "GET data:image/jpeg;base...".
+    return '/assets/default-avatar.png';
+  }
+
   disconnectOnline(): void {
     this.realtimeSub?.unsubscribe();
     this.realtimeSub = undefined;
@@ -192,6 +212,12 @@ export class PingPongComponent implements OnInit, OnDestroy {
 
     if (this.mode === 'online' && this.realtimeState) {
       this.realtimeService.sendPaddle(this.desiredPaddleY);
+      return;
+    }
+
+    // Bot mode: move the player's (left) paddle directly.
+    if (this.mode === 'bot') {
+      this.localState.leftPaddleY = this.desiredPaddleY;
     }
   }
 
@@ -215,6 +241,54 @@ export class PingPongComponent implements OnInit, OnDestroy {
 
   get canShowRematch(): boolean {
     return this.mode === 'online' && this.realtimeState?.status === 'FINISHED';
+  }
+
+  get rematchWon(): boolean {
+    return this.realtimeState?.winner === this.realtimeState?.yourSide;
+  }
+
+  private toPhotoSrc(photo: string | undefined | null): string {
+    const value = (photo || '').trim();
+    if (!value) {
+      return '/assets/default-avatar.png';
+    }
+    const lower = value.toLowerCase();
+    if (lower.startsWith('data:image/') || lower.startsWith('http://') || lower.startsWith('https://')) {
+      return value;
+    }
+    return '/assets/default-avatar.png';
+  }
+
+  get rematchLeftPhotoSrc(): string {
+    return this.toPhotoSrc(this.realtimeState?.leftPlayerPhoto);
+  }
+
+  get rematchRightPhotoSrc(): string {
+    return this.toPhotoSrc(this.realtimeState?.rightPlayerPhoto);
+  }
+
+  get rematchLeftName(): string {
+    return this.realtimeState?.leftPlayer || '';
+  }
+
+  get rematchRightName(): string {
+    return this.realtimeState?.rightPlayer || '';
+  }
+
+  private decisionLabel(accepted: boolean | undefined, otherAccepted: boolean | undefined): string {
+    // In payload we only have booleans; interpret "false,false" as pending (no one answered yet).
+    if (!accepted && !otherAccepted) {
+      return 'Pendiente';
+    }
+    return accepted ? 'Aceptó' : 'Rechazó';
+  }
+
+  get rematchLeftDecisionLabel(): string {
+    return this.decisionLabel(this.realtimeState?.leftRematch, this.realtimeState?.rightRematch);
+  }
+
+  get rematchRightDecisionLabel(): string {
+    return this.decisionLabel(this.realtimeState?.rightRematch, this.realtimeState?.leftRematch);
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -261,6 +335,11 @@ export class PingPongComponent implements OnInit, OnDestroy {
 
     if (event.type === 'kicked') {
       this.handleKickedEvent(event);
+      return;
+    }
+
+    if (event.type === 'match_preview') {
+      this.handleMatchPreviewEvent(event);
     }
   }
 
@@ -565,6 +644,56 @@ export class PingPongComponent implements OnInit, OnDestroy {
     }
 
     return this.localState;
+  }
+
+  private handleMatchPreviewEvent(event: any): void {
+    this.showPreview = true;
+    this.previewOpponentUsername = event.opponentUsername;
+    this.previewOpponentPhoto = event.opponentPhoto;
+    this.previewTimeout = event.timeoutSeconds;
+    this.statusText = `Jugador encontrado: ${event.opponentUsername}`;
+
+    // Clear previous timeout if exists
+    if (this.previewTimeoutId) {
+      clearTimeout(this.previewTimeoutId);
+    }
+
+    // Auto-reject if time runs out
+    this.previewTimeoutId = setTimeout(() => {
+      if (this.showPreview) {
+        this.declinePreview();
+      }
+    }, event.timeoutSeconds * 1000);
+  }
+
+  acceptPreview(): void {
+    if (!this.showPreview) {
+      return;
+    }
+
+    this.showPreview = false;
+    if (this.previewTimeoutId) {
+      clearTimeout(this.previewTimeoutId);
+      this.previewTimeoutId = null;
+    }
+
+    this.realtimeService.sendPreviewDecision(true);
+    this.statusText = 'Aceptaste la partida, cargando...';
+  }
+
+  declinePreview(): void {
+    if (!this.showPreview) {
+      return;
+    }
+
+    this.showPreview = false;
+    if (this.previewTimeoutId) {
+      clearTimeout(this.previewTimeoutId);
+      this.previewTimeoutId = null;
+    }
+
+    this.realtimeService.sendPreviewDecision(false);
+    this.statusText = 'Rechazaste el jugador, buscando otro...';
   }
 
   private clamp(value: number, min: number, max: number): number {
