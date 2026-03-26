@@ -66,6 +66,11 @@ public class PingPongRealtimeService {
 
                 waitingQueue.addLast(new QueuedPlayer(session.getId(), normalizedPlayerName, normalizedPlayerPhoto));
                 sendQueuePosition(session.getId());
+            } else {
+                SessionRef ref = sessionsById.get(session.getId());
+                if (ref != null) {
+                    broadcastRoom(ref.roomIndex());
+                }
             }
 
             pushQueueUpdates();
@@ -202,7 +207,7 @@ public class PingPongRealtimeService {
                     }
 
                     if (Boolean.TRUE.equals(room.leftRematch) && Boolean.TRUE.equals(room.rightRematch)) {
-                        startNewMatch(room);
+                        startRematchDirectly(room);
                     }
                 }
             }
@@ -251,13 +256,13 @@ public class PingPongRealtimeService {
                         waitingQueue.addFirst(new QueuedPlayer(otherSessionId, otherPlayerName, otherPlayerPhoto));
                     }
                 } else {
+                    // Keep preview alive while players are responding.
+                    room.previewTimestampNanos = System.nanoTime();
+
                     // Both players accepted - start the match
                     if (Boolean.TRUE.equals(room.previewLeftAccepted)
                             && Boolean.TRUE.equals(room.previewRightAccepted)) {
-                        room.status = "PLAYING";
-                        room.previewLeftAccepted = null;
-                        room.previewRightAccepted = null;
-                        resetBall(room, randomDirection());
+                        startMatchFromPreview(room);
                     }
                 }
             }
@@ -271,9 +276,11 @@ public class PingPongRealtimeService {
 
     @Scheduled(fixedRate = 16)
     public void tickRooms() {
-        for (RoomState room : rooms.values()) {
-            tickRoom(room);
-            broadcastRoom(room.index);
+        synchronized (matchmakingLock) {
+            for (RoomState room : rooms.values()) {
+                tickRoom(room);
+                broadcastRoom(room.index);
+            }
         }
     }
 
@@ -303,21 +310,27 @@ public class PingPongRealtimeService {
             if ("PREVIEW".equals(room.status)) {
                 long previewElapsedNanos = now - room.previewTimestampNanos;
                 if (previewElapsedNanos > 10_000_000_000L) { // 10 seconds
+                    String leftSessionId = room.leftSessionId;
+                    String rightSessionId = room.rightSessionId;
+                    String leftPlayer = room.leftPlayer;
+                    String rightPlayer = room.rightPlayer;
+                    String leftPlayerPhoto = room.leftPlayerPhoto;
+                    String rightPlayerPhoto = room.rightPlayerPhoto;
+
                     // Timeout: auto-decline both players, put back in queue
-                    if (room.leftSessionId != null) {
-                        waitingQueue
-                                .addLast(new QueuedPlayer(room.leftSessionId, room.leftPlayer, room.leftPlayerPhoto));
+                    if (leftSessionId != null) {
+                        removeQueuedSession(leftSessionId);
+                        waitingQueue.addLast(new QueuedPlayer(leftSessionId, leftPlayer, leftPlayerPhoto));
                     }
-                    if (room.rightSessionId != null) {
-                        waitingQueue.addLast(
-                                new QueuedPlayer(room.rightSessionId, room.rightPlayer, room.rightPlayerPhoto));
+                    if (rightSessionId != null) {
+                        removeQueuedSession(rightSessionId);
+                        waitingQueue.addLast(new QueuedPlayer(rightSessionId, rightPlayer, rightPlayerPhoto));
                     }
+
                     removePlayerFromRoom(room, Side.LEFT);
                     removePlayerFromRoom(room, Side.RIGHT);
-                    sessionsById.remove(room.leftSessionId);
-                    sessionsById.remove(room.rightSessionId);
-                    room.leftSessionId = null;
-                    room.rightSessionId = null;
+                    sessionsById.remove(leftSessionId);
+                    sessionsById.remove(rightSessionId);
                 }
                 return;
             }
@@ -376,8 +389,8 @@ public class PingPongRealtimeService {
         if (room.leftScore >= TARGET_SCORE) {
             room.status = "FINISHED";
             room.winner = "LEFT";
-            room.leftRematch = false;
-            room.rightRematch = false;
+            room.leftRematch = null;
+            room.rightRematch = null;
             room.ballVX = 0;
             room.ballVY = 0;
             room.ballX = 0.5;
@@ -388,8 +401,8 @@ public class PingPongRealtimeService {
         if (room.rightScore >= TARGET_SCORE) {
             room.status = "FINISHED";
             room.winner = "RIGHT";
-            room.leftRematch = false;
-            room.rightRematch = false;
+            room.leftRematch = null;
+            room.rightRematch = null;
             room.ballVX = 0;
             room.ballVY = 0;
             room.ballX = 0.5;
@@ -414,6 +427,27 @@ public class PingPongRealtimeService {
         // Send preview events to both players
         sendMatchPreview(room.leftSessionId, room.rightPlayer, room.rightPlayerPhoto);
         sendMatchPreview(room.rightSessionId, room.leftPlayer, room.leftPlayerPhoto);
+    }
+
+    private void startRematchDirectly(RoomState room) {
+        room.leftScore = 0;
+        room.rightScore = 0;
+        room.winner = "";
+        room.leftRematch = null;
+        room.rightRematch = null;
+        room.previewLeftAccepted = null;
+        room.previewRightAccepted = null;
+        room.status = "PLAYING";
+        resetBall(room, randomDirection());
+    }
+
+    private void startMatchFromPreview(RoomState room) {
+        room.status = "PLAYING";
+        room.previewLeftAccepted = null;
+        room.previewRightAccepted = null;
+        room.leftRematch = null;
+        room.rightRematch = null;
+        resetBall(room, randomDirection());
     }
 
     private void fillEmptySlotsFromQueue() {
@@ -635,8 +669,8 @@ public class PingPongRealtimeService {
         payload.put("rightPaddleY", room.rightPaddleY);
         payload.put("ballX", room.ballX);
         payload.put("ballY", room.ballY);
-        payload.put("leftRematch", room.leftRematch != null && room.leftRematch);
-        payload.put("rightRematch", room.rightRematch != null && room.rightRematch);
+        payload.put("leftRematch", room.leftRematch);
+        payload.put("rightRematch", room.rightRematch);
         payload.put("usedRooms", calculateUsedRooms());
         payload.put("totalRooms", TOTAL_ROOMS);
         payload.put("queueSize", waitingQueue.size());
@@ -784,9 +818,11 @@ public class PingPongRealtimeService {
     }
 
     private record SessionRef(int roomIndex, Side side) {
+
     }
 
     private record QueuedPlayer(String sessionId, String playerName, String playerPhoto) {
+
     }
 
     private enum Side {
@@ -795,6 +831,7 @@ public class PingPongRealtimeService {
     }
 
     private static class RoomState {
+
         private final Object lock = new Object();
         private final int index;
 

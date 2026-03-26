@@ -5,7 +5,7 @@ import { API_BASE_URL } from './api.config';
 export interface PingPongRealtimeState {
   type: 'state';
   roomId: string;
-  status: 'WAITING' | 'PLAYING' | 'FINISHED';
+  status: 'WAITING' | 'PREVIEW' | 'PLAYING' | 'FINISHED';
   winner: '' | 'LEFT' | 'RIGHT';
   targetScore: number;
   playersConnected: number;
@@ -20,8 +20,8 @@ export interface PingPongRealtimeState {
   rightPaddleY: number;
   ballX: number;
   ballY: number;
-  leftRematch: boolean;
-  rightRematch: boolean;
+  leftRematch: boolean | null;
+  rightRematch: boolean | null;
   usedRooms: number;
   totalRooms: number;
   queueSize: number;

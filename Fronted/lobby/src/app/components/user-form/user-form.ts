@@ -185,7 +185,7 @@ export class UserFormComponent {
     if (photo.length <= this.maxStoredPhotoLength) {
       this.safeSetItem('tetrisPhoto', photo);
     } else {
-      localStorage.removeItem('tetrisPhoto');
+      sessionStorage.removeItem('tetrisPhoto');
     }
 
     this.user.nombre = usuario.nombre;
@@ -199,11 +199,11 @@ export class UserFormComponent {
 
   private safeSetItem(key: string, value: string): void {
     try {
-      localStorage.setItem(key, value);
+      sessionStorage.setItem(key, value);
     } catch {
       // Preserve app flow even when browser storage quota is full.
       if (key !== 'usuarioId') {
-        localStorage.removeItem(key);
+        sessionStorage.removeItem(key);
       }
     }
   }

@@ -146,7 +146,32 @@
       "YOU_WON": "You won!",
       "YOU_LOST": "You lost this round",
       "FOUND_MATCH": "Match found!",
-      "ACCEPT_IN": "Accept in"
+      "ACCEPT_IN": "Accept in",
+      "DECISIONS": {
+        "PENDING": "Pending",
+        "ACCEPTED": "Accepted",
+        "REJECTED": "Rejected"
+      },
+      "CANVAS": {
+        "WAITING_PLAYER": "Waiting for player...",
+        "MATCH_FINISHED": "Match finished"
+      },
+      "STATUS": {
+        "WAITING_REMATCH_RESPONSE": "Waiting for opponent response...",
+        "SEARCHING_NEW_OPPONENT": "Searching for a new opponent...",
+        "WAITING_OPPONENT_ACCEPT": "Waiting for opponent to accept...",
+        "MATCH_FOUND_CONFIRM": "Player found. Accept or reject the match.",
+        "WAITING_IN_ROOM": "Waiting for opponent in room {{roomId}}",
+        "PLAYING_IN_ROOM": "Playing in room {{roomId}}",
+        "WON_REMATCH": "You won. Want a rematch?",
+        "LOST_REMATCH": "You lost. Want a rematch?",
+        "QUEUE_FULL": "No queue slots available right now.",
+        "KICKED_SEARCHING": "You left the room. Searching for a new match...",
+        "WON_BOT": "You beat the bot",
+        "OPPONENT_FOUND": "Player found: {{opponent}}",
+        "ACCEPTED_LOADING": "Match accepted, loading...",
+        "REJECTED_SEARCHING": "Player rejected, searching for another..."
+      }
     }
   },
   "CUSTOMIZATION": {

@@ -10,7 +10,7 @@ export class SessionStateService {
     const sanitized = this.sanitizeLargeFields(user);
 
     try {
-      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(sanitized));
+      sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(sanitized));
     } catch {
       // Keep a minimal session shape if storage is almost full.
       const fallback: UsuarioResponse = {
@@ -19,12 +19,12 @@ export class SessionStateService {
         homeLeftImage: '',
         homeRightImage: ''
       };
-      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(fallback));
+      sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(fallback));
     }
   }
 
   getUser(): UsuarioResponse | null {
-    const rawValue = localStorage.getItem(USER_STORAGE_KEY);
+    const rawValue = sessionStorage.getItem(USER_STORAGE_KEY) || localStorage.getItem(USER_STORAGE_KEY);
     if (!rawValue) {
       return null;
     }
@@ -41,6 +41,7 @@ export class SessionStateService {
   }
 
   clear(): void {
+    sessionStorage.removeItem(USER_STORAGE_KEY);
     localStorage.removeItem(USER_STORAGE_KEY);
   }
 

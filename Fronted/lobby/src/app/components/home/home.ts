@@ -281,6 +281,13 @@ export class HomeComponent implements OnInit, OnChanges {
   }
 
   private clearLegacySessionKeys(): void {
+    sessionStorage.removeItem('usuarioId');
+    sessionStorage.removeItem('tetrisUsername');
+    sessionStorage.removeItem('tetrisProfile');
+    sessionStorage.removeItem('tetrisNationality');
+    sessionStorage.removeItem('tetrisAge');
+    sessionStorage.removeItem('tetrisPhoto');
+
     localStorage.removeItem('usuarioId');
     localStorage.removeItem('tetrisUsername');
     localStorage.removeItem('tetrisProfile');
