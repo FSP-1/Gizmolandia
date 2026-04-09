@@ -146,7 +146,32 @@
       "YOU_WON": "¡Ganaste!",
       "YOU_LOST": "Perdiste esta ronda",
       "FOUND_MATCH": "¡Se encontró rival!",
-      "ACCEPT_IN": "Acepta en"
+      "ACCEPT_IN": "Acepta en",
+      "DECISIONS": {
+        "PENDING": "Pendiente",
+        "ACCEPTED": "Aceptó",
+        "REJECTED": "Rechazó"
+      },
+      "CANVAS": {
+        "WAITING_PLAYER": "Esperando jugador...",
+        "MATCH_FINISHED": "Partida finalizada"
+      },
+      "STATUS": {
+        "WAITING_REMATCH_RESPONSE": "Esperando respuesta del rival...",
+        "SEARCHING_NEW_OPPONENT": "Buscando nuevo rival...",
+        "WAITING_OPPONENT_ACCEPT": "Esperando que el rival acepte...",
+        "MATCH_FOUND_CONFIRM": "Jugador encontrado. Acepta o rechaza la partida.",
+        "WAITING_IN_ROOM": "Esperando rival en sala {{roomId}}",
+        "PLAYING_IN_ROOM": "Jugando en sala {{roomId}}",
+        "WON_REMATCH": "Ganaste. ¿Quieres revancha?",
+        "LOST_REMATCH": "Perdiste. ¿Quieres revancha?",
+        "QUEUE_FULL": "No hay lugar en cola en este momento.",
+        "KICKED_SEARCHING": "Saliste de la sala. Buscando nueva partida...",
+        "WON_BOT": "Ganaste al bot",
+        "OPPONENT_FOUND": "Jugador encontrado: {{opponent}}",
+        "ACCEPTED_LOADING": "Aceptaste la partida, cargando...",
+        "REJECTED_SEARCHING": "Rechazaste el jugador, buscando otro..."
+      }
     }
   },
   "CUSTOMIZATION": {

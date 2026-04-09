@@ -101,7 +101,7 @@ export class TetrisComponent implements OnInit, OnDestroy {
   }
 
   private loadUserData() {
-    const savedUsername = localStorage.getItem('tetrisUsername');
+    const savedUsername = sessionStorage.getItem('tetrisUsername') || localStorage.getItem('tetrisUsername');
     if (savedUsername) {
       this.username = savedUsername;
     } else {
@@ -427,7 +427,7 @@ export class TetrisComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const usuarioIdRaw = localStorage.getItem('usuarioId');
+    const usuarioIdRaw = sessionStorage.getItem('usuarioId') || localStorage.getItem('usuarioId');
     if (!usuarioIdRaw) {
       return;
     }

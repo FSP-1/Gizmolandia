@@ -76,7 +76,7 @@ export class SnakeComponent implements OnInit, OnDestroy {
   }
 
   private loadUserData(): void {
-    const savedUsername = localStorage.getItem('tetrisUsername');
+    const savedUsername = sessionStorage.getItem('tetrisUsername') || localStorage.getItem('tetrisUsername');
     if (savedUsername) {
       this.username = savedUsername;
     }
@@ -298,7 +298,7 @@ export class SnakeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const usuarioIdRaw = localStorage.getItem('usuarioId');
+    const usuarioIdRaw = sessionStorage.getItem('usuarioId') || localStorage.getItem('usuarioId');
     if (!usuarioIdRaw) {
       return;
     }

@@ -11,7 +11,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { GameLeaderboardComponent } from '../game-leaderboard/game-leaderboard';
 import { PuntuacionApiService } from '../../../services/puntuacion-api.service';
 import {
@@ -33,7 +33,7 @@ interface LocalMatchState {
   ballVY: number;
   scoreLeft: number;
   scoreRight: number;
-  status: 'WAITING' | 'PLAYING' | 'FINISHED';
+  status: 'WAITING' | 'PREVIEW' | 'PLAYING' | 'FINISHED';
   winner: '' | 'LEFT' | 'RIGHT';
 }
 
@@ -81,6 +81,8 @@ export class PingPongComponent implements OnInit, OnDestroy {
   previewOpponentPhoto = '';
   previewTimeout = 0;
   private previewTimeoutId: number | null = null;
+  private previewIntervalId: number | null = null;
+  private previewAcceptedByMe = false;
 
   private localState: LocalMatchState = {
     leftPaddleY: 0.5,
@@ -98,12 +100,13 @@ export class PingPongComponent implements OnInit, OnDestroy {
   constructor(
     private cdr: ChangeDetectorRef,
     private puntuacionApiService: PuntuacionApiService,
-    private realtimeService: PingPongRealtimeService
+    private realtimeService: PingPongRealtimeService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
     this.ctx = this.canvasRef.nativeElement.getContext('2d')!;
-    const savedName = localStorage.getItem('tetrisUsername');
+    const savedName = sessionStorage.getItem('tetrisUsername') || localStorage.getItem('tetrisUsername');
     this.username = (savedName && savedName.trim()) || 'Jugador';
     this.desiredPaddleY = 0.5;
 
@@ -117,6 +120,7 @@ export class PingPongComponent implements OnInit, OnDestroy {
 
     this.realtimeSub?.unsubscribe();
     this.realtimeService.disconnect();
+    this.clearPreviewTimers();
   }
 
   selectMode(mode: 'bot' | 'online'): void {
@@ -193,15 +197,27 @@ export class PingPongComponent implements OnInit, OnDestroy {
       return;
     }
     this.realtimeService.sendRematchDecision(true);
-    this.statusText = 'Esperando respuesta del rival...';
+    this.statusText = this.t('GAMES.PING_PONG.STATUS.WAITING_REMATCH_RESPONSE');
   }
 
   declineRematch(): void {
     if (this.mode !== 'online') {
       return;
     }
+
+    // Close modal instantly on local UI to avoid stale FINISHED modal
+    // while the server processes the decline and closes/reassigns the socket.
+    if (this.realtimeState) {
+      this.realtimeState = {
+        ...this.realtimeState,
+        status: 'WAITING',
+        leftRematch: null,
+        rightRematch: null
+      };
+    }
+
     this.realtimeService.sendRematchDecision(false);
-    this.statusText = 'Buscando nuevo rival...';
+    this.statusText = this.t('GAMES.PING_PONG.STATUS.SEARCHING_NEW_OPPONENT');
   }
 
   onMouseMove(event: MouseEvent): void {
@@ -275,20 +291,21 @@ export class PingPongComponent implements OnInit, OnDestroy {
     return this.realtimeState?.rightPlayer || '';
   }
 
-  private decisionLabel(accepted: boolean | undefined, otherAccepted: boolean | undefined): string {
-    // In payload we only have booleans; interpret "false,false" as pending (no one answered yet).
-    if (!accepted && !otherAccepted) {
-      return 'Pendiente';
+  private decisionLabel(accepted: boolean | null | undefined): string {
+    if (accepted === null || accepted === undefined) {
+      return this.t('GAMES.PING_PONG.DECISIONS.PENDING');
     }
-    return accepted ? 'Aceptó' : 'Rechazó';
+    return accepted
+      ? this.t('GAMES.PING_PONG.DECISIONS.ACCEPTED')
+      : this.t('GAMES.PING_PONG.DECISIONS.REJECTED');
   }
 
   get rematchLeftDecisionLabel(): string {
-    return this.decisionLabel(this.realtimeState?.leftRematch, this.realtimeState?.rightRematch);
+    return this.decisionLabel(this.realtimeState?.leftRematch);
   }
 
   get rematchRightDecisionLabel(): string {
-    return this.decisionLabel(this.realtimeState?.rightRematch, this.realtimeState?.leftRematch);
+    return this.decisionLabel(this.realtimeState?.rightRematch);
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -354,25 +371,48 @@ export class PingPongComponent implements OnInit, OnDestroy {
 
     this.desiredPaddleY = state.yourSide === 'LEFT' ? state.leftPaddleY : state.rightPaddleY;
 
-    if (state.status === 'WAITING') {
-      this.statusText = 'Esperando rival en sala ' + state.roomId;
-      this.scorePersisted = false;
-      return;
-    }
+    switch (state.status) {
+      case 'PREVIEW':
+        this.statusText = this.previewAcceptedByMe
+          ? this.t('GAMES.PING_PONG.STATUS.WAITING_OPPONENT_ACCEPT')
+          : this.t('GAMES.PING_PONG.STATUS.MATCH_FOUND_CONFIRM');
+        return;
 
-    if (state.status === 'PLAYING') {
-      this.statusText = 'Jugando en sala ' + state.roomId;
-      this.scorePersisted = false;
-      return;
-    }
+      case 'WAITING':
+        this.enterWaitingState(state.roomId);
+        return;
 
-    if (state.status === 'FINISHED') {
-      if (state.winner === state.yourSide) {
-        this.statusText = 'Ganaste. ¿Quieres revancha?';
-        this.persistOnlineWinIfNeeded();
-      } else {
-        this.statusText = 'Perdiste. ¿Quieres revancha?';
-      }
+      case 'PLAYING':
+        this.enterPlayingState(state.roomId);
+        return;
+
+      case 'FINISHED':
+        this.enterFinishedState(state);
+        return;
+    }
+  }
+
+  private enterWaitingState(roomId: string): void {
+    this.previewAcceptedByMe = false;
+    this.hidePreview();
+    this.statusText = this.t('GAMES.PING_PONG.STATUS.WAITING_IN_ROOM', { roomId });
+    this.scorePersisted = false;
+  }
+
+  private enterPlayingState(roomId: string): void {
+    this.previewAcceptedByMe = false;
+    this.hidePreview();
+    this.statusText = this.t('GAMES.PING_PONG.STATUS.PLAYING_IN_ROOM', { roomId });
+    this.scorePersisted = false;
+  }
+
+  private enterFinishedState(state: PingPongRealtimeState): void {
+    this.previewAcceptedByMe = false;
+    if (state.winner === state.yourSide) {
+      this.statusText = this.t('GAMES.PING_PONG.STATUS.WON_REMATCH');
+      this.persistOnlineWinIfNeeded();
+    } else {
+      this.statusText = this.t('GAMES.PING_PONG.STATUS.LOST_REMATCH');
     }
   }
 
@@ -392,11 +432,11 @@ export class PingPongComponent implements OnInit, OnDestroy {
 
   private handleQueueFullEvent(event: PingPongQueueFullEvent): void {
     this.maxQueue = event.maxQueue;
-    this.statusText = 'No hay lugar en cola en este momento.';
+    this.statusText = this.t('GAMES.PING_PONG.STATUS.QUEUE_FULL');
   }
 
   private handleKickedEvent(_event: PingPongKickedEvent): void {
-    this.statusText = 'Saliste de la sala. Buscando nueva partida...';
+    this.statusText = this.t('GAMES.PING_PONG.STATUS.KICKED_SEARCHING');
   }
 
   private startRenderLoop(): void {
@@ -514,7 +554,7 @@ export class PingPongComponent implements OnInit, OnDestroy {
     if (this.localState.scoreLeft >= this.targetScore) {
       this.localState.status = 'FINISHED';
       this.localState.winner = 'LEFT';
-      this.statusText = 'Ganaste al bot';
+      this.statusText = this.t('GAMES.PING_PONG.STATUS.WON_BOT');
       return;
     }
 
@@ -550,7 +590,7 @@ export class PingPongComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const usuarioIdRaw = localStorage.getItem('usuarioId');
+    const usuarioIdRaw = sessionStorage.getItem('usuarioId') || localStorage.getItem('usuarioId');
     if (!usuarioIdRaw) {
       return;
     }
@@ -621,7 +661,9 @@ export class PingPongComponent implements OnInit, OnDestroy {
       ctx.fillRect(0, 0, width, height);
       ctx.fillStyle = '#f8fafc';
       ctx.font = '700 30px Arial';
-      const text = state.status === 'WAITING' ? 'Esperando jugador...' : 'Partida finalizada';
+      const text = state.status === 'WAITING'
+        ? this.t('GAMES.PING_PONG.CANVAS.WAITING_PLAYER')
+        : this.t('GAMES.PING_PONG.CANVAS.MATCH_FINISHED');
       const textWidth = ctx.measureText(text).width;
       ctx.fillText(text, (width - textWidth) / 2, height / 2);
     }
@@ -648,15 +690,20 @@ export class PingPongComponent implements OnInit, OnDestroy {
 
   private handleMatchPreviewEvent(event: any): void {
     this.showPreview = true;
+    this.previewAcceptedByMe = false;
     this.previewOpponentUsername = event.opponentUsername;
     this.previewOpponentPhoto = event.opponentPhoto;
     this.previewTimeout = event.timeoutSeconds;
-    this.statusText = `Jugador encontrado: ${event.opponentUsername}`;
+    this.statusText = this.t('GAMES.PING_PONG.STATUS.OPPONENT_FOUND', {
+      opponent: event.opponentUsername
+    });
 
-    // Clear previous timeout if exists
-    if (this.previewTimeoutId) {
-      clearTimeout(this.previewTimeoutId);
-    }
+    this.clearPreviewTimers();
+
+    this.previewIntervalId = window.setInterval(() => {
+      this.previewTimeout = Math.max(0, this.previewTimeout - 1);
+      this.cdr.markForCheck();
+    }, 1000);
 
     // Auto-reject if time runs out
     this.previewTimeoutId = setTimeout(() => {
@@ -671,14 +718,11 @@ export class PingPongComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.showPreview = false;
-    if (this.previewTimeoutId) {
-      clearTimeout(this.previewTimeoutId);
-      this.previewTimeoutId = null;
-    }
+    this.previewAcceptedByMe = true;
+    this.hidePreview();
 
     this.realtimeService.sendPreviewDecision(true);
-    this.statusText = 'Aceptaste la partida, cargando...';
+    this.statusText = this.t('GAMES.PING_PONG.STATUS.ACCEPTED_LOADING');
   }
 
   declinePreview(): void {
@@ -686,17 +730,35 @@ export class PingPongComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.previewAcceptedByMe = false;
+    this.hidePreview();
+
+    this.realtimeService.sendPreviewDecision(false);
+    this.statusText = this.t('GAMES.PING_PONG.STATUS.REJECTED_SEARCHING');
+  }
+
+  private hidePreview(): void {
     this.showPreview = false;
+    this.clearPreviewTimers();
+  }
+
+  private clearPreviewTimers(): void {
     if (this.previewTimeoutId) {
       clearTimeout(this.previewTimeoutId);
       this.previewTimeoutId = null;
     }
 
-    this.realtimeService.sendPreviewDecision(false);
-    this.statusText = 'Rechazaste el jugador, buscando otro...';
+    if (this.previewIntervalId) {
+      clearInterval(this.previewIntervalId);
+      this.previewIntervalId = null;
+    }
   }
 
   private clamp(value: number, min: number, max: number): number {
     return Math.max(min, Math.min(max, value));
+  }
+
+  private t(key: string, params?: Record<string, unknown>): string {
+    return this.translate.instant(key, params);
   }
 }

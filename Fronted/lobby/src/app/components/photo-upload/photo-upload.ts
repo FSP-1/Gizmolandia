@@ -28,6 +28,12 @@ export class PhotoUploadComponent {
   private async compressImage(file: File): Promise<string> {
     const dataUrl = await this.readFileAsDataUrl(file);
 
+    
+    //Saltando la compresión para GIFs para preservar la animación
+    if (file.type === 'image/gif' || file.name.toLowerCase().endsWith('.gif')) {
+      return dataUrl;
+    }
+
     const image = await this.loadImage(dataUrl);
     const maxSide = 1024;
     const ratio = Math.min(maxSide / image.width, maxSide / image.height, 1);
