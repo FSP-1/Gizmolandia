@@ -12,4 +12,6 @@ import com.gizmolandia.api.model.ChatRoomType;
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
 
     List<ChatMessage> findTop100ByRoomTypeOrderByCreatedAtDesc(ChatRoomType roomType);
+
+    List<ChatMessage> findTop100ByRoomTypeAndIdGreaterThanOrderByIdAsc(ChatRoomType roomType, Long id);
 }

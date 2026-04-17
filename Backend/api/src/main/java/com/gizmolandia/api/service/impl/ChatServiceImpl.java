@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.gizmolandia.api.dto.ChatAvatarContentDTO;
 import com.gizmolandia.api.dto.ChatJoinResponseDTO;
 import com.gizmolandia.api.dto.ChatMediaUploadResponseDTO;
 import com.gizmolandia.api.dto.ChatMessageRequestDTO;
@@ -49,6 +51,7 @@ public class ChatServiceImpl implements ChatService {
     private static final int MAX_USERS_PER_ROOM = 10;
     private static final int MAX_WORDS_PER_MESSAGE = 500;
     private static final int MAX_FETCH_LIMIT = 100;
+    private static final int MAX_INLINE_AVATAR_LENGTH = 4096;
     private static final long MAX_MEDIA_BYTES = 5_000_000L;
     private static final Path MEDIA_STORAGE_DIR = Paths.get("uploads", "chat-media");
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
@@ -117,10 +120,20 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ChatMessageResponseDTO> listMessages(String roomType, Integer limit) {
+    public List<ChatMessageResponseDTO> listMessages(String roomType, Integer limit, Long afterId) {
         ChatRoomType parsedRoom = ChatRoomType.from(roomType);
 
         int safeLimit = limit == null ? 50 : Math.max(1, Math.min(limit, MAX_FETCH_LIMIT));
+
+        if (afterId != null && afterId > 0) {
+            List<ChatMessage> incremental = chatMessageRepository
+                    .findTop100ByRoomTypeAndIdGreaterThanOrderByIdAsc(parsedRoom, afterId);
+
+            return incremental.stream()
+                    .limit(safeLimit)
+                    .map(this::toDTO)
+                    .collect(Collectors.toList());
+        }
 
         List<ChatMessage> ordered = chatMessageRepository.findTop100ByRoomTypeOrderByCreatedAtDesc(parsedRoom)
                 .stream()
@@ -232,6 +245,44 @@ public class ChatServiceImpl implements ChatService {
             return new UrlResource(target.toUri());
         } catch (IOException ex) {
             throw new IllegalStateException("No se pudo leer la imagen", ex);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ChatAvatarContentDTO loadAvatar(Long usuarioId) {
+        Usuario usuario = findUsuarioOrThrow(usuarioId);
+        String avatar = normalizeNullable(usuario.getFoto());
+
+        if (avatar == null || !avatar.toLowerCase(Locale.ROOT).startsWith("data:")) {
+            throw new ResourceNotFoundException("Avatar no disponible");
+        }
+
+        int commaIndex = avatar.indexOf(',');
+        if (commaIndex <= 0) {
+            throw new IllegalArgumentException("Avatar inválido");
+        }
+
+        String metadata = avatar.substring(5, commaIndex);
+        String payload = avatar.substring(commaIndex + 1);
+
+        if (!metadata.toLowerCase(Locale.ROOT).contains(";base64")) {
+            throw new IllegalArgumentException("Avatar inválido");
+        }
+
+        int separatorIndex = metadata.indexOf(';');
+        String contentType = separatorIndex > 0
+                ? metadata.substring(0, separatorIndex)
+                : "application/octet-stream";
+
+        try {
+            byte[] content = Base64.getDecoder().decode(payload);
+            return ChatAvatarContentDTO.builder()
+                    .content(content)
+                    .contentType(contentType)
+                    .build();
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Avatar inválido");
         }
     }
 
@@ -416,13 +467,14 @@ public class ChatServiceImpl implements ChatService {
     }
 
     private ChatMessageResponseDTO toDTO(ChatMessage message) {
+        String fotoUsuario = normalizeChatAvatar(message.getUsuario().getId(), message.getUsuario().getFoto());
         return ChatMessageResponseDTO.builder()
                 .id(message.getId())
                 .roomType(message.getRoomType().name())
                 .usuarioId(message.getUsuario().getId())
                 .nombreUsuario(message.getUsuario().getNombre())
                 .userProfile(message.getUsuario().getUserProfile())
-                .fotoUsuario(message.getUsuario().getFoto())
+                .fotoUsuario(fotoUsuario)
                 .commentText(message.getCommentText())
                 .wordCount(message.getWordCount())
                 .mediaUrl(message.getMediaUrl())
@@ -432,5 +484,26 @@ public class ChatServiceImpl implements ChatService {
                 .scoreValue(message.getScoreValue())
                 .createdAt(message.getCreatedAt())
                 .build();
+    }
+
+    private String normalizeChatAvatar(Long usuarioId, String avatar) {
+        if (avatar == null) {
+            return null;
+        }
+
+        String trimmed = avatar.trim();
+        if (trimmed.isEmpty()) {
+            return null;
+        }
+
+        String lower = trimmed.toLowerCase(Locale.ROOT);
+        if (lower.startsWith("data:image/") && trimmed.length() > MAX_INLINE_AVATAR_LENGTH) {
+            return ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/api/chat/avatars/")
+                    .path(String.valueOf(usuarioId))
+                    .toUriString();
+        }
+
+        return trimmed;
     }
 }

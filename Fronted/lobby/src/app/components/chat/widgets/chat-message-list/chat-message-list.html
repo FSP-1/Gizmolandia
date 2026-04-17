@@ -9,7 +9,7 @@
     [class.own]="isOwnMessage(msg)">
     <header class="message-header">
       <div class="author-block">
-        <img *ngIf="msg.fotoUsuario" [src]="msg.fotoUsuario" alt="profile" class="author-avatar">
+        <img *ngIf="msg.fotoUsuario" [src]="msg.fotoUsuario" alt="profile" class="author-avatar" width="36" height="36" loading="lazy" decoding="async">
         <div *ngIf="!msg.fotoUsuario" class="author-avatar fallback">👤</div>
 
         <div>
@@ -26,7 +26,7 @@
     <p class="message-text">{{ msg.commentText }}</p>
 
     <div *ngIf="msg.mediaUrl" class="media-box">
-      <img [src]="msg.mediaUrl" alt="media" loading="lazy">
+      <img [src]="msg.mediaUrl" alt="media" loading="lazy" decoding="async">
       <span class="media-chip">{{ msg.mediaType === 'GIF' ? ('CHAT.MEDIA.GIF' | translate) : ('CHAT.MEDIA.IMAGE' | translate) }}</span>
     </div>
   </article>

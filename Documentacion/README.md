@@ -86,6 +86,20 @@ Cuando trabajas en el chat, en la subida de imagenes o en incidencias de mediaUr
 
 ---
 
+### 6. [05 - Optimizacion Chat Incremental e INP](05-optimizacion-chat-incremental-inp.md) ⚡
+**Resumen de mejoras de rendimiento en chat y avatar**
+
+Aqui encontraras:
+- ✅ Polling incremental por afterId
+- ✅ Endpoint de avatar liviano para evitar base64 gigante en cada mensaje
+- ✅ Ajustes frontend para reducir trabajo de render y mejorar INP
+- ✅ Checklist de validacion post-cambios
+
+**¿Cuándo leerlo?**
+Cuando estes midiendo rendimiento del chat o revisando transferencias y tiempos de interaccion.
+
+---
+
 ## 🎯 Guía Rápida por Escenario
 
 ### "Acabo de descargar el proyecto, ¿por dónde empiezo?"

@@ -25,8 +25,12 @@ export class ChatApiService {
     return this.http.post<ChatJoinResponse>(`${this.baseUrl}/${roomType}/leave?usuarioId=${usuarioId}`, {});
   }
 
-  listMessages(roomType: ChatRoomType, limit = 60): Observable<ChatMessageResponse[]> {
-    return this.http.get<ChatMessageResponse[]>(`${this.baseUrl}/${roomType}/mensajes?limit=${limit}`);
+  listMessages(roomType: ChatRoomType, limit = 60, afterId?: number): Observable<ChatMessageResponse[]> {
+    let url = `${this.baseUrl}/${roomType}/mensajes?limit=${limit}`;
+    if (typeof afterId === 'number' && afterId > 0) {
+      url += `&afterId=${afterId}`;
+    }
+    return this.http.get<ChatMessageResponse[]>(url);
   }
 
   uploadMedia(file: File): Observable<ChatMediaUploadResponse> {

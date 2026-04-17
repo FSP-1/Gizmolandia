@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gizmolandia.api.dto.ChatAvatarContentDTO;
 import com.gizmolandia.api.dto.ChatJoinResponseDTO;
 import com.gizmolandia.api.dto.ChatMediaUploadResponseDTO;
 import com.gizmolandia.api.dto.ChatMessageRequestDTO;
@@ -54,9 +55,10 @@ public class ChatController {
     @GetMapping("/{roomType}/mensajes")
     public ResponseEntity<List<ChatMessageResponseDTO>> listMessages(
             @PathVariable String roomType,
-            @RequestParam(defaultValue = "50") Integer limit
+            @RequestParam(defaultValue = "50") Integer limit,
+            @RequestParam(required = false) Long afterId
     ) {
-        return ResponseEntity.ok(chatService.listMessages(roomType, limit));
+        return ResponseEntity.ok(chatService.listMessages(roomType, limit, afterId));
     }
 
     @PostMapping("/mensajes")
@@ -77,6 +79,23 @@ public class ChatController {
                 .cacheControl(CacheControl.maxAge(30, TimeUnit.DAYS).cachePublic().noTransform())
                 .contentType(mediaType)
                 .body(resource);
+    }
+
+    @GetMapping("/avatars/{usuarioId}")
+    public ResponseEntity<byte[]> loadAvatar(@PathVariable Long usuarioId) {
+        ChatAvatarContentDTO avatar = chatService.loadAvatar(usuarioId);
+
+        MediaType mediaType;
+        try {
+            mediaType = MediaType.parseMediaType(avatar.getContentType());
+        } catch (Exception ex) {
+            mediaType = MediaType.APPLICATION_OCTET_STREAM;
+        }
+
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(30, TimeUnit.DAYS).cachePublic().noTransform())
+                .contentType(mediaType)
+                .body(avatar.getContent());
     }
 
     @GetMapping("/juegos/puntuaciones/{usuarioId}")

@@ -1,6 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subscription } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   ChatMessageRequest,
@@ -48,6 +47,7 @@ export class GeneralChatComponent implements OnInit, OnDestroy {
 
   private sessionUser: UsuarioResponse | null = null;
   private messageRefreshTimerId: number | null = null;
+  private latestMessageId: number | null = null;
 
   constructor(
     private readonly chatApiService: ChatApiService,
@@ -65,7 +65,7 @@ export class GeneralChatComponent implements OnInit, OnDestroy {
 
     if (!this.userId) {
       this.errorMessage = this.translate.instant('CHAT.ERRORS.NO_SESSION');
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
       return;
     }
 
@@ -86,9 +86,10 @@ export class GeneralChatComponent implements OnInit, OnDestroy {
     this.leaveActiveRoom();
     this.activeRoom = room;
     this.messages = [];
+    this.latestMessageId = null;
     this.errorMessage = '';
     this.enterRoom(room);
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   onBack(): void {
@@ -117,14 +118,14 @@ export class GeneralChatComponent implements OnInit, OnDestroy {
     };
 
     this.chatApiService.sendMessage(request).subscribe({
-      next: () => {
+      next: (sentMessage) => {
         this.sending = false;
-        this.fetchMessages();
+        this.upsertMessages([sentMessage]);
       },
       error: (error) => {
         this.sending = false;
         this.errorMessage = error?.error?.mensaje || error?.error?.errores?.commentText || this.translate.instant('CHAT.ERRORS.SEND_FAILED');
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       }
     });
   }
@@ -148,26 +149,26 @@ export class GeneralChatComponent implements OnInit, OnDestroy {
             next: (scores) => {
               this.scoreOptions = scores;
               this.loading = false;
-              this.cdr.detectChanges();
+              this.cdr.markForCheck();
             },
             error: () => {
               this.scoreOptions = [];
               this.loading = false;
-              this.cdr.detectChanges();
+              this.cdr.markForCheck();
             }
           });
         } else {
           this.scoreOptions = [];
           this.loading = false;
-          this.cdr.detectChanges();
+          this.cdr.markForCheck();
         }
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       },
       error: (error) => {
         this.loading = false;
         this.messages = [];
         this.errorMessage = error?.error?.mensaje || this.translate.instant('CHAT.ERRORS.JOIN_FAILED');
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       }
     });
   }
@@ -176,7 +177,20 @@ export class GeneralChatComponent implements OnInit, OnDestroy {
     this.chatApiService.listMessages(this.activeRoom, 60).subscribe({
       next: (messages) => {
         this.messages = messages;
-        this.cdr.detectChanges();
+        this.latestMessageId = messages.length > 0 ? messages[messages.length - 1].id : null;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  private fetchNewMessages(): void {
+    if (!this.latestMessageId) {
+      return;
+    }
+
+    this.chatApiService.listMessages(this.activeRoom, 60, this.latestMessageId).subscribe({
+      next: (messages) => {
+        this.upsertMessages(messages);
       }
     });
   }
@@ -184,13 +198,24 @@ export class GeneralChatComponent implements OnInit, OnDestroy {
   private startMessageRefresh(): void {
     this.stopMessageRefresh();
     this.messageRefreshTimerId = window.setInterval(() => {
-      this.chatApiService.listMessages(this.activeRoom, 60).subscribe({
-        next: (messages) => {
-          this.messages = messages;
-          this.cdr.detectChanges();
-        }
-      });
+      this.fetchNewMessages();
     }, 2500);
+  }
+
+  private upsertMessages(incoming: ChatMessageResponse[]): void {
+    if (!incoming.length) {
+      return;
+    }
+
+    const lastId = this.latestMessageId ?? 0;
+    const newMessages = incoming.filter((message) => message.id > lastId);
+    if (!newMessages.length) {
+      return;
+    }
+
+    this.messages = [...this.messages, ...newMessages].slice(-120);
+    this.latestMessageId = this.messages[this.messages.length - 1].id;
+    this.cdr.markForCheck();
   }
 
   private stopMessageRefresh(): void {

@@ -10,14 +10,25 @@ import { ChatMessageResponse } from '../../../../services/api.models';
   templateUrl: './chat-message-list.html',
   styleUrls: ['./chat-message-list.css']
 })
-export class ChatMessageListComponent {
+export class ChatMessageListComponent implements OnChanges, AfterViewInit {
   @ViewChild('messagesWrapper') messagesWrapper?: ElementRef<HTMLDivElement>;
   @Input() messages: ChatMessageResponse[] = [];
   @Input() currentUserId: number | null = null;
 
+  private readonly bottomThresholdPx = 80;
+
+  ngAfterViewInit(): void {
+    this.scrollToBottom();
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['messages']) {
-      setTimeout(() => this.scrollToBottom());
+      const shouldAutoScroll = this.isNearBottom();
+      setTimeout(() => {
+        if (shouldAutoScroll) {
+          this.scrollToBottom();
+        }
+      });
     }
   }
 
@@ -36,6 +47,16 @@ export class ChatMessageListComponent {
     }
 
     wrapper.scrollTop = wrapper.scrollHeight;
+  }
+
+  private isNearBottom(): boolean {
+    const wrapper = this.messagesWrapper?.nativeElement;
+    if (!wrapper) {
+      return true;
+    }
+
+    const distanceToBottom = wrapper.scrollHeight - wrapper.scrollTop - wrapper.clientHeight;
+    return distanceToBottom <= this.bottomThresholdPx;
   }
 
   formatDate(value: string): string {

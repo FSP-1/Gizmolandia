@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.gizmolandia.api.dto.ChatAvatarContentDTO;
 import com.gizmolandia.api.dto.ChatJoinResponseDTO;
 import com.gizmolandia.api.dto.ChatMediaUploadResponseDTO;
 import com.gizmolandia.api.dto.ChatMessageRequestDTO;
@@ -17,13 +18,15 @@ public interface ChatService {
 
     ChatJoinResponseDTO leaveRoom(String roomType, Long usuarioId);
 
-    List<ChatMessageResponseDTO> listMessages(String roomType, Integer limit);
+    List<ChatMessageResponseDTO> listMessages(String roomType, Integer limit, Long afterId);
 
     ChatMessageResponseDTO sendMessage(ChatMessageRequestDTO dto);
 
     ChatMediaUploadResponseDTO uploadMedia(MultipartFile file);
 
     Resource loadMedia(String fileName);
+
+    ChatAvatarContentDTO loadAvatar(Long usuarioId);
 
     List<ChatScoreOptionDTO> listScoreOptions(Long usuarioId);
 }
