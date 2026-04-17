@@ -6,6 +6,7 @@
 - [Autenticación](#autenticación)
 - [Usuarios](#usuarios)
 - [Puntuaciones](#puntuaciones)
+- [Chat General](#chat-general)
 - [WebSocket](#websocket)
 - [Códigos de Estado](#códigos-de-estado)
 - [Ejemplos cURL](#ejemplos-curl)
@@ -31,6 +32,82 @@ Accept: application/json
 
 - **Origen permitido**: `http://localhost:4200` (desarrollo)
 - **Métodos permitidos**: GET, POST, PUT, PATCH, DELETE, OPTIONS
+
+---
+
+## 💬 Chat General
+
+Base:
+
+```
+http://localhost:8080/api/chat
+```
+
+### POST /api/chat/{roomType}/join?usuarioId={id}
+
+Descripcion: marca usuario activo en la sala.
+
+### POST /api/chat/{roomType}/leave?usuarioId={id}
+
+Descripcion: marca usuario inactivo en la sala.
+
+### GET /api/chat/{roomType}/mensajes?limit=60
+
+Descripcion: devuelve ultimos mensajes de la sala.
+
+### POST /api/chat/mensajes
+
+Descripcion: crea mensaje de chat.
+
+Request ejemplo:
+
+```json
+{
+  "usuarioId": 1,
+  "roomType": "NORMAL",
+  "commentText": "Hola",
+  "mediaUrl": "http://localhost:8080/api/chat/media/archivo.jpg",
+  "puntuacionId": null
+}
+```
+
+Validaciones clave:
+
+- commentText obligatorio
+- mediaUrl opcional y corta (no base64)
+- en sala JUEGOS, puntuacionId obligatorio
+
+### POST /api/chat/media/upload
+
+Descripcion: sube imagen/GIF del chat por multipart.
+
+Tipo: multipart/form-data
+
+Campo requerido:
+
+- file
+
+Response ejemplo:
+
+```json
+{
+  "mediaUrl": "http://localhost:8080/api/chat/media/abc123.jpg",
+  "mediaType": "IMAGE",
+  "fileName": "abc123.jpg"
+}
+```
+
+### GET /api/chat/media/{fileName}
+
+Descripcion: sirve el archivo guardado para renderizar en UI.
+
+### GET /api/chat/juegos/puntuaciones/{usuarioId}
+
+Descripcion: devuelve puntuaciones del usuario para habilitar la sala JUEGOS.
+
+Para detalle funcional completo, ver: [04 - Chat General y Media Upload](04-chat-general-media-upload.md)
+
+Para diagramas de secuencia por endpoint (join, upload, send, list, load media, leave y score options), ver seccion "Diagramas de secuencia por endpoint" en [04 - Chat General y Media Upload](04-chat-general-media-upload.md#diagramas-de-secuencia-por-endpoint)
 
 ---
 

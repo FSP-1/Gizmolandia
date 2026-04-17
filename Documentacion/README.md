@@ -71,6 +71,21 @@ Cuando necesitas entender la estructura interna de Spring Boot, o cuando vas a a
 
 ---
 
+### 5. [04 - Chat General y Media Upload](04-chat-general-media-upload.md) 💬
+**Documentacion completa del chat con subida de imagen/GIF separada**
+
+Aqui encontraras:
+- ✅ Flujo nuevo: upload multipart + envio de comentario con URL corta
+- ✅ Endpoints de chat actualizados
+- ✅ Validaciones frontend y backend
+- ✅ Errores esperados y troubleshooting
+- ✅ Checklist de pruebas manuales
+
+**¿Cuándo leerlo?**  
+Cuando trabajas en el chat, en la subida de imagenes o en incidencias de mediaUrl.
+
+---
+
 ## 🎯 Guía Rápida por Escenario
 
 ### "Acabo de descargar el proyecto, ¿por dónde empiezo?"
@@ -92,6 +107,9 @@ Cuando necesitas entender la estructura interna de Spring Boot, o cuando vas a a
 
 ### "Necesito debuggear un error"
 → Lee: [02 - API REST Endpoints](02-api-rest-endpoints.md) sección "Códigos de Estado"
+
+### "Quiero entender el flujo nuevo de chat con imagen"
+→ Lee: [04 - Chat General y Media Upload](04-chat-general-media-upload.md)
 
 ---
 
@@ -229,5 +247,6 @@ documentacion/
 ├── 00-guia-general.md                     ⭐ Comienza aquí
 ├── 01-arquitectura-angular-spring.md      🏗️ Cómo se comunican
 ├── 02-api-rest-endpoints.md               🔌 Referencia de APIs
-└── 03-estructura-spring-boot.md           📦 Estructura interna
+├── 03-estructura-spring-boot.md           📦 Estructura interna
+└── 04-chat-general-media-upload.md         💬 Chat y media
 ```
