@@ -17,6 +17,7 @@ import {
   ChatComposeBoxComponent,
   ChatComposePayload
 } from '../widgets/chat-compose-box/chat-compose-box';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-general-chat',
@@ -52,7 +53,8 @@ export class GeneralChatComponent implements OnInit, OnDestroy {
     private readonly chatApiService: ChatApiService,
     private readonly sessionStateService: SessionStateService,
     private readonly translate: TranslateService,
-    private readonly cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef,
+    private readonly router: Router
   ) {}
 
   ngOnInit(): void {
@@ -90,7 +92,12 @@ export class GeneralChatComponent implements OnInit, OnDestroy {
   }
 
   onBack(): void {
-    this.backToHome.emit();
+    if (this.backToHome.observed) {
+      this.backToHome.emit();
+      return;
+    }
+
+    this.router.navigate(['/home']);
   }
 
   onSend(payload: ChatComposePayload): void {

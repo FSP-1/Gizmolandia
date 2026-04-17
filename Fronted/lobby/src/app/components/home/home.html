@@ -1,9 +1,4 @@
-<app-games *ngIf="showGames" [userPhoto]="userPhoto" (backToHome)="toggleGames()"></app-games>
-<ng-container *ngIf="showChat">
-  <app-general-chat [userId]="userId" (backToHome)="toggleChat()"></app-general-chat>
-</ng-container>
-
-<div *ngIf="!showGames && !showChat" class="home-wrapper" [ngStyle]="homeWrapperStyles" [class.has-left-image]="!!leftImage" [class.has-right-image]="!!rightImage">
+<div class="home-wrapper" [ngStyle]="homeWrapperStyles" [class.has-left-image]="!!leftImage" [class.has-right-image]="!!rightImage">
   <div class="side-image left" *ngIf="leftImage">
     <img [src]="leftImage" alt="Left decoration">
   </div>

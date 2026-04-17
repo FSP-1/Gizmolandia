@@ -2,8 +2,6 @@ import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CustomizationComponent } from '../customization/customization';
-import { GamesComponent } from '../games/games';
-import { GeneralChatComponent } from '../chat/general-chat/general-chat';
 import { UsuarioApiService } from '../../services/usuario-api.service';
 import { UsuarioPersonalizacionRequest, UsuarioResponse } from '../../services/api.models';
 import { SessionStateService } from '../../services/session-state.service';
@@ -22,7 +20,7 @@ interface HomeCustomizationConfig {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, TranslateModule, CustomizationComponent, GamesComponent, GeneralChatComponent],
+  imports: [CommonModule, TranslateModule, CustomizationComponent],
   templateUrl: './home.html',
   styleUrls: ['./home.css']
 })
@@ -40,8 +38,6 @@ export class HomeComponent implements OnInit, OnChanges {
   @Input() initialLanguage: 'es' | 'en' | '' = '';
   
   showCustomization = false;
-  showGames = false;
-  showChat = false;
   backgroundColor = '#667eea';
   leftImage = '';
   rightImage = '';
@@ -150,17 +146,15 @@ export class HomeComponent implements OnInit, OnChanges {
   }
 
   toggleGames() {
-    this.showGames = !this.showGames;
+    this.router.navigate(['/home/games']);
   }
 
   toggleChat() {
-    this.showChat = !this.showChat;
+    this.router.navigate(['/home/chat']);
   }
 
   logout(): void {
     this.showCustomization = false;
-    this.showGames = false;
-    this.showChat = false;
 
     this.sessionStateService.clear();
     this.clearLegacySessionKeys();

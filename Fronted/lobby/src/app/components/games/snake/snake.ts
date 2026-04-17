@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ElementRef, ViewChild, HostListener, Input, ChangeDetectorRef } from '@angular/core';
+import { Component, OnDestroy, OnInit, ElementRef, ViewChild, HostListener, Input, ChangeDetectorRef, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { GameLeaderboardComponent } from '../game-leaderboard/game-leaderboard';
@@ -26,7 +26,7 @@ interface Fruit {
   templateUrl: './snake.html',
   styleUrls: ['./snake.css']
 })
-export class SnakeComponent implements OnInit, OnDestroy {
+export class SnakeComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('gameCanvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
   @Input() userPhoto: string = '';
 
@@ -44,6 +44,7 @@ export class SnakeComponent implements OnInit, OnDestroy {
   private fruit!: Fruit;
   private profileImage: HTMLImageElement | null = null;
   private scorePersisted = false;
+  private ready = false;
 
   score = 0;
   highScore = 0;
@@ -62,6 +63,13 @@ export class SnakeComponent implements OnInit, OnDestroy {
     this.loadUserSkin();
     this.resetState();
     this.draw();
+    this.ready = true;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['userPhoto']) {
+      this.loadUserSkin();
+    }
   }
 
   constructor(
@@ -99,6 +107,9 @@ export class SnakeComponent implements OnInit, OnDestroy {
   private loadUserSkin(): void {
     if (!this.userPhoto) {
       this.profileImage = null;
+      if (this.ready) {
+        this.draw();
+      }
       return;
     }
 
@@ -106,9 +117,15 @@ export class SnakeComponent implements OnInit, OnDestroy {
     image.src = this.userPhoto;
     image.onload = () => {
       this.profileImage = image;
+      if (this.ready) {
+        this.draw();
+      }
     };
     image.onerror = () => {
       this.profileImage = null;
+      if (this.ready) {
+        this.draw();
+      }
     };
   }
 
@@ -285,6 +302,10 @@ export class SnakeComponent implements OnInit, OnDestroy {
   }
 
   private draw(): void {
+    if (!this.fruit) {
+      return;
+    }
+
     const canvas = this.canvasRef.nativeElement;
     this.ctx.clearRect(0, 0, canvas.width, canvas.height);
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild, HostListener, ChangeDetectorRef, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, HostListener, ChangeDetectorRef, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { GameLeaderboardComponent } from '../game-leaderboard/game-leaderboard';
@@ -20,7 +20,7 @@ interface Shape {
   templateUrl: './tetris.html',
   styleUrls: ['./tetris.css']
 })
-export class TetrisComponent implements OnInit, OnDestroy {
+export class TetrisComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('gameCanvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
   @Input() userPhoto: string = '';
   
@@ -74,9 +74,12 @@ export class TetrisComponent implements OnInit, OnDestroy {
     this.createNewShape();
     this.loadHighScore();
     this.loadUserData();
-    // Store profile image if passed
-    if (this.userPhoto) {
-      this.userProfileImage = this.userPhoto;
+    this.syncUserPhoto();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['userPhoto']) {
+      this.syncUserPhoto();
     }
   }
 
@@ -84,6 +87,11 @@ export class TetrisComponent implements OnInit, OnDestroy {
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
     }
+  }
+
+  private syncUserPhoto(): void {
+    this.userProfileImage = this.userPhoto || '';
+    this.cdr.detectChanges();
   }
 
   private initGrid() {

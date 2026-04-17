@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild, Input, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, Input, ChangeDetectorRef, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
@@ -19,7 +19,7 @@ interface Ball {
   templateUrl: './brick-breaker.html',
   styleUrls: ['./brick-breaker.css']
 })
-export class BrickBreakerComponent implements OnInit, OnDestroy {
+export class BrickBreakerComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('gameCanvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
   @Input() userPhoto: string = '';
 
@@ -38,17 +38,16 @@ export class BrickBreakerComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const canvas = this.canvasRef.nativeElement;
     this.ctx = canvas.getContext('2d')!;
-    
-    if (this.userPhoto) {
-      this.ballImage = new Image();
-      this.ballImage.src = this.userPhoto;
-      this.ballImage.onload = () => {
-        this.initBalls();
-        this.draw();
-      };
-    } else {
-      this.initBalls();
-      this.draw();
+
+    this.applyUserPhotoSkin();
+    this.initBalls();
+    this.draw();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['userPhoto']) {
+      this.applyUserPhotoSkin();
+      this.cdr.detectChanges();
     }
   }
 
@@ -56,6 +55,25 @@ export class BrickBreakerComponent implements OnInit, OnDestroy {
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
     }
+  }
+
+  private applyUserPhotoSkin(): void {
+    if (!this.userPhoto) {
+      this.ballImage = null;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const image = new Image();
+    image.src = this.userPhoto;
+    image.onload = () => {
+      this.ballImage = image;
+      this.cdr.detectChanges();
+    };
+    image.onerror = () => {
+      this.ballImage = null;
+      this.cdr.detectChanges();
+    };
   }
 
   private initBalls() {
