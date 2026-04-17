@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { API_BASE_URL } from './api.config';
 import {
   ChatJoinResponse,
+  ChatMediaUploadResponse,
   ChatMessageRequest,
   ChatMessageResponse,
   ChatRoomType,
@@ -26,6 +27,12 @@ export class ChatApiService {
 
   listMessages(roomType: ChatRoomType, limit = 60): Observable<ChatMessageResponse[]> {
     return this.http.get<ChatMessageResponse[]>(`${this.baseUrl}/${roomType}/mensajes?limit=${limit}`);
+  }
+
+  uploadMedia(file: File): Observable<ChatMediaUploadResponse> {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    return this.http.post<ChatMediaUploadResponse>(`${this.baseUrl}/media/upload`, formData);
   }
 
   sendMessage(payload: ChatMessageRequest): Observable<ChatMessageResponse> {

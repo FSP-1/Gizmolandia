@@ -21,15 +21,17 @@
     <label class="file-label" for="chatMedia">{{ 'CHAT.COMPOSE.MEDIA_LABEL' | translate }}</label>
     <input id="chatMedia" type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif" (change)="onFileSelected($event)">
 
-    <div *ngIf="mediaUrl" class="media-preview">
-      <img [src]="mediaUrl" alt="preview">
+    <p *ngIf="uploadingMedia" class="media-uploading">{{ 'CHAT.COMPOSE.UPLOADING_MEDIA' | translate }}</p>
+
+    <div *ngIf="mediaPreviewUrl || mediaUrl" class="media-preview">
+      <img [src]="mediaPreviewUrl || mediaUrl" alt="preview">
       <button type="button" (click)="clearMedia()">{{ 'CHAT.COMPOSE.REMOVE_MEDIA' | translate }}</button>
     </div>
   </div>
 
   <p *ngIf="error" class="error-text">{{ error }}</p>
 
-  <button type="button" class="send-btn" [disabled]="sending" (click)="send()">
+  <button type="button" class="send-btn" [disabled]="sending || uploadingMedia" (click)="send()">
     {{ sending ? ('CHAT.COMPOSE.SENDING' | translate) : ('CHAT.COMPOSE.SEND' | translate) }}
   </button>
 </div>

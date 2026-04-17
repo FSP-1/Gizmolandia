@@ -82,6 +82,12 @@ export interface ChatMessageRequest {
   puntuacionId?: number | null;
 }
 
+export interface ChatMediaUploadResponse {
+  mediaUrl: string;
+  mediaType: ChatMediaType;
+  fileName: string;
+}
+
 export interface ChatMessageResponse {
   id: number;
   roomType: ChatRoomType;

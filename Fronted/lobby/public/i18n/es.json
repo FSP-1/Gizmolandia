@@ -99,6 +99,7 @@
       "WORD_COUNTER": "{{count}}/500 palabras",
       "MEDIA_LABEL": "Subir imagen o GIF",
       "REMOVE_MEDIA": "Quitar media",
+      "UPLOADING_MEDIA": "Subiendo imagen...",
       "SENDING": "Enviando...",
       "SEND": "Enviar comentario"
     },
@@ -108,6 +109,8 @@
       "JOIN_FAILED": "No fue posible entrar en la sala.",
       "ONLY_IMAGE_OR_GIF": "Solo se permite imagen normal o GIF.",
       "MEDIA_TOO_LARGE": "La imagen es demasiado grande.",
+      "MEDIA_UPLOADING": "Espera a que termine de subir la imagen.",
+      "MEDIA_UPLOAD_FAILED": "No se pudo subir la imagen.",
       "MEDIA_READ_FAILED": "No se pudo leer la imagen seleccionada.",
       "WRITE_COMMENT": "Escribe un comentario.",
       "MAX_WORDS": "El comentario no puede superar 500 palabras.",

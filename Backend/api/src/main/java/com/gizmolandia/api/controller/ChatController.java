@@ -2,7 +2,10 @@ package com.gizmolandia.api.controller;
 
 import java.util.List;
 
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,9 +13,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gizmolandia.api.dto.ChatJoinResponseDTO;
+import com.gizmolandia.api.dto.ChatMediaUploadResponseDTO;
 import com.gizmolandia.api.dto.ChatMessageRequestDTO;
 import com.gizmolandia.api.dto.ChatMessageResponseDTO;
 import com.gizmolandia.api.dto.ChatScoreOptionDTO;
@@ -55,6 +60,18 @@ public class ChatController {
     @PostMapping("/mensajes")
     public ResponseEntity<ChatMessageResponseDTO> sendMessage(@Valid @RequestBody ChatMessageRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(chatService.sendMessage(dto));
+    }
+
+    @PostMapping(value = "/media/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ChatMediaUploadResponseDTO> uploadMedia(@RequestPart("file") org.springframework.web.multipart.MultipartFile file) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(chatService.uploadMedia(file));
+    }
+
+    @GetMapping("/media/{fileName:.+}")
+    public ResponseEntity<Resource> loadMedia(@PathVariable String fileName) {
+        Resource resource = chatService.loadMedia(fileName);
+        MediaType mediaType = MediaTypeFactory.getMediaType(resource).orElse(MediaType.APPLICATION_OCTET_STREAM);
+        return ResponseEntity.ok().contentType(mediaType).body(resource);
     }
 
     @GetMapping("/juegos/puntuaciones/{usuarioId}")

@@ -1,16 +1,28 @@
 package com.gizmolandia.api.service.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.gizmolandia.api.dto.ChatJoinResponseDTO;
+import com.gizmolandia.api.dto.ChatMediaUploadResponseDTO;
 import com.gizmolandia.api.dto.ChatMessageRequestDTO;
 import com.gizmolandia.api.dto.ChatMessageResponseDTO;
 import com.gizmolandia.api.dto.ChatScoreOptionDTO;
@@ -37,6 +49,8 @@ public class ChatServiceImpl implements ChatService {
     private static final int MAX_USERS_PER_ROOM = 10;
     private static final int MAX_WORDS_PER_MESSAGE = 500;
     private static final int MAX_FETCH_LIMIT = 100;
+    private static final long MAX_MEDIA_BYTES = 5_000_000L;
+    private static final Path MEDIA_STORAGE_DIR = Paths.get("uploads", "chat-media");
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
 
     private final ChatMessageRepository chatMessageRepository;
@@ -170,6 +184,58 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    public ChatMediaUploadResponseDTO uploadMedia(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("Debes seleccionar una imagen");
+        }
+
+        if (file.getSize() > MAX_MEDIA_BYTES) {
+            throw new IllegalArgumentException("La imagen es demasiado grande");
+        }
+
+        ChatMediaType mediaType = resolveUploadedMediaType(file.getContentType(), file.getOriginalFilename());
+        String extension = resolveUploadedExtension(file.getContentType(), file.getOriginalFilename());
+
+        try {
+            Files.createDirectories(MEDIA_STORAGE_DIR);
+
+            String fileName = UUID.randomUUID() + extension;
+            Path target = resolveMediaPath(fileName);
+
+            try (InputStream inputStream = file.getInputStream()) {
+                Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            String mediaUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/api/chat/media/")
+                    .path(fileName)
+                    .toUriString();
+
+            return ChatMediaUploadResponseDTO.builder()
+                    .mediaUrl(mediaUrl)
+                    .mediaType(mediaType.name())
+                    .fileName(fileName)
+                    .build();
+        } catch (IOException ex) {
+            throw new IllegalStateException("No se pudo guardar la imagen", ex);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Resource loadMedia(String fileName) {
+        Path target = resolveMediaPath(fileName);
+        if (!Files.exists(target) || !Files.isRegularFile(target)) {
+            throw new ResourceNotFoundException("Imagen no encontrada");
+        }
+        try {
+            return new UrlResource(target.toUri());
+        } catch (IOException ex) {
+            throw new IllegalStateException("No se pudo leer la imagen", ex);
+        }
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<ChatScoreOptionDTO> listScoreOptions(Long usuarioId) {
         findUsuarioOrThrow(usuarioId);
@@ -227,6 +293,101 @@ public class ChatServiceImpl implements ChatService {
         }
 
         throw new IllegalArgumentException("Solo se permite subir imagen normal o GIF");
+    }
+
+    private ChatMediaType resolveUploadedMediaType(String contentType, String originalFilename) {
+        String normalizedContentType = normalizeNullable(contentType);
+        String normalizedFilename = normalizeNullable(originalFilename);
+
+        if (isGifContent(normalizedContentType) || isGifFilename(normalizedFilename)) {
+            return ChatMediaType.GIF;
+        }
+
+        if (isImageContent(normalizedContentType) || isImageFilename(normalizedFilename)) {
+            return ChatMediaType.IMAGE;
+        }
+
+        throw new IllegalArgumentException("Solo se permite subir imagen normal o GIF");
+    }
+
+    private String resolveUploadedExtension(String contentType, String originalFilename) {
+        String normalizedContentType = normalizeNullable(contentType);
+        String normalizedFilename = normalizeNullable(originalFilename);
+
+        if (isGifContent(normalizedContentType) || isGifFilename(normalizedFilename)) {
+            return ".gif";
+        }
+        if (isPngContent(normalizedContentType) || isPngFilename(normalizedFilename)) {
+            return ".png";
+        }
+        if (isJpegContent(normalizedContentType) || isJpegFilename(normalizedFilename)) {
+            return ".jpg";
+        }
+        if (isWebpContent(normalizedContentType) || isWebpFilename(normalizedFilename)) {
+            return ".webp";
+        }
+
+        throw new IllegalArgumentException("Solo se permite subir imagen normal o GIF");
+    }
+
+    private boolean isGifContent(String value) {
+        return value != null && value.toLowerCase(Locale.ROOT).startsWith("image/gif");
+    }
+
+    private boolean isPngContent(String value) {
+        return value != null && value.toLowerCase(Locale.ROOT).startsWith("image/png");
+    }
+
+    private boolean isJpegContent(String value) {
+        if (value == null) {
+            return false;
+        }
+        String lower = value.toLowerCase(Locale.ROOT);
+        return lower.startsWith("image/jpeg") || lower.startsWith("image/jpg");
+    }
+
+    private boolean isWebpContent(String value) {
+        return value != null && value.toLowerCase(Locale.ROOT).startsWith("image/webp");
+    }
+
+    private boolean isImageContent(String value) {
+        return isPngContent(value) || isJpegContent(value) || isWebpContent(value);
+    }
+
+    private boolean isGifFilename(String value) {
+        return value != null && value.toLowerCase(Locale.ROOT).endsWith(".gif");
+    }
+
+    private boolean isPngFilename(String value) {
+        return value != null && value.toLowerCase(Locale.ROOT).endsWith(".png");
+    }
+
+    private boolean isJpegFilename(String value) {
+        if (value == null) {
+            return false;
+        }
+        String lower = value.toLowerCase(Locale.ROOT);
+        return lower.endsWith(".jpg") || lower.endsWith(".jpeg");
+    }
+
+    private boolean isWebpFilename(String value) {
+        return value != null && value.toLowerCase(Locale.ROOT).endsWith(".webp");
+    }
+
+    private boolean isImageFilename(String value) {
+        return isPngFilename(value) || isJpegFilename(value) || isWebpFilename(value);
+    }
+
+    private Path resolveMediaPath(String fileName) {
+        String safeFileName = Paths.get(fileName).getFileName().toString();
+        Path baseDir = MEDIA_STORAGE_DIR.toAbsolutePath().normalize();
+        Path resolved = baseDir.resolve(safeFileName).normalize();
+
+        if (!resolved.startsWith(baseDir)) {
+            throw new IllegalArgumentException("Nombre de archivo inválido");
+        }
+
+        return resolved;
     }
 
     private String normalizeComment(String value) {

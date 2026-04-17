@@ -24,7 +24,7 @@ public class ChatMessageRequestDTO {
     @Size(max = 6000, message = "El comentario excede el tamaño permitido")
     private String commentText;
 
-    @Size(max = 6000000, message = "La media es demasiado grande")
+    @Size(max = 2000, message = "La URL de media es demasiado larga")
     private String mediaUrl;
 
     private Long puntuacionId;

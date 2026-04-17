@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angu
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ChatApiService } from '../../../../services/chat-api.service';
 import { ChatRoomType, ChatScoreOption } from '../../../../services/api.models';
 
 export interface ChatComposePayload {
@@ -19,6 +20,7 @@ export interface ChatComposePayload {
 })
 export class ChatComposeBoxComponent {
   private readonly maxMediaBytes = 4500000;
+  private uploadToken = 0;
 
   @Input() activeRoom: ChatRoomType = 'NORMAL';
   @Input() scoreOptions: ChatScoreOption[] = [];
@@ -28,9 +30,12 @@ export class ChatComposeBoxComponent {
   commentText = '';
   selectedScoreId: number | null = null;
   mediaUrl: string | null = null;
+  mediaPreviewUrl: string | null = null;
+  uploadingMedia = false;
   error = '';
 
   constructor(
+    private readonly chatApi: ChatApiService,
     private readonly translate: TranslateService,
     private readonly cdr: ChangeDetectorRef
   ) {}
@@ -62,29 +67,74 @@ export class ChatComposeBoxComponent {
       this.error = this.translate.instant('CHAT.ERRORS.MEDIA_TOO_LARGE');
       target.value = '';
       this.mediaUrl = null;
+      this.mediaPreviewUrl = null;
       this.cdr.detectChanges();
       return;
     }
 
+    this.error = '';
+    this.uploadingMedia = true;
+    this.mediaUrl = null;
+    this.mediaPreviewUrl = null;
+    const currentToken = ++this.uploadToken;
+
     const reader = new FileReader();
     reader.onload = () => {
-      this.mediaUrl = typeof reader.result === 'string' ? reader.result : null;
-      this.error = '';
+      if (currentToken !== this.uploadToken) {
+        return;
+      }
+      this.mediaPreviewUrl = typeof reader.result === 'string' ? reader.result : null;
       this.cdr.detectChanges();
     };
     reader.onerror = () => {
+      if (currentToken !== this.uploadToken) {
+        return;
+      }
+      this.uploadingMedia = false;
       this.error = this.translate.instant('CHAT.ERRORS.MEDIA_READ_FAILED');
       this.cdr.detectChanges();
     };
     reader.readAsDataURL(file);
+
+    this.chatApi.uploadMedia(file).subscribe({
+      next: (response) => {
+        if (currentToken !== this.uploadToken) {
+          return;
+        }
+        this.mediaUrl = response.mediaUrl;
+        this.uploadingMedia = false;
+        this.error = '';
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        if (currentToken !== this.uploadToken) {
+          return;
+        }
+        this.uploadingMedia = false;
+        this.mediaUrl = null;
+        this.mediaPreviewUrl = null;
+        this.error = this.translate.instant('CHAT.ERRORS.MEDIA_UPLOAD_FAILED');
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   clearMedia(): void {
+    this.uploadToken += 1;
     this.mediaUrl = null;
+    this.mediaPreviewUrl = null;
+    this.uploadingMedia = false;
+    this.error = '';
+    this.cdr.detectChanges();
   }
 
   send(): void {
     this.error = '';
+
+    if (this.uploadingMedia) {
+      this.error = this.translate.instant('CHAT.ERRORS.MEDIA_UPLOADING');
+      return;
+    }
 
     if (this.wordCount === 0) {
       this.error = this.translate.instant('CHAT.ERRORS.WRITE_COMMENT');
@@ -109,6 +159,7 @@ export class ChatComposeBoxComponent {
 
     this.commentText = '';
     this.mediaUrl = null;
+    this.mediaPreviewUrl = null;
     this.selectedScoreId = null;
     this.cdr.detectChanges();
   }
