@@ -53,6 +53,7 @@ export class GamesComponent implements OnInit, OnDestroy {
             ...sessionUser,
             ...usuario
           });
+          setTimeout(() => this.cdr.detectChanges());
         }
       });
     }

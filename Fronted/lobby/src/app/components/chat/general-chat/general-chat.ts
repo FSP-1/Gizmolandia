@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subscription, interval } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   ChatMessageRequest,
@@ -47,7 +47,7 @@ export class GeneralChatComponent implements OnInit, OnDestroy {
   errorMessage = '';
 
   private sessionUser: UsuarioResponse | null = null;
-  private refreshSub?: Subscription;
+  private messageRefreshTimerId: number | null = null;
 
   constructor(
     private readonly chatApiService: ChatApiService,
@@ -70,11 +70,10 @@ export class GeneralChatComponent implements OnInit, OnDestroy {
     }
 
     this.enterRoom(this.activeRoom);
-    this.refreshSub = interval(4000).subscribe(() => this.fetchMessages());
   }
 
   ngOnDestroy(): void {
-    this.refreshSub?.unsubscribe();
+    this.stopMessageRefresh();
     this.leaveActiveRoom();
   }
 
@@ -83,6 +82,7 @@ export class GeneralChatComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.stopMessageRefresh();
     this.leaveActiveRoom();
     this.activeRoom = room;
     this.messages = [];
@@ -120,7 +120,6 @@ export class GeneralChatComponent implements OnInit, OnDestroy {
       next: () => {
         this.sending = false;
         this.fetchMessages();
-        this.cdr.detectChanges();
       },
       error: (error) => {
         this.sending = false;
@@ -142,6 +141,7 @@ export class GeneralChatComponent implements OnInit, OnDestroy {
         this.activeUsers = joinData.activeUsers;
         this.maxUsers = joinData.maxUsers;
         this.fetchMessages();
+        this.startMessageRefresh();
 
         if (room === 'JUEGOS') {
           this.chatApiService.listScoreOptions(this.userId!).subscribe({
@@ -179,6 +179,25 @@ export class GeneralChatComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  private startMessageRefresh(): void {
+    this.stopMessageRefresh();
+    this.messageRefreshTimerId = window.setInterval(() => {
+      this.chatApiService.listMessages(this.activeRoom, 60).subscribe({
+        next: (messages) => {
+          this.messages = messages;
+          this.cdr.detectChanges();
+        }
+      });
+    }, 2500);
+  }
+
+  private stopMessageRefresh(): void {
+    if (this.messageRefreshTimerId !== null) {
+      window.clearInterval(this.messageRefreshTimerId);
+      this.messageRefreshTimerId = null;
+    }
   }
 
   private leaveActiveRoom(): void {

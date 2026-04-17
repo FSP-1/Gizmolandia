@@ -14,6 +14,7 @@ import { Subscription } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { GameLeaderboardComponent } from '../game-leaderboard/game-leaderboard';
 import { PuntuacionApiService } from '../../../services/puntuacion-api.service';
+import { GamePhotoCacheService } from '../../../services/game-photo-cache.service';
 import {
   PingPongKickedEvent,
   PingPongLobbyEvent,
@@ -74,6 +75,9 @@ export class PingPongComponent implements OnInit, OnDestroy {
   private realtimeSub?: Subscription;
   private realtimeState: PingPongRealtimeState | null = null;
   private scorePersisted = false;
+  private previewOpponentPhotoSrcValue = '/assets/default-avatar.png';
+  private rematchLeftPhotoSrcValue = '/assets/default-avatar.png';
+  private rematchRightPhotoSrcValue = '/assets/default-avatar.png';
 
   // Match preview state
   showPreview = false;
@@ -101,7 +105,8 @@ export class PingPongComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private puntuacionApiService: PuntuacionApiService,
     private realtimeService: PingPongRealtimeService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private gamePhotoCacheService: GamePhotoCacheService
   ) {}
 
   ngOnInit(): void {
@@ -173,16 +178,7 @@ export class PingPongComponent implements OnInit, OnDestroy {
   }
 
   get previewOpponentPhotoSrc(): string {
-    const photo = (this.previewOpponentPhoto || '').trim();
-    if (!photo) {
-      return '/assets/default-avatar.png';
-    }
-    const lower = photo.toLowerCase();
-    if (lower.startsWith('data:image/') || lower.startsWith('http://') || lower.startsWith('https://')) {
-      return photo;
-    }
-    // Prevent invalid URL fetches like "GET data:image/jpeg;base...".
-    return '/assets/default-avatar.png';
+    return this.previewOpponentPhotoSrcValue;
   }
 
   disconnectOnline(): void {
@@ -276,11 +272,11 @@ export class PingPongComponent implements OnInit, OnDestroy {
   }
 
   get rematchLeftPhotoSrc(): string {
-    return this.toPhotoSrc(this.realtimeState?.leftPlayerPhoto);
+    return this.rematchLeftPhotoSrcValue;
   }
 
   get rematchRightPhotoSrc(): string {
-    return this.toPhotoSrc(this.realtimeState?.rightPlayerPhoto);
+    return this.rematchRightPhotoSrcValue;
   }
 
   get rematchLeftName(): string {
@@ -370,6 +366,7 @@ export class PingPongComponent implements OnInit, OnDestroy {
     this.queuePosition = null;
 
     this.desiredPaddleY = state.yourSide === 'LEFT' ? state.leftPaddleY : state.rightPaddleY;
+    this.syncRematchPhotos();
 
     switch (state.status) {
       case 'PREVIEW':
@@ -693,6 +690,7 @@ export class PingPongComponent implements OnInit, OnDestroy {
     this.previewAcceptedByMe = false;
     this.previewOpponentUsername = event.opponentUsername;
     this.previewOpponentPhoto = event.opponentPhoto;
+    this.syncPreviewPhoto();
     this.previewTimeout = event.timeoutSeconds;
     this.statusText = this.t('GAMES.PING_PONG.STATUS.OPPONENT_FOUND', {
       opponent: event.opponentUsername
@@ -740,6 +738,29 @@ export class PingPongComponent implements OnInit, OnDestroy {
   private hidePreview(): void {
     this.showPreview = false;
     this.clearPreviewTimers();
+  }
+
+  private syncPreviewPhoto(): void {
+    this.previewOpponentPhotoSrcValue = '/assets/default-avatar.png';
+    this.gamePhotoCacheService.loadSrc(this.previewOpponentPhoto).then((src) => {
+      this.previewOpponentPhotoSrcValue = src;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private syncRematchPhotos(): void {
+    const leftPhoto = this.realtimeState?.leftPlayerPhoto || '';
+    const rightPhoto = this.realtimeState?.rightPlayerPhoto || '';
+
+    this.gamePhotoCacheService.loadSrc(leftPhoto).then((src) => {
+      this.rematchLeftPhotoSrcValue = src;
+      this.cdr.detectChanges();
+    });
+
+    this.gamePhotoCacheService.loadSrc(rightPhoto).then((src) => {
+      this.rematchRightPhotoSrcValue = src;
+      this.cdr.detectChanges();
+    });
   }
 
   private clearPreviewTimers(): void {

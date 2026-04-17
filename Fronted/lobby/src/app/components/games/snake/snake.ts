@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { GameLeaderboardComponent } from '../game-leaderboard/game-leaderboard';
 import { PuntuacionApiService } from '../../../services/puntuacion-api.service';
+import { GamePhotoCacheService } from '../../../services/game-photo-cache.service';
 
 type Direction = 'up' | 'down' | 'left' | 'right';
 
@@ -45,6 +46,7 @@ export class SnakeComponent implements OnInit, OnDestroy, OnChanges {
   private profileImage: HTMLImageElement | null = null;
   private scorePersisted = false;
   private ready = false;
+  private profileImageSrc = '';
 
   score = 0;
   highScore = 0;
@@ -74,7 +76,8 @@ export class SnakeComponent implements OnInit, OnDestroy, OnChanges {
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private puntuacionApiService: PuntuacionApiService
+    private puntuacionApiService: PuntuacionApiService,
+    private gamePhotoCacheService: GamePhotoCacheService
   ) {}
 
   ngOnDestroy(): void {
@@ -107,26 +110,38 @@ export class SnakeComponent implements OnInit, OnDestroy, OnChanges {
   private loadUserSkin(): void {
     if (!this.userPhoto) {
       this.profileImage = null;
+      this.profileImageSrc = '';
       if (this.ready) {
         this.draw();
       }
       return;
     }
 
-    const image = new Image();
-    image.src = this.userPhoto;
-    image.onload = () => {
-      this.profileImage = image;
+    this.gamePhotoCacheService.loadSrc(this.userPhoto).then((src) => {
+      this.profileImageSrc = src;
+      if (src && src !== '/assets/default-avatar.png') {
+        const image = new Image();
+        image.decoding = 'async';
+        image.onload = () => {
+          this.profileImage = image;
+          if (this.ready) {
+            this.draw();
+          }
+        };
+        image.onerror = () => {
+          this.profileImage = null;
+          if (this.ready) {
+            this.draw();
+          }
+        };
+        image.src = src;
+      } else {
+        this.profileImage = null;
+      }
       if (this.ready) {
         this.draw();
       }
-    };
-    image.onerror = () => {
-      this.profileImage = null;
-      if (this.ready) {
-        this.draw();
-      }
-    };
+    });
   }
 
   startGame(): void {

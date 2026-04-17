@@ -47,12 +47,12 @@ export class GameLeaderboardComponent implements OnInit, OnChanges {
       next: (rows) => {
         this.ranking = rows.slice(0, this.top);
         this.loading = false;
-        this.cdr.detectChanges();
+        setTimeout(() => this.cdr.detectChanges());
       },
       error: () => {
         this.ranking = [];
         this.loading = false;
-        this.cdr.detectChanges();
+        setTimeout(() => this.cdr.detectChanges());
       }
     });
   }

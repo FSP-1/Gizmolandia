@@ -1,8 +1,10 @@
 package com.gizmolandia.api.controller;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.core.io.Resource;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.MediaTypeFactory;
@@ -71,7 +73,10 @@ public class ChatController {
     public ResponseEntity<Resource> loadMedia(@PathVariable String fileName) {
         Resource resource = chatService.loadMedia(fileName);
         MediaType mediaType = MediaTypeFactory.getMediaType(resource).orElse(MediaType.APPLICATION_OCTET_STREAM);
-        return ResponseEntity.ok().contentType(mediaType).body(resource);
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(30, TimeUnit.DAYS).cachePublic().noTransform())
+                .contentType(mediaType)
+                .body(resource);
     }
 
     @GetMapping("/juegos/puntuaciones/{usuarioId}")

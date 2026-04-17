@@ -91,7 +91,7 @@ export class TetrisComponent implements OnInit, OnDestroy, OnChanges {
 
   private syncUserPhoto(): void {
     this.userProfileImage = this.userPhoto || '';
-    this.cdr.detectChanges();
+    setTimeout(() => this.cdr.detectChanges());
   }
 
   private initGrid() {
