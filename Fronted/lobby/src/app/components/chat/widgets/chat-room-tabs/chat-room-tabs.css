@@ -1,0 +1,31 @@
+.room-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.room-tab {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: #f8fafc;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.room-tab:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.room-tab.active {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.room-tab:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

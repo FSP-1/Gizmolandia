@@ -73,7 +73,46 @@
     "DEFAULT_STATUS": "Listo para jugar",
     "CUSTOMIZE": "Personalizar",
     "GAMES": "Juegos",
+    "CHAT": "Chat general",
     "LOGOUT": "Cerrar sesion"
+  },
+  "CHAT": {
+    "TITLE": "Chat general",
+    "SUBTITLE": "Salas: Normal, Juegos y Nerd Stuff. Maximo {{maxUsers}} personas por sala.",
+    "BACK": "Volver",
+    "CAPACITY": "Conectados en esta sala: {{activeUsers}}/{{maxUsers}}",
+    "EMPTY": "Aun no hay mensajes en esta sala.",
+    "MEDIA": {
+      "GIF": "GIF",
+      "IMAGE": "IMAGEN"
+    },
+    "ROOMS": {
+      "NORMAL": "Normal",
+      "JUEGOS": "Juegos",
+      "NERD_STUFF": "Nerd Stuff"
+    },
+    "COMPOSE": {
+      "SCORE_LABEL": "Puntuacion jugada",
+      "SCORE_PLACEHOLDER": "Selecciona una puntuacion",
+      "COMMENT_LABEL": "Comentario (max 500 palabras)",
+      "COMMENT_PLACEHOLDER": "Escribe tu comentario...",
+      "WORD_COUNTER": "{{count}}/500 palabras",
+      "MEDIA_LABEL": "Subir imagen o GIF",
+      "REMOVE_MEDIA": "Quitar media",
+      "SENDING": "Enviando...",
+      "SEND": "Enviar comentario"
+    },
+    "ERRORS": {
+      "NO_SESSION": "No hay sesion activa para usar el chat.",
+      "SEND_FAILED": "No se pudo enviar el mensaje.",
+      "JOIN_FAILED": "No fue posible entrar en la sala.",
+      "ONLY_IMAGE_OR_GIF": "Solo se permite imagen normal o GIF.",
+      "MEDIA_TOO_LARGE": "La imagen es demasiado grande.",
+      "MEDIA_READ_FAILED": "No se pudo leer la imagen seleccionada.",
+      "WRITE_COMMENT": "Escribe un comentario.",
+      "MAX_WORDS": "El comentario no puede superar 500 palabras.",
+      "SCORE_REQUIRED": "En Juegos debes seleccionar una puntuacion jugada."
+    }
   },
   "GAMES": {
     "BACK": "← Volver",

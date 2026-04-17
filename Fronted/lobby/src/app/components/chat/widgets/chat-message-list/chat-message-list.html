@@ -1,0 +1,33 @@
+<div class="messages-wrapper">
+  <div *ngIf="messages.length === 0" class="empty-state">
+    {{ 'CHAT.EMPTY' | translate }}
+  </div>
+
+  <article
+    *ngFor="let msg of messages; trackBy: trackByMessageId"
+    class="message-card"
+    [class.own]="isOwnMessage(msg)">
+    <header class="message-header">
+      <div class="author-block">
+        <img *ngIf="msg.fotoUsuario" [src]="msg.fotoUsuario" alt="profile" class="author-avatar">
+        <div *ngIf="!msg.fotoUsuario" class="author-avatar fallback">👤</div>
+
+        <div>
+          <p class="author-name">{{ msg.userProfile || msg.nombreUsuario }}</p>
+          <p class="message-time">{{ formatDate(msg.createdAt) }}</p>
+        </div>
+      </div>
+
+      <div *ngIf="msg.scoreGame && msg.scoreValue !== null" class="score-badge">
+        {{ msg.scoreGame }} · {{ msg.scoreValue }}
+      </div>
+    </header>
+
+    <p class="message-text">{{ msg.commentText }}</p>
+
+    <div *ngIf="msg.mediaUrl" class="media-box">
+      <img [src]="msg.mediaUrl" alt="media" loading="lazy">
+      <span class="media-chip">{{ msg.mediaType === 'GIF' ? ('CHAT.MEDIA.GIF' | translate) : ('CHAT.MEDIA.IMAGE' | translate) }}</span>
+    </div>
+  </article>
+</div>

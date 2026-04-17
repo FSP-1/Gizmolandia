@@ -1,0 +1,11 @@
+<div class="room-tabs" role="tablist" aria-label="Salas de chat">
+  <button
+    *ngFor="let tab of tabs"
+    type="button"
+    class="room-tab"
+    [class.active]="tab.room === activeRoom"
+    [disabled]="disabled"
+    (click)="select(tab.room)">
+    {{ tab.labelKey | translate }}
+  </button>
+</div>

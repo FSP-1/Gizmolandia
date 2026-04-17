@@ -263,6 +263,28 @@
   box-shadow: var(--games-btn-shadow-hover);
 }
 
+.chat-btn {
+  margin-top: 1rem;
+  padding: 0.82rem 1.45rem;
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 20px rgba(2, 132, 199, 0.4);
+}
+
+.chat-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(2, 132, 199, 0.58);
+}
+
 .logout-btn {
   margin-top: 1rem;
   padding: 0.8rem 1.45rem;

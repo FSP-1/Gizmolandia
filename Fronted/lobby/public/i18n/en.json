@@ -73,7 +73,46 @@
     "DEFAULT_STATUS": "Ready to play",
     "CUSTOMIZE": "Customize",
     "GAMES": "Games",
+    "CHAT": "General chat",
     "LOGOUT": "Log out"
+  },
+  "CHAT": {
+    "TITLE": "General chat",
+    "SUBTITLE": "Rooms: Normal, Games and Nerd Stuff. Maximum {{maxUsers}} people per room.",
+    "BACK": "Back",
+    "CAPACITY": "Connected in this room: {{activeUsers}}/{{maxUsers}}",
+    "EMPTY": "There are no messages in this room yet.",
+    "MEDIA": {
+      "GIF": "GIF",
+      "IMAGE": "IMAGE"
+    },
+    "ROOMS": {
+      "NORMAL": "Normal",
+      "JUEGOS": "Games",
+      "NERD_STUFF": "Nerd Stuff"
+    },
+    "COMPOSE": {
+      "SCORE_LABEL": "Played score",
+      "SCORE_PLACEHOLDER": "Select a score",
+      "COMMENT_LABEL": "Comment (max 500 words)",
+      "COMMENT_PLACEHOLDER": "Write your comment...",
+      "WORD_COUNTER": "{{count}}/500 words",
+      "MEDIA_LABEL": "Upload image or GIF",
+      "REMOVE_MEDIA": "Remove media",
+      "SENDING": "Sending...",
+      "SEND": "Send comment"
+    },
+    "ERRORS": {
+      "NO_SESSION": "There is no active session to use chat.",
+      "SEND_FAILED": "Could not send the message.",
+      "JOIN_FAILED": "Could not join the room.",
+      "ONLY_IMAGE_OR_GIF": "Only regular image or GIF is allowed.",
+      "MEDIA_TOO_LARGE": "The image is too large.",
+      "MEDIA_READ_FAILED": "Could not read the selected image.",
+      "WRITE_COMMENT": "Write a comment.",
+      "MAX_WORDS": "Comment cannot exceed 500 words.",
+      "SCORE_REQUIRED": "In Games room you must select a played score."
+    }
   },
   "GAMES": {
     "BACK": "← Back",

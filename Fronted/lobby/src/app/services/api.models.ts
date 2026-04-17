@@ -62,3 +62,46 @@ export interface ApiValidationError {
   mensaje?: string;
   errores?: Record<string, string>;
 }
+
+export type ChatRoomType = 'NORMAL' | 'JUEGOS' | 'NERD_STUFF';
+export type ChatMediaType = 'IMAGE' | 'GIF';
+
+export interface ChatJoinResponse {
+  roomType: ChatRoomType;
+  usuarioId: number;
+  activeUsers: number;
+  maxUsers: number;
+  joined: boolean;
+}
+
+export interface ChatMessageRequest {
+  usuarioId: number;
+  roomType: ChatRoomType;
+  commentText: string;
+  mediaUrl?: string | null;
+  puntuacionId?: number | null;
+}
+
+export interface ChatMessageResponse {
+  id: number;
+  roomType: ChatRoomType;
+  usuarioId: number;
+  nombreUsuario: string;
+  userProfile: string;
+  fotoUsuario: string;
+  commentText: string;
+  wordCount: number;
+  mediaUrl?: string | null;
+  mediaType?: ChatMediaType | null;
+  puntuacionId?: number | null;
+  scoreGame?: string | null;
+  scoreValue?: number | null;
+  createdAt: string;
+}
+
+export interface ChatScoreOption {
+  puntuacionId: number;
+  juego: string;
+  puntuacion: number;
+  fechaPartida: string;
+}

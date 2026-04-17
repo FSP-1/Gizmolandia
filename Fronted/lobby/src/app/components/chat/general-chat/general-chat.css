@@ -1,0 +1,65 @@
+.chat-shell {
+  width: min(1000px, 96vw);
+  margin: 2rem auto;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(160deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.82));
+  backdrop-filter: blur(8px);
+  padding: 1rem;
+  color: #f8fafc;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.8rem;
+}
+
+.chat-header h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.chat-header p {
+  margin: 0.2rem 0 0;
+  color: rgba(226, 232, 240, 0.85);
+}
+
+.back-btn {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  color: #f8fafc;
+  border-radius: 999px;
+  padding: 0.45rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.room-capacity {
+  margin: 0.75rem 0;
+  color: #cbd5e1;
+  font-size: 0.86rem;
+}
+
+.error-banner {
+  border: 1px solid rgba(248, 113, 113, 0.5);
+  background: rgba(127, 29, 29, 0.5);
+  border-radius: 10px;
+  padding: 0.5rem 0.65rem;
+  color: #fecaca;
+  margin: 0.7rem 0;
+}
+
+@media (max-width: 760px) {
+  .chat-shell {
+    margin: 1rem auto;
+    padding: 0.75rem;
+  }
+
+  .chat-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

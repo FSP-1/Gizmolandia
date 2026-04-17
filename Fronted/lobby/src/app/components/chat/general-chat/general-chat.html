@@ -1,0 +1,29 @@
+<section class="chat-shell">
+  <header class="chat-header">
+    <div>
+      <h2>{{ 'CHAT.TITLE' | translate }}</h2>
+      <p>{{ 'CHAT.SUBTITLE' | translate:{ maxUsers: maxUsers } }}</p>
+    </div>
+
+    <button type="button" class="back-btn" (click)="onBack()">{{ 'CHAT.BACK' | translate }}</button>
+  </header>
+
+  <app-chat-room-tabs
+    [activeRoom]="activeRoom"
+    [disabled]="loading || sending"
+    (roomSelected)="onRoomSelected($event)">
+  </app-chat-room-tabs>
+
+  <p class="room-capacity">{{ 'CHAT.CAPACITY' | translate:{ activeUsers: activeUsers, maxUsers: maxUsers } }}</p>
+
+  <p *ngIf="errorMessage" class="error-banner">{{ errorMessage }}</p>
+
+  <app-chat-message-list [messages]="messages" [currentUserId]="userId"></app-chat-message-list>
+
+  <app-chat-compose-box
+    [activeRoom]="activeRoom"
+    [scoreOptions]="scoreOptions"
+    [sending]="sending"
+    (submitMessage)="onSend($event)">
+  </app-chat-compose-box>
+</section>
