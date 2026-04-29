@@ -19,7 +19,7 @@ export interface ChatComposePayload {
   styleUrls: ['./chat-compose-box.css']
 })
 export class ChatComposeBoxComponent {
-  private readonly maxMediaBytes = 4500000;
+  private readonly maxMediaBytes = 30 * 1024 * 1024; // 30MB
   private uploadToken = 0;
 
   @Input() activeRoom: ChatRoomType = 'NORMAL';

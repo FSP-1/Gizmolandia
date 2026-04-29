@@ -108,7 +108,7 @@
       "SEND_FAILED": "No se pudo enviar el mensaje.",
       "JOIN_FAILED": "No fue posible entrar en la sala.",
       "ONLY_IMAGE_OR_GIF": "Solo se permite imagen normal o GIF.",
-      "MEDIA_TOO_LARGE": "La imagen es demasiado grande.",
+      "MEDIA_TOO_LARGE": "La imagen es demasiado grande. Máximo 30MB.",
       "MEDIA_UPLOADING": "Espera a que termine de subir la imagen.",
       "MEDIA_UPLOAD_FAILED": "No se pudo subir la imagen.",
       "MEDIA_READ_FAILED": "No se pudo leer la imagen seleccionada.",

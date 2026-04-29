@@ -52,7 +52,7 @@ public class ChatServiceImpl implements ChatService {
     private static final int MAX_WORDS_PER_MESSAGE = 500;
     private static final int MAX_FETCH_LIMIT = 100;
     private static final int MAX_INLINE_AVATAR_LENGTH = 4096;
-    private static final long MAX_MEDIA_BYTES = 5_000_000L;
+    private static final long MAX_MEDIA_BYTES = 30_000_000L; // 30MB
     private static final Path MEDIA_STORAGE_DIR = Paths.get("uploads", "chat-media");
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
 
@@ -174,7 +174,8 @@ public class ChatServiceImpl implements ChatService {
                 throw new IllegalArgumentException("En la sala JUEGOS debes seleccionar una puntuación jugada");
             }
             score = puntuacionRepository.findByIdAndUsuarioId(dto.getPuntuacionId(), usuario.getId())
-                    .orElseThrow(() -> new IllegalArgumentException("La puntuación seleccionada no pertenece al usuario"));
+                    .orElseThrow(
+                            () -> new IllegalArgumentException("La puntuación seleccionada no pertenece al usuario"));
             scoreGame = score.getJuego();
             scoreValue = score.getPuntuacion();
         }
@@ -190,8 +191,7 @@ public class ChatServiceImpl implements ChatService {
                         .puntuacion(score)
                         .scoreGame(scoreGame)
                         .scoreValue(scoreValue)
-                        .build()
-        );
+                        .build());
 
         return toDTO(saved);
     }
@@ -293,11 +293,11 @@ public class ChatServiceImpl implements ChatService {
         return puntuacionRepository.findTop100ByUsuarioIdOrderByFechaPartidaDesc(usuarioId)
                 .stream()
                 .map(p -> ChatScoreOptionDTO.builder()
-                .puntuacionId(p.getId())
-                .juego(p.getJuego())
-                .puntuacion(p.getPuntuacion())
-                .fechaPartida(p.getFechaPartida())
-                .build())
+                        .puntuacionId(p.getId())
+                        .juego(p.getJuego())
+                        .puntuacion(p.getPuntuacion())
+                        .fechaPartida(p.getFechaPartida())
+                        .build())
                 .collect(Collectors.toList());
     }
 

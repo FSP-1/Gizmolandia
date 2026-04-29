@@ -32,7 +32,7 @@ export class CustomizationComponent {
   loadingProfile = false;
   errorMessage = '';
 
-  private maxSize = 25 * 1024 * 1024; // 25MB
+  private maxSize = 30 * 1024 * 1024; // 30MB
 
   predefinedColors = [
     '#667eea', '#764ba2', '#f093fb', '#4facfe',
@@ -77,7 +77,7 @@ export class CustomizationComponent {
     const file = event.target.files[0];
     if (file) {
       if (file.size > this.maxSize) {
-        this.errorMessage = 'La imagen es demasiado grande. Máximo 25MB.';
+        this.errorMessage = 'La imagen es demasiado grande. Máximo 30MB.';
         return;
       }
       this.errorMessage = '';
@@ -101,7 +101,7 @@ export class CustomizationComponent {
     const file = event.target.files[0];
     if (file) {
       if (file.size > this.maxSize) {
-        this.errorMessage = 'La imagen es demasiado grande. Máximo 25MB.';
+        this.errorMessage = 'La imagen es demasiado grande. Máximo 30MB.';
         return;
       }
       this.errorMessage = '';
@@ -137,7 +137,7 @@ export class CustomizationComponent {
     const file = event.target.files[0];
     if (file) {
       if (file.size > this.maxSize) {
-        this.errorMessage = 'La imagen es demasiado grande. Máximo 25MB.';
+        this.errorMessage = 'La imagen es demasiado grande. Máximo 30MB.';
         return;
       }
       this.errorMessage = '';

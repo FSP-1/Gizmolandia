@@ -108,7 +108,7 @@
       "SEND_FAILED": "Could not send the message.",
       "JOIN_FAILED": "Could not join the room.",
       "ONLY_IMAGE_OR_GIF": "Only regular image or GIF is allowed.",
-      "MEDIA_TOO_LARGE": "The image is too large.",
+      "MEDIA_TOO_LARGE": "The image is too large. Maximum 30MB.",
       "MEDIA_UPLOADING": "Wait until the image finishes uploading.",
       "MEDIA_UPLOAD_FAILED": "Could not upload the image.",
       "MEDIA_READ_FAILED": "Could not read the selected image.",
