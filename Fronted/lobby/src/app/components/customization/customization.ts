@@ -30,6 +30,9 @@ export class CustomizationComponent {
   loadingLeft = false;
   loadingRight = false;
   loadingProfile = false;
+  errorMessage = '';
+
+  private maxSize = 25 * 1024 * 1024; // 25MB
 
   predefinedColors = [
     '#667eea', '#764ba2', '#f093fb', '#4facfe',
@@ -73,6 +76,11 @@ export class CustomizationComponent {
   onLeftImageUpload(event: any) {
     const file = event.target.files[0];
     if (file) {
+      if (file.size > this.maxSize) {
+        this.errorMessage = 'La imagen es demasiado grande. Máximo 25MB.';
+        return;
+      }
+      this.errorMessage = '';
       this.loadingLeft = true;
       const reader = new FileReader();
       reader.onload = (e: any) => {
@@ -92,6 +100,11 @@ export class CustomizationComponent {
   onRightImageUpload(event: any) {
     const file = event.target.files[0];
     if (file) {
+      if (file.size > this.maxSize) {
+        this.errorMessage = 'La imagen es demasiado grande. Máximo 25MB.';
+        return;
+      }
+      this.errorMessage = '';
       this.loadingRight = true;
       const reader = new FileReader();
       reader.onload = (e: any) => {
@@ -123,6 +136,11 @@ export class CustomizationComponent {
   onProfileImageUpload(event: any) {
     const file = event.target.files[0];
     if (file) {
+      if (file.size > this.maxSize) {
+        this.errorMessage = 'La imagen es demasiado grande. Máximo 25MB.';
+        return;
+      }
+      this.errorMessage = '';
       this.loadingProfile = true;
       const reader = new FileReader();
       reader.onload = (e: any) => {

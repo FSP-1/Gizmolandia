@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
@@ -56,7 +57,7 @@ public class Usuario {
     @Column(nullable = false)
     private Integer edad;
 
-    @Column(columnDefinition = "MEDIUMTEXT")
+    @Column(columnDefinition = "LONGTEXT")
     private String foto;
 
     @NotBlank
@@ -67,10 +68,12 @@ public class Usuario {
     @Column(name = "home_background_color", length = 20)
     private String homeBackgroundColor;
 
-    @Column(name = "home_left_image", columnDefinition = "MEDIUMTEXT")
+    @Lob
+    @Column(name = "home_left_image", columnDefinition = "LONGTEXT")
     private String homeLeftImage;
 
-    @Column(name = "home_right_image", columnDefinition = "MEDIUMTEXT")
+    @Lob
+    @Column(name = "home_right_image", columnDefinition = "LONGTEXT")
     private String homeRightImage;
 
     @Column(name = "home_status", length = 80)

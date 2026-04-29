@@ -5,6 +5,10 @@
       <button class="close-btn" (click)="cancel()">×</button>
     </div>
 
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
     <div class="panel-content">
       <section class="section section-color">
         <h3>
