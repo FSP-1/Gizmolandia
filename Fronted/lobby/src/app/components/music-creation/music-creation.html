@@ -1,0 +1,74 @@
+<div class="music-page">
+
+  <div class="music-header">
+
+    <h1> Music Creation Studio</h1>
+
+    <div class="toolbar">
+
+      <div class="tempo-box">
+        <label>BPM</label>
+
+        <input
+          type="number"
+          min="60"
+          max="300"
+          [(ngModel)]="tempo">
+      </div>
+
+        <button
+        class="play-btn"
+        (click)="play()">
+
+        ▶ PLAY
+
+        </button>
+
+        <button
+        class="stop-btn"
+        (click)="stop()">
+
+        ⏹ STOP
+
+        </button>
+
+
+    </div>
+
+  </div>
+<div class="timeline">
+
+  <div class="timeline-spacer"></div>
+
+  <div
+    *ngFor="let n of [].constructor(cols); let i=index"
+    class="timeline-step">
+
+    {{ i + 1 }}
+
+  </div>
+
+</div>
+  <div class="music-grid">
+
+    <div
+      class="music-row"
+      *ngFor="let instrument of instruments; let r=index">
+
+      <div class="instrument-name">
+        {{ instrument }}
+      </div>
+
+    <button
+    *ngFor="let cell of grid[r]; let c=index"
+    class="step"
+    [class.active]="cell"
+    [class.current]="c === currentStep"
+    (click)="toggleCell(r,c)">
+    </button>
+
+    </div>
+
+  </div>
+
+</div>

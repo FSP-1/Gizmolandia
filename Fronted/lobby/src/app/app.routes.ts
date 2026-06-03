@@ -4,7 +4,7 @@ import { HomeComponent } from './components/home/home';
 import { CodingComponent } from './components/coding/coding';
 import { GeneralChatComponent } from './components/chat/general-chat/general-chat';
 import { GamesComponent } from './components/games/games';
-
+import { MusicCreationComponent } from './components/music-creation/music-creation';
 export const routes: Routes = [
   {
     path: '',
@@ -40,6 +40,11 @@ export const routes: Routes = [
     path: 'home/chat',
     component: GeneralChatComponent,
     title: 'Gizmolandia | Chat'
+  },
+  {
+  path: 'home/music',
+  component: MusicCreationComponent,
+  title: 'Gizmolandia | Music'
   },
   {
     path: '**',

@@ -161,6 +161,10 @@ export class HomeComponent implements OnInit, OnChanges {
     this.router.navigate(['/home/chat']);
   }
 
+  toggleMusic() {
+    this.router.navigate(['/home/music']);
+  }
+  
   logout(): void {
     this.showCustomization = false;
 

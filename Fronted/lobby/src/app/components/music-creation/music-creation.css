@@ -1,0 +1,175 @@
+.music-page {
+  min-height: 100vh;
+  padding: 30px;
+  background:
+    radial-gradient(circle at top,
+      #24243e,
+      #141e30,
+      #0f172a);
+
+  color: white;
+}
+
+.music-header {
+  margin-bottom: 30px;
+}
+
+.music-header h1 {
+  text-align: center;
+  font-size: 2.2rem;
+  margin-bottom: 20px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.tempo-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tempo-box label {
+  font-size: .8rem;
+  opacity: .8;
+}
+
+.tempo-box input {
+  width: 100px;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: #1e293b;
+  color: white;
+  text-align: center;
+}
+
+.play-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+
+  background: linear-gradient(
+    135deg,
+    #22c55e,
+    #16a34a
+  );
+
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.play-btn:hover {
+  transform: translateY(-2px);
+}
+
+.stop-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+
+  background: linear-gradient(
+    135deg,
+    #ef4444,
+    #b91c1c
+  );
+
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.stop-btn:hover {
+  transform: translateY(-2px);
+}
+
+.music-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  max-width: 1200px;
+  margin: auto;
+}
+
+.music-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.instrument-name {
+  width: 120px;
+
+  text-align: right;
+
+  font-weight: bold;
+
+  color: #94a3b8;
+}
+
+.step {
+  width: 50px;
+  height: 50px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #1e293b;
+
+  cursor: pointer;
+
+  transition: .15s;
+}
+
+.step:hover {
+  transform: scale(1.08);
+}
+
+.step.active {
+  background: linear-gradient(
+    135deg,
+    #8b5cf6,
+    #6d28d9
+  );
+
+  box-shadow:
+    0 0 15px rgba(139,92,246,.7);
+}
+.timeline {
+  display: flex;
+  gap: 8px;
+
+  margin-bottom: 15px;
+
+  max-width: 1200px;
+  margin-inline: auto;
+}
+
+.timeline-spacer {
+  width: 120px;
+}
+
+.timeline-step {
+  width: 50px;
+  text-align: center;
+  color: #64748b;
+  font-weight: bold;
+}
+
+.step.current {
+  border: 3px solid #facc15;
+
+  transform: scale(1.1);
+
+  box-shadow:
+    0 0 20px rgba(250,204,21,.9);
+}
