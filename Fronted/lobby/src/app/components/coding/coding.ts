@@ -6,8 +6,8 @@ import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
-type SheetId = 'html-css' | 'typescript';
-type EditorTab = 'html' | 'css' | 'typescript';
+type SheetId = 'html-css' | 'javascript';
+type EditorTab = 'html' | 'css' | 'javascript';
 
 interface CodingSheetCard {
   id: SheetId;
@@ -24,7 +24,7 @@ interface HtmlCssExampleManifest {
   css: string;
 }
 
-interface TypeScriptExampleManifest {
+interface JavaScriptExampleManifest {
   id: string;
   title: string;
   description: string;
@@ -41,7 +41,7 @@ interface TypeScriptExampleManifest {
 })
 export class CodingComponent {
   @ViewChild('htmlCssPreviewFrame') private htmlCssPreviewFrame?: ElementRef<HTMLIFrameElement>;
-  @ViewChild('typeScriptPreviewFrame') private typeScriptPreviewFrame?: ElementRef<HTMLIFrameElement>;
+  @ViewChild('javaScriptPreviewFrame') private javaScriptPreviewFrame?: ElementRef<HTMLIFrameElement>;
 
   readonly sheets: CodingSheetCard[] = [
     {
@@ -51,26 +51,26 @@ export class CodingComponent {
       badge: 'UI',
     },
     {
-      id: 'typescript',
-      title: 'TypeScript Lab',
-      summary: 'Ejemplos de TypeScript que se transpilan y se ejecutan con un guardado seguro.',
-      badge: 'TS',
+      id: 'javascript',
+      title: 'JavaScript Lab',
+      summary: 'Templates JavaScript listos para tocar, ejecutar y convertir en mini piezas visuales.',
+      badge: 'JS',
     }
   ];
 
   htmlCssExamples: HtmlCssExampleManifest[] = [];
-  typeScriptExamples: TypeScriptExampleManifest[] = [];
+  javaScriptExamples: JavaScriptExampleManifest[] = [];
 
   activeSheetId: SheetId = 'html-css';
   activeEditorTab: EditorTab = 'html';
   sidebarCollapsed = false;
   selectedHtmlCssId = '';
-  selectedTypeScriptId = '';
+  selectedJavaScriptId = '';
   layoutHtml = '';
   layoutCss = '';
-  typeScriptCode = '';
+  javaScriptCode = '';
   htmlCssPreviewSrcdoc = '';
-  typeScriptPreviewSrcdoc = '';
+  javaScriptPreviewSrcdoc = '';
   loadingMessage = 'Cargando ejemplos...';
   loadingExamples = true;
   private previewShellHtml = '';
@@ -89,7 +89,7 @@ export class CodingComponent {
 
   ngAfterViewInit(): void {
     this.writePreviewFrame('html-css', this.htmlCssPreviewSrcdoc);
-    this.writePreviewFrame('typescript', this.typeScriptPreviewSrcdoc);
+    this.writePreviewFrame('javascript', this.javaScriptPreviewSrcdoc);
   }
 
   get activeSheet(): CodingSheetCard {
@@ -104,8 +104,8 @@ export class CodingComponent {
     return this.htmlCssExamples.find((example) => example.id === this.selectedHtmlCssId);
   }
 
-  get activeTypeScriptExample(): TypeScriptExampleManifest | undefined {
-    return this.typeScriptExamples.find((example) => example.id === this.selectedTypeScriptId);
+  get activeJavaScriptExample(): JavaScriptExampleManifest | undefined {
+    return this.javaScriptExamples.find((example) => example.id === this.selectedJavaScriptId);
   }
 
   selectSheet(sheetId: SheetId): void {
@@ -113,7 +113,7 @@ export class CodingComponent {
     if (sheetId === 'html-css') {
       this.activeEditorTab = 'html';
     } else {
-      this.activeEditorTab = 'typescript';
+      this.activeEditorTab = 'javascript';
     }
 
     this.changeDetectorRef.markForCheck();
@@ -139,13 +139,13 @@ export class CodingComponent {
     this.changeDetectorRef.markForCheck();
   }
 
-  async onTypeScriptSelectionChange(exampleId: string): Promise<void> {
-    await this.loadTypeScriptExample(exampleId);
-    this.typeScriptPreviewSrcdoc = this.buildIdlePreviewDocument(
-      this.translate.instant('CODING.TS_MODE'),
-      this.translate.instant('CODING.TS_IDLE_HINT')
+  async onJavaScriptSelectionChange(exampleId: string): Promise<void> {
+    await this.loadJavaScriptExample(exampleId);
+    this.javaScriptPreviewSrcdoc = this.buildIdlePreviewDocument(
+      this.translate.instant('CODING.JS_MODE'),
+      this.translate.instant('CODING.JS_IDLE_HINT')
     );
-    this.writePreviewFrame('typescript', this.typeScriptPreviewSrcdoc);
+    this.writePreviewFrame('javascript', this.javaScriptPreviewSrcdoc);
     this.changeDetectorRef.markForCheck();
   }
 
@@ -167,11 +167,11 @@ export class CodingComponent {
           this.layoutCss
         ].join('\n')
       : [
-          `TypeScript example: ${this.activeTypeScriptExample?.title ?? 'Custom'}`,
+          `JavaScript example: ${this.activeJavaScriptExample?.title ?? 'Custom'}`,
           '',
-          'TypeScript',
+          'JavaScript',
           '----------',
-          this.typeScriptCode
+          this.javaScriptCode
         ].join('\n');
 
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
@@ -193,8 +193,8 @@ export class CodingComponent {
     this.changeDetectorRef.markForCheck();
   }
 
-  updateTypeScriptCode(value: string): void {
-    this.typeScriptCode = value;
+  updateJavaScriptCode(value: string): void {
+    this.javaScriptCode = value;
     this.changeDetectorRef.markForCheck();
   }
 
@@ -210,27 +210,27 @@ export class CodingComponent {
     this.changeDetectorRef.markForCheck();
   }
 
-  executeTypeScript(): void {
-    this.typeScriptPreviewSrcdoc = this.buildTypeScriptPreviewDocument(
-      this.activeTypeScriptExample?.title ?? 'TypeScript',
-      this.activeTypeScriptExample?.description ?? 'Resultado del ejemplo seleccionado.',
-      this.typeScriptCode
+  executeJavaScript(): void {
+    this.javaScriptPreviewSrcdoc = this.buildJavaScriptPreviewDocument(
+      this.activeJavaScriptExample?.title ?? 'JavaScript',
+      this.activeJavaScriptExample?.description ?? 'Resultado del ejemplo seleccionado.',
+      this.javaScriptCode
     );
-    this.writePreviewFrame('typescript', this.typeScriptPreviewSrcdoc);
+    this.writePreviewFrame('javascript', this.javaScriptPreviewSrcdoc);
     this.changeDetectorRef.markForCheck();
   }
 
   private async loadLibraries(): Promise<void> {
     try {
-      const [htmlCssExamples, typeScriptExamples, previewShellHtml, previewShellCss] = await Promise.all([
+      const [htmlCssExamples, javaScriptExamples, previewShellHtml, previewShellCss] = await Promise.all([
         firstValueFrom(this.http.get<HtmlCssExampleManifest[]>('/assets/html-css-cool/manifest.json')),
-        firstValueFrom(this.http.get<TypeScriptExampleManifest[]>('/assets/typescript-cool/manifest.json')),
+        firstValueFrom(this.http.get<JavaScriptExampleManifest[]>('/assets/javascript-cool/manifest.json')),
         firstValueFrom(this.http.get('/assets/codigo/codigo.html', { responseType: 'text' })),
         firstValueFrom(this.http.get('/assets/codigo/codigo.css', { responseType: 'text' }))
       ]);
 
       this.htmlCssExamples = htmlCssExamples;
-      this.typeScriptExamples = typeScriptExamples;
+      this.javaScriptExamples = javaScriptExamples;
       this.previewShellHtml = previewShellHtml;
       this.previewShellCss = previewShellCss;
 
@@ -238,20 +238,20 @@ export class CodingComponent {
         await this.loadHtmlCssExample(htmlCssExamples[0].id);
       }
 
-      if (typeScriptExamples.length > 0) {
-        await this.loadTypeScriptExample(typeScriptExamples[0].id);
+      if (javaScriptExamples.length > 0) {
+        await this.loadJavaScriptExample(javaScriptExamples[0].id);
       }
 
       this.htmlCssPreviewSrcdoc = this.buildIdlePreviewDocument(
         this.translate.instant('CODING.HTML_CSS'),
         this.translate.instant('CODING.HTML_IDLE_HINT')
       );
-      this.typeScriptPreviewSrcdoc = this.buildIdlePreviewDocument(
-        this.translate.instant('CODING.TS_MODE'),
-        this.translate.instant('CODING.TS_IDLE_HINT')
+      this.javaScriptPreviewSrcdoc = this.buildIdlePreviewDocument(
+        this.translate.instant('CODING.JS_MODE'),
+        this.translate.instant('CODING.JS_IDLE_HINT')
       );
       this.writePreviewFrame('html-css', this.htmlCssPreviewSrcdoc);
-      this.writePreviewFrame('typescript', this.typeScriptPreviewSrcdoc);
+      this.writePreviewFrame('javascript', this.javaScriptPreviewSrcdoc);
 
       this.loadingMessage = this.translate.instant('CODING.LOADED');
       this.changeDetectorRef.markForCheck();
@@ -284,17 +284,17 @@ export class CodingComponent {
     this.changeDetectorRef.markForCheck();
   }
 
-  private async loadTypeScriptExample(exampleId: string): Promise<void> {
-    const example = this.typeScriptExamples.find((candidate) => candidate.id === exampleId);
+  private async loadJavaScriptExample(exampleId: string): Promise<void> {
+    const example = this.javaScriptExamples.find((candidate) => candidate.id === exampleId);
     if (!example) {
       return;
     }
 
-    this.selectedTypeScriptId = example.id;
-    this.activeSheetId = 'typescript';
-    this.activeEditorTab = 'typescript';
+    this.selectedJavaScriptId = example.id;
+    this.activeSheetId = 'javascript';
+    this.activeEditorTab = 'javascript';
 
-    this.typeScriptCode = await firstValueFrom(this.http.get(`/assets/typescript-cool/${example.file}`, { responseType: 'text' }));
+    this.javaScriptCode = await firstValueFrom(this.http.get(`/assets/javascript-cool/${example.file}`, { responseType: 'text' }));
     this.changeDetectorRef.markForCheck();
   }
 
@@ -303,7 +303,7 @@ export class CodingComponent {
       title,
       message,
       title,
-      `<section class="idle-card"><h2>${this.escapeHtml(this.translate.instant('CODING.TS_WAITING_TITLE'))}</h2><p>${this.escapeHtml(message)}</p></section>`,
+      `<section class="idle-card"><h2>${this.escapeHtml(this.translate.instant('CODING.JS_WAITING_TITLE'))}</h2><p>${this.escapeHtml(message)}</p></section>`,
       ''
     );
   }
@@ -321,14 +321,88 @@ export class CodingComponent {
     );
   }
 
-  private buildTypeScriptPreviewDocument(title: string, message: string, source: string): string {
-    const transformedSource = this.transformTypeScriptSource(source);
+  private buildJavaScriptPreviewDocument(title: string, message: string, source: string): string {
+    const runnerConfig = {
+      source,
+      blockedMessage: this.translate.instant('CODING.JS_SANDBOX_BLOCKED'),
+      missingRunMessage: this.translate.instant('CODING.JS_BLOCKED_MESSAGE'),
+      runTitle: this.translate.instant('CODING.JS_RUN_TITLE'),
+      errorTitle: this.translate.instant('CODING.JS_ERROR_TITLE'),
+    };
+
     return this.fillPreviewShell(
       title,
       message,
-      'TypeScript',
-      `<div id="ts-output" class="ts-output"><h2>${this.escapeHtml(this.translate.instant('CODING.TS_OUTPUT_TITLE'))}</h2><pre>${this.escapeHtml(this.translate.instant('CODING.TS_OUTPUT_MESSAGE'))}</pre></div>`,
-      `<script>(function(){const code=${JSON.stringify(transformedSource)};const logs=[];const output=document.getElementById('ts-output');const safeConsole={log:function(){logs.push(Array.from(arguments).map(String).join(' '));},warn:function(){logs.push('WARN: '+Array.from(arguments).map(String).join(' '));},error:function(){logs.push('ERROR: '+Array.from(arguments).map(String).join(' '));}};try{const blocked=/\b(window|document|globalThis|parent|top|location|history|localStorage|sessionStorage|indexedDB|fetch|XMLHttpRequest|WebSocket|navigator|process|require|eval|Function)\b/i;if(blocked.test(code)){throw new Error(${JSON.stringify(this.translate.instant('CODING.TS_SANDBOX_BLOCKED'))});}const moduleShim={exports:{}};const runner=new Function('exports','module','console','\'use strict\'; const window = undefined; const document = undefined; const globalThis = undefined; const parent = undefined; const top = undefined; const location = undefined; const history = undefined; const localStorage = undefined; const sessionStorage = undefined; const indexedDB = undefined; const fetch = undefined; const XMLHttpRequest = undefined; const WebSocket = undefined; const navigator = undefined; const process = undefined; const require = undefined; const eval = undefined; const Function = undefined; '+code+'; if (typeof run === "function") { module.exports.run = run; } return module.exports;');const exported=runner(moduleShim.exports,moduleShim,safeConsole)||moduleShim.exports;const run=exported.run||exported.default;if(typeof run!=='function'){throw new Error(${JSON.stringify(this.translate.instant('CODING.TS_BLOCKED_MESSAGE'))});}const result=run();const rendered=typeof result==='string'?result:'<pre>'+JSON.stringify(result,null,2)+'</pre>';output.innerHTML='<h2>${this.translate.instant('CODING.TS_RUN_TITLE')}</h2>'+rendered+(logs.length?'<pre>'+logs.join('\\n')+'</pre>':'');}catch(error){output.innerHTML='<h2>${this.translate.instant('CODING.TS_ERROR_TITLE')}</h2><p class="ts-error">'+String(error&&error.message?error.message:error)+'</p>';}})();</script>`
+      'JavaScript',
+      `<div id="js-output" class="js-output"><h2>${this.escapeHtml(this.translate.instant('CODING.JS_OUTPUT_TITLE'))}</h2><pre>${this.escapeHtml(this.translate.instant('CODING.JS_OUTPUT_MESSAGE'))}</pre></div>`,
+      `<script>window.__GIZMO_JS_RUNNER__=${this.toSafeScriptJson(runnerConfig)};</script>
+<script>
+(function () {
+  const config = window.__GIZMO_JS_RUNNER__;
+  const code = config.source;
+  const logs = [];
+  const output = document.getElementById('js-output');
+  const safeConsole = {
+    log: function () { logs.push(Array.from(arguments).map(String).join(' ')); },
+    warn: function () { logs.push('WARN: ' + Array.from(arguments).map(String).join(' ')); },
+    error: function () { logs.push('ERROR: ' + Array.from(arguments).map(String).join(' ')); }
+  };
+  const escapePreviewText = function (value) {
+    return String(value)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+  };
+
+  try {
+    const blocked = /\\b(window|document|globalThis|parent|top|location|history|localStorage|sessionStorage|indexedDB|fetch|XMLHttpRequest|WebSocket|navigator|process|require|eval|Function)\\b/;
+    if (blocked.test(code)) {
+      throw new Error(config.blockedMessage);
+    }
+
+    const moduleShim = { exports: {} };
+    const runnerSource = [
+      "'use strict';",
+      "const window = undefined;",
+      "const document = undefined;",
+      "const globalThis = undefined;",
+      "const parent = undefined;",
+      "const top = undefined;",
+      "const location = undefined;",
+      "const history = undefined;",
+      "const localStorage = undefined;",
+      "const sessionStorage = undefined;",
+      "const indexedDB = undefined;",
+      "const fetch = undefined;",
+      "const XMLHttpRequest = undefined;",
+      "const WebSocket = undefined;",
+      "const navigator = undefined;",
+      "const process = undefined;",
+      "const require = undefined;",
+      "const Function = undefined;",
+      code,
+      "if (typeof run === 'function') { module.exports.run = run; }",
+      "return module.exports;"
+    ].join('\\n');
+
+    const runner = new Function('exports', 'module', 'console', runnerSource);
+    const exported = runner(moduleShim.exports, moduleShim, safeConsole) || moduleShim.exports;
+    const run = exported.run || exported.default;
+    if (typeof run !== 'function') {
+      throw new Error(config.missingRunMessage);
+    }
+
+    const result = run();
+    const rendered = typeof result === 'string' ? result : '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+    output.innerHTML = '<h2>' + escapePreviewText(config.runTitle) + '</h2>' + rendered + (logs.length ? '<pre>' + escapePreviewText(logs.join('\\n')) + '</pre>' : '');
+  } catch (error) {
+    const message = String(error && error.message ? error.message : error);
+    output.innerHTML = '<h2>' + escapePreviewText(config.errorTitle) + '</h2><p class="js-error">' + escapePreviewText(message) + '</p>';
+  }
+})();
+</script>`
     );
   }
 
@@ -350,7 +424,7 @@ export class CodingComponent {
   }
 
   private writePreviewFrame(mode: SheetId, srcdoc: string): void {
-    const frame = mode === 'html-css' ? this.htmlCssPreviewFrame : this.typeScriptPreviewFrame;
+    const frame = mode === 'html-css' ? this.htmlCssPreviewFrame : this.javaScriptPreviewFrame;
     if (!frame) {
       return;
     }
@@ -364,17 +438,6 @@ export class CodingComponent {
 
   private defaultPreviewShellCss(): string {
     return '';
-  }
-
-  private transformTypeScriptSource(source: string): string {
-    return source
-      .replace(/^\s*export\s+/gm, '')
-      .replace(/\sas\s+const\b/g, '')
-      .replace(/\breadonly\s+/g, '')
-      .replace(/\bpublic\s+/g, '')
-      .replace(/\bprivate\s+/g, '')
-      .replace(/\bprotected\s+/g, '')
-      .replace(/:\s*[^=;,)]+(?=[=;,)])/g, '');
   }
 
   private sanitizeHtmlFragment(value: string): string {
@@ -397,7 +460,7 @@ export class CodingComponent {
   }
 
   private removeUnsafeNodes(root: ParentNode): void {
-    root.querySelectorAll('script, iframe, object, embed, link[rel="import"], meta[http-equiv="refresh"]').forEach((node) => node.remove());
+    root.querySelectorAll('script[src], iframe, object, embed, link[rel="import"], meta[http-equiv="refresh"]').forEach((node) => node.remove());
   }
 
   private removeUnsafeAttributes(root: ParentNode): void {
@@ -419,6 +482,15 @@ export class CodingComponent {
       .replace(/expression\s*\(/gi, '(')
       .replace(/url\((['"]?)\s*javascript:/gi, 'url($1about:blank')
       .replace(/<\/style/gi, '<\\/style');
+  }
+
+  private toSafeScriptJson(value: unknown): string {
+    return JSON.stringify(value)
+      .replace(/</g, '\\u003C')
+      .replace(/>/g, '\\u003E')
+      .replace(/&/g, '\\u0026')
+      .replace(/\u2028/g, '\\u2028')
+      .replace(/\u2029/g, '\\u2029');
   }
 
 }

@@ -101,13 +101,14 @@ Cuando estes midiendo rendimiento del chat o revisando transferencias y tiempos 
 ---
 
 ### 7. [06 - Coding Playground](06-coding-playground.md) 💻
-**Resumen del playground de codigo visual y TypeScript aislado**
+**Resumen del playground de codigo visual con HTML + CSS y JavaScript aislado**
 
 Aqui encontraras:
-- ✅ Barra lateral plegable por lenguaje
+- ✅ Barra lateral plegable por modo
 - ✅ Ejemplos cargados desde `assets`
 - ✅ Preview manual con boton `Ejecutar`
 - ✅ Shell visual compartido para ambos modos
+- ✅ Templates JavaScript con `run()` y ejemplos HTML + CSS interactivos
 - ✅ Cadenas i18n en español e ingles
 
 **¿Cuándo leerlo?**  

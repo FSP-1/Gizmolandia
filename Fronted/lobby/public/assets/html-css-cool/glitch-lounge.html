@@ -3,9 +3,22 @@
   <p class="eyebrow">Retro console</p>
   <h2 data-text="Glitch lounge">Glitch lounge</h2>
   <p class="copy">Textos vivos, contraste fuerte y vibe arcade nocturna.</p>
-  <ul class="stats">
-    <li>Neon</li>
-    <li>Noise</li>
-    <li>Motion</li>
+  <ul class="stats" aria-label="Controles visuales">
+    <li><button type="button">Neon</button></li>
+    <li><button type="button">Noise</button></li>
+    <li><button type="button">Motion</button></li>
   </ul>
 </section>
+<script>
+const lounge = document.querySelector('.glitch-lounge');
+const title = lounge.querySelector('h2');
+const buttons = lounge.querySelectorAll('button');
+
+buttons.forEach((button) => {
+  button.addEventListener('click', () => {
+    lounge.dataset.mode = button.textContent.toLowerCase();
+    title.dataset.text = `${button.textContent} lounge`;
+    title.textContent = `${button.textContent} lounge`;
+  });
+});
+</script>

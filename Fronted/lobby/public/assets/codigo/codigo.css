@@ -48,7 +48,7 @@ body {
   margin-top: 0.85rem;
 }
 
-.preview-content--ts pre,
+.preview-content--js pre,
 .preview-extra pre {
   margin: 0;
   white-space: pre-wrap;
@@ -56,11 +56,117 @@ body {
 }
 
 .idle-card,
-.ts-output {
+.js-output {
   display: grid;
   gap: 0.35rem;
 }
 
-.ts-error {
+.js-error {
   color: #fda4af;
+}
+
+.js-arcade,
+.js-playlist,
+.js-quests {
+  overflow: hidden;
+  padding: 1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(30, 41, 59, 0.88));
+}
+
+.js-arcade h2,
+.js-playlist h2,
+.js-quests h2 {
+  margin: 0 0 0.85rem;
+  font-size: 1.65rem;
+}
+
+.js-arcade ul,
+.js-quests ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.js-arcade li,
+.js-quests li,
+.js-playlist article {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.35rem 0.75rem;
+  align-items: center;
+  padding: 0.7rem 0.8rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.js-arcade li span,
+.js-quests li strong,
+.js-playlist strong {
+  color: #f8fafc;
+}
+
+.js-arcade li strong,
+.js-quests em,
+.js-playlist em {
+  color: #fde68a;
+  font-style: normal;
+}
+
+.power-meter {
+  height: 0.7rem;
+  margin: 0 0 0.85rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.18);
+}
+
+.power-meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #34d399, #facc15, #fb7185);
+  box-shadow: 0 0 24px rgba(250, 204, 21, 0.38);
+}
+
+.js-arcade small {
+  display: block;
+  margin-top: 0.8rem;
+  color: #86efac;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.js-playlist div {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.js-playlist article {
+  grid-template-columns: auto 1fr auto;
+}
+
+.js-playlist article.is-live {
+  background: linear-gradient(90deg, rgba(6, 182, 212, 0.24), rgba(244, 114, 182, 0.18));
+  box-shadow: 0 0 32px rgba(6, 182, 212, 0.16);
+}
+
+.js-playlist span,
+.js-quests li span {
+  color: #67e8f9;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.js-quests li {
+  grid-template-columns: auto 1fr auto;
+}
+
+.js-quests li.done {
+  background: rgba(22, 163, 74, 0.18);
 }

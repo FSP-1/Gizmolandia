@@ -1,0 +1,20 @@
+[
+  {
+    "id": "arcade-combo",
+    "title": "Arcade Combo",
+    "description": "JavaScript calcula una racha arcade y devuelve una tarjeta con medidor de energia.",
+    "file": "arcade-combo.js"
+  },
+  {
+    "id": "neon-playlist",
+    "title": "Neon Playlist",
+    "description": "Renderiza una playlist futurista con chips, duraciones y estado activo.",
+    "file": "neon-playlist.js"
+  },
+  {
+    "id": "quest-board",
+    "title": "Quest Board",
+    "description": "Convierte misiones en un tablero visual con progreso y recompensas.",
+    "file": "quest-board.js"
+  }
+]

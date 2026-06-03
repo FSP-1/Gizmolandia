@@ -1,36 +1,23 @@
 # Gizmolandia
 
-Proyecto de lobby con juegos y personalizacion de perfil.
+Gizmolandia es una app de lobby para jugadores hecha con Angular, Spring Boot y MySQL. Incluye registro/login, personalizacion de perfil, juegos con puntuaciones, chat general con salas y subida de imagen/GIF, y un playground de coding para probar templates visuales de HTML + CSS y JavaScript.
 
-Stack actual:
+## Que tiene
 
-- Frontend: Angular (en progreso)
-- Backend: Spring Boot (en progreso)
-- Base de datos: MySQL (con Docker)
+- Frontend Angular con rutas para home, perfil, juegos, chat y coding.
+- Backend Spring Boot con API REST para usuarios, autenticacion, puntuaciones y chat.
+- Juegos arcade como Snake, Tetris, Brick Breaker y Ping Pong, incluyendo modo en tiempo real para Ping Pong.
+- Chat por salas con mensajes, presencia, puntuaciones compartidas y media upload.
+- Playground de codigo con previews aislados en iframe sandbox.
+- Internacionalizacion en espanol e ingles.
 
-## Backend Spring Boot
+## Documentacion
 
-Se preparara una API REST con arquitectura MVC para CRUD de entidades.
+La documentacion completa esta en [Documentacion/README.md](Documentacion/README.md). Ahi se explica la arquitectura, endpoints, backend, chat, rendimiento y el playground de coding.
 
-Estructura recomendada de paquetes:
+## Stack
 
-- `controller`
-- `service`
-- `repository`
-- `model` o `entity`
-- `dto` (opcional)
-- `config`
-
-Dependencias base recomendadas:
-
-- Spring Web
-- Spring Data JPA
-- MySQL Driver
-- Validation
-- Lombok
-- Spring Boot DevTools
-
-Notas:
-
-- Spring Boot gestionara la creacion de tablas inicialmente via JPA/Hibernate.
-- MySQL correra en Docker en la siguiente fase.
+- Frontend: Angular
+- Backend: Spring Boot
+- Base de datos: MySQL
+- Tiempo real: WebSocket

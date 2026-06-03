@@ -17,6 +17,6 @@ public class RealtimeWebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(pingPongWebSocketHandler, "/ws/ping-pong")
-                .setAllowedOrigins("http://localhost:4200");
+                .setAllowedOriginPatterns("http://*", "https://*");
     }
 }

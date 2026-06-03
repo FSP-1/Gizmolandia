@@ -4,5 +4,16 @@
   <p class="eyebrow">Prism orbit</p>
   <h2>Orbita de color</h2>
   <p class="copy">Un layout con anillos, reflejos y una llamada a la accion brillante.</p>
-  <button class="cta">Explorar orbita</button>
+  <button class="cta" type="button">Explorar orbita</button>
 </section>
+<script>
+const orbitCard = document.querySelector('.prism-orbit');
+const orbitButton = document.querySelector('.cta');
+let speed = 0;
+
+orbitButton.addEventListener('click', () => {
+  speed = (speed + 1) % 3;
+  orbitCard.dataset.speed = String(speed);
+  orbitButton.textContent = ['Explorar orbita', 'Velocidad prisma', 'Hiper orbita'][speed];
+});
+</script>

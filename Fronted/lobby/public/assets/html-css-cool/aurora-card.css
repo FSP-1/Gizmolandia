@@ -26,6 +26,18 @@ body {
   box-shadow: 0 32px 80px rgba(2, 6, 23, 0.45);
   overflow: hidden;
   text-align: center;
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.aurora-card.is-boosted {
+  transform: translateY(-6px) scale(1.02);
+  border-color: rgba(103, 232, 249, 0.58);
+  box-shadow: 0 38px 96px rgba(45, 212, 191, 0.25);
+}
+
+.aurora-card.is-boosted .aurora-orb {
+  opacity: 1;
+  filter: blur(5px);
 }
 
 .aurora-orb {
@@ -81,6 +93,12 @@ h2 {
   background: linear-gradient(135deg, #67e8f9, #34d399);
   box-shadow: 0 16px 36px rgba(52, 211, 153, 0.25);
   animation: pulse 2.8s ease-in-out infinite;
+  cursor: pointer;
+  transition: filter 180ms ease, transform 180ms ease;
+}
+
+.cta:hover {
+  filter: brightness(1.08);
 }
 
 @keyframes drift {

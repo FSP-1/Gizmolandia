@@ -139,10 +139,9 @@ export class PingPongRealtimeService {
   }
 
   private buildWsUrl(playerName: string): string {
-    const apiUrl = new URL(API_BASE_URL);
-    const protocol = apiUrl.protocol === 'https:' ? 'wss:' : 'ws:';
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const player = encodeURIComponent((playerName || 'Jugador').trim() || 'Jugador');
 
-    return `${protocol}//${apiUrl.host}/ws/ping-pong?player=${player}`;
+    return `${protocol}//${window.location.host}/ws/ping-pong?player=${player}`;
   }
 }

@@ -4,5 +4,16 @@
   <p class="eyebrow">Aurora lab</p>
   <h2>Brillo en movimiento</h2>
   <p class="copy">Una tarjeta con capas de luz, blur y ritmo suave.</p>
-  <button class="cta">Encender modo aurora</button>
+  <button class="cta" type="button">Encender modo aurora</button>
 </section>
+<script>
+const card = document.querySelector('.aurora-card');
+const button = document.querySelector('.cta');
+let active = false;
+
+button.addEventListener('click', () => {
+  active = !active;
+  card.classList.toggle('is-boosted', active);
+  button.textContent = active ? 'Aurora al maximo' : 'Encender modo aurora';
+});
+</script>

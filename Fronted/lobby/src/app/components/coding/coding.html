@@ -36,16 +36,16 @@
           <p>{{ 'CODING.HTML_CSS_DESCRIPTION' | translate }}</p>
         </button>
 
-        <button type="button" class="language-card" [class.active]="activeSheetId === 'typescript'" (click)="selectSheet('typescript')">
-          <span class="language-badge">TS</span>
-          <strong>{{ 'CODING.TYPESCRIPT' | translate }}</strong>
-          <p>{{ 'CODING.TYPESCRIPT_DESCRIPTION' | translate }}</p>
+        <button type="button" class="language-card" [class.active]="activeSheetId === 'javascript'" (click)="selectSheet('javascript')">
+          <span class="language-badge">JS</span>
+          <strong>{{ 'CODING.JAVASCRIPT' | translate }}</strong>
+          <p>{{ 'CODING.JAVASCRIPT_DESCRIPTION' | translate }}</p>
         </button>
       </div>
 
       <p class="panel-note" *ngIf="loadingExamples">{{ loadingMessage }}</p>
 
-      <ng-container *ngIf="activeSheetId === 'html-css'; else typescriptSidebar">
+      <ng-container *ngIf="activeSheetId === 'html-css'; else javascriptSidebar">
         <label class="select-group">
           <span>{{ 'CODING.HTML_CSS_EXAMPLES' | translate }}</span>
           <select [ngModel]="selectedHtmlCssId" (ngModelChange)="onHtmlCssSelectionChange($event)">
@@ -60,18 +60,18 @@
         </article>
       </ng-container>
 
-      <ng-template #typescriptSidebar>
+      <ng-template #javascriptSidebar>
         <label class="select-group">
-          <span>{{ 'CODING.TYPESCRIPT_EXAMPLES' | translate }}</span>
-          <select [ngModel]="selectedTypeScriptId" (ngModelChange)="onTypeScriptSelectionChange($event)">
-            <option *ngFor="let example of typeScriptExamples" [value]="example.id">{{ example.title }}</option>
+          <span>{{ 'CODING.JAVASCRIPT_EXAMPLES' | translate }}</span>
+          <select [ngModel]="selectedJavaScriptId" (ngModelChange)="onJavaScriptSelectionChange($event)">
+            <option *ngFor="let example of javaScriptExamples" [value]="example.id">{{ example.title }}</option>
           </select>
         </label>
 
-        <article class="asset-summary" *ngIf="activeTypeScriptExample">
-          <p class="asset-title">{{ activeTypeScriptExample.title }}</p>
-          <p>{{ activeTypeScriptExample.description }}</p>
-          <small>{{ activeTypeScriptExample.file }}</small>
+        <article class="asset-summary" *ngIf="activeJavaScriptExample">
+          <p class="asset-title">{{ activeJavaScriptExample.title }}</p>
+          <p>{{ activeJavaScriptExample.description }}</p>
+          <small>{{ activeJavaScriptExample.file }}</small>
         </article>
       </ng-template>
     </aside>
@@ -88,12 +88,12 @@
           <button type="button" [class.active]="activeEditorTab === 'css'" (click)="setEditorTab('css')">CSS</button>
         </div>
 
-        <div class="sheet-switch" *ngIf="activeSheetId === 'typescript'">
-          <button type="button" class="active">TypeScript</button>
+        <div class="sheet-switch" *ngIf="activeSheetId === 'javascript'">
+          <button type="button" class="active">JavaScript</button>
         </div>
       </div>
 
-      <ng-container *ngIf="activeSheetId === 'html-css'; else typeScriptEditor">
+      <ng-container *ngIf="activeSheetId === 'html-css'; else javaScriptEditor">
         <label class="editor-block">
           <span>{{ activeEditorTab === 'html' ? ('CODING.HTML' | translate) : ('CODING.CSS' | translate) }}</span>
           <textarea *ngIf="activeEditorTab === 'html'" [(ngModel)]="layoutHtml"></textarea>
@@ -106,14 +106,14 @@
         </div>
       </ng-container>
 
-      <ng-template #typeScriptEditor>
+      <ng-template #javaScriptEditor>
         <label class="editor-block">
-          <span>{{ 'CODING.TYPESCRIPT' | translate }}</span>
-          <textarea [(ngModel)]="typeScriptCode"></textarea>
+          <span>{{ 'CODING.JAVASCRIPT' | translate }}</span>
+          <textarea [(ngModel)]="javaScriptCode"></textarea>
         </label>
         <div class="editor-hint">
-          <p>{{ 'CODING.TS_HINT' | translate }}</p>
-          <button type="button" class="run-btn" (click)="executeTypeScript()">{{ 'CODING.EXECUTE' | translate }}</button>
+          <p>{{ 'CODING.JS_HINT' | translate }}</p>
+          <button type="button" class="run-btn" (click)="executeJavaScript()">{{ 'CODING.EXECUTE' | translate }}</button>
         </div>
       </ng-template>
     </main>
@@ -126,12 +126,12 @@
         </div>
       </div>
 
-      <ng-container *ngIf="activeSheetId === 'html-css'; else typeScriptPreview">
+      <ng-container *ngIf="activeSheetId === 'html-css'; else javaScriptPreview">
         <iframe #htmlCssPreviewFrame class="preview-frame" sandbox="allow-scripts allow-forms"></iframe>
       </ng-container>
 
-      <ng-template #typeScriptPreview>
-        <iframe #typeScriptPreviewFrame class="preview-frame" sandbox="allow-scripts allow-forms"></iframe>
+      <ng-template #javaScriptPreview>
+        <iframe #javaScriptPreviewFrame class="preview-frame" sandbox="allow-scripts allow-forms"></iframe>
       </ng-template>
     </section>
   </section>

@@ -79,6 +79,17 @@ h2 {
   font-weight: 800;
   background: linear-gradient(135deg, #c4b5fd, #67e8f9);
   box-shadow: 0 16px 36px rgba(103, 232, 249, 0.22);
+  cursor: pointer;
+}
+
+.prism-orbit[data-speed="1"] .orbit {
+  animation-duration: 4s;
+}
+
+.prism-orbit[data-speed="2"] .orbit {
+  animation-duration: 1.8s;
+  border-width: 2px;
+  box-shadow: 0 0 26px rgba(103, 232, 249, 0.25);
 }
 
 @keyframes spin {
