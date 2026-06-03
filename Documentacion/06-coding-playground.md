@@ -6,7 +6,7 @@ El componente `coding` funciona como un playground visual para editar y ejecutar
 
 ## Qué se hizo
 
-- Se añadió una barra lateral plegable para elegir el lenguaje y dejar más espacio al editor.
+- Se añadió una barra lateral plegable para elegir el lenguaje de programación y dejar más espacio al editor.
 - Se cargan ejemplos desde `public/assets/html-css-cool` y `public/assets/typescript-cool`.
 - Se usa un shell visual compartido desde `public/assets/codigo` para mantener el aspecto del preview.
 - La ejecución de cada ejemplo es manual, mediante botón `Ejecutar`.
