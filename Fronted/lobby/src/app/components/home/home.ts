@@ -126,7 +126,11 @@ export class HomeComponent implements OnInit, OnChanges {
       '--games-btn-start': theme.gamesStart,
       '--games-btn-end': theme.gamesEnd,
       '--games-btn-shadow': theme.gamesShadow,
-      '--games-btn-shadow-hover': theme.gamesShadowHover
+      '--games-btn-shadow-hover': theme.gamesShadowHover,
+      '--coding-btn-start': theme.codingStart,
+      '--coding-btn-end': theme.codingEnd,
+      '--coding-btn-shadow': theme.codingShadow,
+      '--coding-btn-shadow-hover': theme.codingShadowHover
     };
   }
 
@@ -147,6 +151,10 @@ export class HomeComponent implements OnInit, OnChanges {
 
   toggleGames() {
     this.router.navigate(['/home/games']);
+  }
+
+  toggleCoding() {
+    this.router.navigate(['/home/coding']);
   }
 
   toggleChat() {
@@ -322,6 +330,10 @@ export class HomeComponent implements OnInit, OnChanges {
     gamesEnd: string;
     gamesShadow: string;
     gamesShadowHover: string;
+    codingStart: string;
+    codingEnd: string;
+    codingShadow: string;
+    codingShadowHover: string;
   } {
     const rgb = this.parseColor(background) ?? { r: 102, g: 126, b: 234 };
     const luminance = this.relativeLuminance(rgb);
@@ -338,7 +350,11 @@ export class HomeComponent implements OnInit, OnChanges {
         gamesStart: '#374151',
         gamesEnd: '#111827',
         gamesShadow: '0 5px 20px rgba(17, 24, 39, 0.45)',
-        gamesShadowHover: '0 8px 30px rgba(17, 24, 39, 0.62)'
+        gamesShadowHover: '0 8px 30px rgba(17, 24, 39, 0.62)',
+        codingStart: '#14532d',
+        codingEnd: '#065f46',
+        codingShadow: '0 5px 20px rgba(6, 95, 70, 0.42)',
+        codingShadowHover: '0 8px 30px rgba(6, 95, 70, 0.58)'
       };
     }
 
@@ -352,7 +368,11 @@ export class HomeComponent implements OnInit, OnChanges {
       gamesStart: '#fef3c7',
       gamesEnd: '#fed7aa',
       gamesShadow: '0 5px 20px rgba(254, 243, 199, 0.35)',
-      gamesShadowHover: '0 8px 30px rgba(254, 243, 199, 0.5)'
+      gamesShadowHover: '0 8px 30px rgba(254, 243, 199, 0.5)',
+      codingStart: '#34d399',
+      codingEnd: '#22c55e',
+      codingShadow: '0 5px 20px rgba(34, 197, 94, 0.34)',
+      codingShadowHover: '0 8px 30px rgba(34, 197, 94, 0.52)'
     };
   }
 

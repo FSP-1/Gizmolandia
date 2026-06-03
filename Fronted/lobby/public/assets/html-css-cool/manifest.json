@@ -1,0 +1,23 @@
+[
+  {
+    "id": "aurora-card",
+    "title": "Aurora Card",
+    "description": "Glass card with aurora glow, floating layers and soft motion.",
+    "html": "aurora-card.html",
+    "css": "aurora-card.css"
+  },
+  {
+    "id": "glitch-lounge",
+    "title": "Glitch Lounge",
+    "description": "Retro terminal card with scanlines and glitch title.",
+    "html": "glitch-lounge.html",
+    "css": "glitch-lounge.css"
+  },
+  {
+    "id": "prism-orbit",
+    "title": "Prism Orbit",
+    "description": "Orbital rings, prism highlights and a floating CTA.",
+    "html": "prism-orbit.html",
+    "css": "prism-orbit.css"
+  }
+]

@@ -1,0 +1,94 @@
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at top, rgba(56, 189, 248, 0.24), transparent 30%),
+    linear-gradient(160deg, #020617 0%, #0f172a 55%, #111827 100%);
+  color: #f8fafc;
+  font-family: Inter, system-ui, sans-serif;
+  overflow: hidden;
+}
+
+.aurora-card {
+  position: relative;
+  width: min(92vw, 420px);
+  padding: 2rem;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05));
+  backdrop-filter: blur(18px);
+  box-shadow: 0 32px 80px rgba(2, 6, 23, 0.45);
+  overflow: hidden;
+  text-align: center;
+}
+
+.aurora-orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(8px);
+  opacity: 0.8;
+  animation: drift 7s ease-in-out infinite;
+}
+
+.aurora-orb-one {
+  width: 160px;
+  height: 160px;
+  top: -30px;
+  left: -30px;
+  background: radial-gradient(circle, rgba(45, 212, 191, 0.9), transparent 68%);
+}
+
+.aurora-orb-two {
+  width: 130px;
+  height: 130px;
+  right: -20px;
+  bottom: -24px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.9), transparent 66%);
+  animation-delay: -2.4s;
+}
+
+.eyebrow {
+  margin: 0 0 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.42em;
+  font-size: 0.72rem;
+  color: #67e8f9;
+}
+
+h2 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.15rem);
+  line-height: 1;
+}
+
+.copy {
+  margin: 1rem 0 1.35rem;
+  color: rgba(226, 232, 240, 0.82);
+}
+
+.cta {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.9rem 1.3rem;
+  color: #04111f;
+  font-weight: 800;
+  background: linear-gradient(135deg, #67e8f9, #34d399);
+  box-shadow: 0 16px 36px rgba(52, 211, 153, 0.25);
+  animation: pulse 2.8s ease-in-out infinite;
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(12px, -8px) scale(1.05); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px) scale(1.02); }
+}

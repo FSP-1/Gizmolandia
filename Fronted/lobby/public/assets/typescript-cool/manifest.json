@@ -1,0 +1,20 @@
+[
+  {
+    "id": "nebula-pulse",
+    "title": "Nebula Pulse",
+    "description": "TypeScript that builds a glowing card and returns HTML.",
+    "file": "nebula-pulse.ts"
+  },
+  {
+    "id": "wave-notes",
+    "title": "Wave Notes",
+    "description": "Small list renderer with a stylish card output.",
+    "file": "wave-notes.ts"
+  },
+  {
+    "id": "prism-stats",
+    "title": "Prism Stats",
+    "description": "Derives badges and returns a visual status strip.",
+    "file": "prism-stats.ts"
+  }
+]

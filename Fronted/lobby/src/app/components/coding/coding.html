@@ -1,0 +1,139 @@
+<section class="coding-page">
+  <header class="coding-hero">
+    <div>
+      <p class="eyebrow">Gizmolandia / Coding</p>
+      <h1>Editor seguro para ideas visuales</h1>
+      <p class="hero-copy">
+        Selecciona un asset desde la lista, modificalo en el editor y mira el resultado en preview.
+        HTML, CSS y TypeScript se cargan desde <code>assets</code> y el runtime bloquea codigo peligroso.
+      </p>
+    </div>
+
+    <div class="hero-actions">
+      <button type="button" class="ghost-btn sidebar-toggle" (click)="toggleSidebar()">
+        {{ sidebarCollapsed ? 'Abrir panel' : 'Cerrar panel' }}
+      </button>
+      <button type="button" class="ghost-btn" (click)="goHome()">Volver al home</button>
+      <button type="button" class="download-btn" (click)="downloadCode()">Descargar código</button>
+    </div>
+  </header>
+
+  <section class="coding-grid" [class.sidebar-collapsed]="sidebarCollapsed">
+    <aside class="sheet-panel" [class.collapsed]="sidebarCollapsed">
+      <div class="panel-head">
+        <div>
+          <p class="panel-label">Lenguajes</p>
+          <h2>Biblioteca</h2>
+        </div>
+        <button type="button" class="panel-status panel-status-button" (click)="toggleSidebar()">
+          {{ sidebarCollapsed ? '›' : '‹' }}
+        </button>
+      </div>
+
+      <div class="language-toggle">
+        <button type="button" class="language-card" [class.active]="activeSheetId === 'html-css'" (click)="selectSheet('html-css')">
+          <span class="language-badge">UI</span>
+          <strong>HTML + CSS</strong>
+          <p>Animaciones, tarjetas y layouts visuales.</p>
+        </button>
+
+        <button type="button" class="language-card" [class.active]="activeSheetId === 'typescript'" (click)="selectSheet('typescript')">
+          <span class="language-badge">TS</span>
+          <strong>TypeScript</strong>
+          <p>Ejemplos de lógica, listas y renderizado.</p>
+        </button>
+      </div>
+
+      <p class="panel-note" *ngIf="loadingExamples">{{ loadingMessage }}</p>
+
+      <ng-container *ngIf="activeSheetId === 'html-css'; else typescriptSidebar">
+        <label class="select-group">
+          <span>Ejemplos HTML + CSS</span>
+          <select [ngModel]="selectedHtmlCssId" (ngModelChange)="onHtmlCssSelectionChange($event)">
+            <option *ngFor="let example of htmlCssExamples" [value]="example.id">{{ example.title }}</option>
+          </select>
+        </label>
+
+        <article class="asset-summary" *ngIf="activeHtmlCssExample">
+          <p class="asset-title">{{ activeHtmlCssExample.title }}</p>
+          <p>{{ activeHtmlCssExample.description }}</p>
+          <small>{{ activeHtmlCssExample.html }} + {{ activeHtmlCssExample.css }}</small>
+        </article>
+      </ng-container>
+
+      <ng-template #typescriptSidebar>
+        <label class="select-group">
+          <span>Ejemplos TypeScript</span>
+          <select [ngModel]="selectedTypeScriptId" (ngModelChange)="onTypeScriptSelectionChange($event)">
+            <option *ngFor="let example of typeScriptExamples" [value]="example.id">{{ example.title }}</option>
+          </select>
+        </label>
+
+        <article class="asset-summary" *ngIf="activeTypeScriptExample">
+          <p class="asset-title">{{ activeTypeScriptExample.title }}</p>
+          <p>{{ activeTypeScriptExample.description }}</p>
+          <small>{{ activeTypeScriptExample.file }}</small>
+        </article>
+      </ng-template>
+    </aside>
+
+    <main class="editor-panel">
+      <div class="panel-head">
+        <div>
+          <p class="panel-label">Editor</p>
+          <h2>{{ activeSheet.title }}</h2>
+        </div>
+
+        <div class="sheet-switch" *ngIf="activeSheetId === 'html-css'">
+          <button type="button" [class.active]="activeEditorTab === 'html'" (click)="setEditorTab('html')">HTML</button>
+          <button type="button" [class.active]="activeEditorTab === 'css'" (click)="setEditorTab('css')">CSS</button>
+        </div>
+
+        <div class="sheet-switch" *ngIf="activeSheetId === 'typescript'">
+          <button type="button" class="active">TypeScript</button>
+        </div>
+      </div>
+
+      <ng-container *ngIf="activeSheetId === 'html-css'; else typeScriptEditor">
+        <label class="editor-block">
+          <span>{{ activeEditorTab === 'html' ? 'HTML' : 'CSS' }}</span>
+          <textarea *ngIf="activeEditorTab === 'html'" [(ngModel)]="layoutHtml"></textarea>
+          <textarea *ngIf="activeEditorTab === 'css'" [(ngModel)]="layoutCss"></textarea>
+        </label>
+
+        <div class="editor-hint">
+          <p>Puedes cambiar el marcado o los estilos y pulsar ejecutar para ver el resultado.</p>
+          <button type="button" class="run-btn" (click)="executeHtmlCss()">Ejecutar</button>
+        </div>
+      </ng-container>
+
+      <ng-template #typeScriptEditor>
+        <label class="editor-block">
+          <span>TypeScript</span>
+          <textarea [(ngModel)]="typeScriptCode"></textarea>
+        </label>
+        <div class="editor-hint">
+          <p>Modifica el ejemplo y pulsa ejecutar para volver a renderizarlo.</p>
+          <button type="button" class="run-btn" (click)="executeTypeScript()">Ejecutar</button>
+        </div>
+      </ng-template>
+    </main>
+
+    <section class="preview-panel">
+      <div class="panel-head">
+        <div>
+          <p class="panel-label">Preview</p>
+          <h2>{{ activeSheet.title }}</h2>
+        </div>
+      </div>
+
+      <ng-container *ngIf="activeSheetId === 'html-css'; else typeScriptPreview">
+        <iframe #htmlCssPreviewFrame class="preview-frame" sandbox="allow-scripts allow-forms"></iframe>
+      </ng-container>
+
+      <ng-template #typeScriptPreview>
+        <iframe #typeScriptPreviewFrame class="preview-frame" sandbox="allow-scripts allow-forms"></iframe>
+      </ng-template>
+    </section>
+  </section>
+</section>

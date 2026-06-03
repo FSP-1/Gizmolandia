@@ -73,6 +73,7 @@
     "DEFAULT_STATUS": "Ready to play",
     "CUSTOMIZE": "Customize",
     "GAMES": "Games",
+    "CODING": "Coding",
     "CHAT": "General chat",
     "LOGOUT": "Log out"
   },

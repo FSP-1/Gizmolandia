@@ -11,6 +11,10 @@
   --games-btn-end: #f5576c;
   --games-btn-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
   --games-btn-shadow-hover: 0 8px 30px rgba(245, 87, 108, 0.6);
+  --coding-btn-start: #1d976c;
+  --coding-btn-end: #93f9b9;
+  --coding-btn-shadow: 0 5px 20px rgba(29, 151, 108, 0.35);
+  --coding-btn-shadow-hover: 0 8px 30px rgba(29, 151, 108, 0.55);
   min-height: 100vh;
   width: 100%;
   display: flex;
@@ -261,6 +265,28 @@
 .games-btn:hover {
   transform: translateY(-3px);
   box-shadow: var(--games-btn-shadow-hover);
+}
+
+.coding-btn {
+  margin-top: 1rem;
+  padding: 0.82rem 1.45rem;
+  background: linear-gradient(135deg, var(--coding-btn-start), var(--coding-btn-end));
+  color: var(--home-btn-text);
+  border: 1px solid var(--home-btn-border);
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--coding-btn-shadow);
+}
+
+.coding-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--coding-btn-shadow-hover);
 }
 
 .chat-btn {

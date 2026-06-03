@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { UserFormComponent } from './components/user-form/user-form';
 import { HomeComponent } from './components/home/home';
+import { CodingComponent } from './components/coding/coding';
 import { GeneralChatComponent } from './components/chat/general-chat/general-chat';
 import { GamesComponent } from './components/games/games';
 
@@ -24,6 +25,11 @@ export const routes: Routes = [
     path: 'home/games',
     component: GamesComponent,
     title: 'Gizmolandia | Juegos'
+  },
+  {
+    path: 'home/coding',
+    component: CodingComponent,
+    title: 'Gizmolandia | Coding'
   },
   {
     path: 'home/games/:game',
