@@ -4,6 +4,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnIn
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 type SheetId = 'html-css' | 'typescript';
 type EditorTab = 'html' | 'css' | 'typescript';
@@ -33,7 +34,7 @@ interface TypeScriptExampleManifest {
 @Component({
   selector: 'app-coding',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './coding.html',
   styleUrls: ['./coding.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -79,6 +80,7 @@ export class CodingComponent {
     private router: Router,
     private http: HttpClient,
     private changeDetectorRef: ChangeDetectorRef
+    , private translate: TranslateService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -129,14 +131,20 @@ export class CodingComponent {
 
   async onHtmlCssSelectionChange(exampleId: string): Promise<void> {
     await this.loadHtmlCssExample(exampleId);
-    this.htmlCssPreviewSrcdoc = this.buildIdlePreviewDocument('HTML + CSS', 'Selecciona un ejemplo y pulsa ejecutar.');
+    this.htmlCssPreviewSrcdoc = this.buildIdlePreviewDocument(
+      this.translate.instant('CODING.HTML_CSS'),
+      this.translate.instant('CODING.HTML_IDLE_HINT')
+    );
     this.writePreviewFrame('html-css', this.htmlCssPreviewSrcdoc);
     this.changeDetectorRef.markForCheck();
   }
 
   async onTypeScriptSelectionChange(exampleId: string): Promise<void> {
     await this.loadTypeScriptExample(exampleId);
-    this.typeScriptPreviewSrcdoc = this.buildIdlePreviewDocument('TypeScript', 'Selecciona un ejemplo y pulsa ejecutar.');
+    this.typeScriptPreviewSrcdoc = this.buildIdlePreviewDocument(
+      this.translate.instant('CODING.TS_MODE'),
+      this.translate.instant('CODING.TS_IDLE_HINT')
+    );
     this.writePreviewFrame('typescript', this.typeScriptPreviewSrcdoc);
     this.changeDetectorRef.markForCheck();
   }
@@ -234,15 +242,21 @@ export class CodingComponent {
         await this.loadTypeScriptExample(typeScriptExamples[0].id);
       }
 
-      this.htmlCssPreviewSrcdoc = this.buildIdlePreviewDocument('HTML + CSS', 'Selecciona un ejemplo y pulsa ejecutar.');
-      this.typeScriptPreviewSrcdoc = this.buildIdlePreviewDocument('TypeScript', 'Selecciona un ejemplo y pulsa ejecutar.');
+      this.htmlCssPreviewSrcdoc = this.buildIdlePreviewDocument(
+        this.translate.instant('CODING.HTML_CSS'),
+        this.translate.instant('CODING.HTML_IDLE_HINT')
+      );
+      this.typeScriptPreviewSrcdoc = this.buildIdlePreviewDocument(
+        this.translate.instant('CODING.TS_MODE'),
+        this.translate.instant('CODING.TS_IDLE_HINT')
+      );
       this.writePreviewFrame('html-css', this.htmlCssPreviewSrcdoc);
       this.writePreviewFrame('typescript', this.typeScriptPreviewSrcdoc);
 
-      this.loadingMessage = 'Ejemplos cargados.';
+      this.loadingMessage = this.translate.instant('CODING.LOADED');
       this.changeDetectorRef.markForCheck();
     } catch {
-      this.loadingMessage = 'No se pudieron cargar los ejemplos desde assets.';
+      this.loadingMessage = this.translate.instant('CODING.LOAD_FAILED');
       this.changeDetectorRef.markForCheck();
     } finally {
       this.loadingExamples = false;
@@ -289,7 +303,7 @@ export class CodingComponent {
       title,
       message,
       title,
-      `<section class="idle-card"><h2>Preview listo</h2><p>${this.escapeHtml(message)}</p></section>`,
+      `<section class="idle-card"><h2>${this.escapeHtml(this.translate.instant('CODING.TS_WAITING_TITLE'))}</h2><p>${this.escapeHtml(message)}</p></section>`,
       ''
     );
   }
@@ -313,8 +327,8 @@ export class CodingComponent {
       title,
       message,
       'TypeScript',
-      '<div id="ts-output" class="ts-output"><h2>Ejecutando TypeScript...</h2><pre>Preparando preview seguro.</pre></div>',
-      `<script>(function(){const code=${JSON.stringify(transformedSource)};const logs=[];const output=document.getElementById('ts-output');const safeConsole={log:function(){logs.push(Array.from(arguments).map(String).join(' '));},warn:function(){logs.push('WARN: '+Array.from(arguments).map(String).join(' '));},error:function(){logs.push('ERROR: '+Array.from(arguments).map(String).join(' '));}};try{const blocked=/\b(window|document|globalThis|parent|top|location|history|localStorage|sessionStorage|indexedDB|fetch|XMLHttpRequest|WebSocket|navigator|process|require|eval|Function)\b/i;if(blocked.test(code)){throw new Error('El TypeScript contiene una API bloqueada para este sandbox.');}const moduleShim={exports:{}};const runner=new Function('exports','module','console','\'use strict\'; const window = undefined; const document = undefined; const globalThis = undefined; const parent = undefined; const top = undefined; const location = undefined; const history = undefined; const localStorage = undefined; const sessionStorage = undefined; const indexedDB = undefined; const fetch = undefined; const XMLHttpRequest = undefined; const WebSocket = undefined; const navigator = undefined; const process = undefined; const require = undefined; const eval = undefined; const Function = undefined; '+code+'; if (typeof run === "function") { module.exports.run = run; } return module.exports;');const exported=runner(moduleShim.exports,moduleShim,safeConsole)||moduleShim.exports;const run=exported.run||exported.default;if(typeof run!=='function'){throw new Error('El archivo debe exportar una función run().');}const result=run();const rendered=typeof result==='string'?result:'<pre>'+JSON.stringify(result,null,2)+'</pre>';output.innerHTML='<h2>Preview ejecutado</h2>'+rendered+(logs.length?'<pre>'+logs.join('\\n')+'</pre>':'');}catch(error){output.innerHTML='<h2>Preview bloqueado</h2><p class="ts-error">'+String(error&&error.message?error.message:error)+'</p>';}})();</script>`
+      `<div id="ts-output" class="ts-output"><h2>${this.escapeHtml(this.translate.instant('CODING.TS_OUTPUT_TITLE'))}</h2><pre>${this.escapeHtml(this.translate.instant('CODING.TS_OUTPUT_MESSAGE'))}</pre></div>`,
+      `<script>(function(){const code=${JSON.stringify(transformedSource)};const logs=[];const output=document.getElementById('ts-output');const safeConsole={log:function(){logs.push(Array.from(arguments).map(String).join(' '));},warn:function(){logs.push('WARN: '+Array.from(arguments).map(String).join(' '));},error:function(){logs.push('ERROR: '+Array.from(arguments).map(String).join(' '));}};try{const blocked=/\b(window|document|globalThis|parent|top|location|history|localStorage|sessionStorage|indexedDB|fetch|XMLHttpRequest|WebSocket|navigator|process|require|eval|Function)\b/i;if(blocked.test(code)){throw new Error(${JSON.stringify(this.translate.instant('CODING.TS_SANDBOX_BLOCKED'))});}const moduleShim={exports:{}};const runner=new Function('exports','module','console','\'use strict\'; const window = undefined; const document = undefined; const globalThis = undefined; const parent = undefined; const top = undefined; const location = undefined; const history = undefined; const localStorage = undefined; const sessionStorage = undefined; const indexedDB = undefined; const fetch = undefined; const XMLHttpRequest = undefined; const WebSocket = undefined; const navigator = undefined; const process = undefined; const require = undefined; const eval = undefined; const Function = undefined; '+code+'; if (typeof run === "function") { module.exports.run = run; } return module.exports;');const exported=runner(moduleShim.exports,moduleShim,safeConsole)||moduleShim.exports;const run=exported.run||exported.default;if(typeof run!=='function'){throw new Error(${JSON.stringify(this.translate.instant('CODING.TS_BLOCKED_MESSAGE'))});}const result=run();const rendered=typeof result==='string'?result:'<pre>'+JSON.stringify(result,null,2)+'</pre>';output.innerHTML='<h2>${this.translate.instant('CODING.TS_RUN_TITLE')}</h2>'+rendered+(logs.length?'<pre>'+logs.join('\\n')+'</pre>':'');}catch(error){output.innerHTML='<h2>${this.translate.instant('CODING.TS_ERROR_TITLE')}</h2><p class="ts-error">'+String(error&&error.message?error.message:error)+'</p>';}})();</script>`
     );
   }
 

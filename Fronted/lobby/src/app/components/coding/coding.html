@@ -1,20 +1,19 @@
 <section class="coding-page">
   <header class="coding-hero">
     <div>
-      <p class="eyebrow">Gizmolandia / Coding</p>
-      <h1>Editor seguro para ideas visuales</h1>
+      <p class="eyebrow">Gizmolandia / {{ 'CODING.TITLE' | translate }}</p>
+      <h1>{{ 'CODING.TITLE' | translate }}</h1>
       <p class="hero-copy">
-        Selecciona un asset desde la lista, modificalo en el editor y mira el resultado en preview.
-        HTML, CSS y TypeScript se cargan desde <code>assets</code> y el runtime bloquea codigo peligroso.
+        {{ 'CODING.SUBTITLE' | translate }}
       </p>
     </div>
 
     <div class="hero-actions">
       <button type="button" class="ghost-btn sidebar-toggle" (click)="toggleSidebar()">
-        {{ sidebarCollapsed ? 'Abrir panel' : 'Cerrar panel' }}
+        {{ sidebarCollapsed ? ('CODING.EXPAND' | translate) : ('CODING.CLOSE_PANEL' | translate) }}
       </button>
-      <button type="button" class="ghost-btn" (click)="goHome()">Volver al home</button>
-      <button type="button" class="download-btn" (click)="downloadCode()">Descargar código</button>
+      <button type="button" class="ghost-btn" (click)="goHome()">{{ 'CODING.BACK_HOME' | translate }}</button>
+      <button type="button" class="download-btn" (click)="downloadCode()">{{ 'CODING.DOWNLOAD' | translate }}</button>
     </div>
   </header>
 
@@ -22,8 +21,8 @@
     <aside class="sheet-panel" [class.collapsed]="sidebarCollapsed">
       <div class="panel-head">
         <div>
-          <p class="panel-label">Lenguajes</p>
-          <h2>Biblioteca</h2>
+          <p class="panel-label">{{ 'CODING.LANGUAGES' | translate }}</p>
+          <h2>{{ 'CODING.LIBRARY' | translate }}</h2>
         </div>
         <button type="button" class="panel-status panel-status-button" (click)="toggleSidebar()">
           {{ sidebarCollapsed ? '›' : '‹' }}
@@ -33,14 +32,14 @@
       <div class="language-toggle">
         <button type="button" class="language-card" [class.active]="activeSheetId === 'html-css'" (click)="selectSheet('html-css')">
           <span class="language-badge">UI</span>
-          <strong>HTML + CSS</strong>
-          <p>Animaciones, tarjetas y layouts visuales.</p>
+          <strong>{{ 'CODING.HTML_CSS' | translate }}</strong>
+          <p>{{ 'CODING.HTML_CSS_DESCRIPTION' | translate }}</p>
         </button>
 
         <button type="button" class="language-card" [class.active]="activeSheetId === 'typescript'" (click)="selectSheet('typescript')">
           <span class="language-badge">TS</span>
-          <strong>TypeScript</strong>
-          <p>Ejemplos de lógica, listas y renderizado.</p>
+          <strong>{{ 'CODING.TYPESCRIPT' | translate }}</strong>
+          <p>{{ 'CODING.TYPESCRIPT_DESCRIPTION' | translate }}</p>
         </button>
       </div>
 
@@ -48,7 +47,7 @@
 
       <ng-container *ngIf="activeSheetId === 'html-css'; else typescriptSidebar">
         <label class="select-group">
-          <span>Ejemplos HTML + CSS</span>
+          <span>{{ 'CODING.HTML_CSS_EXAMPLES' | translate }}</span>
           <select [ngModel]="selectedHtmlCssId" (ngModelChange)="onHtmlCssSelectionChange($event)">
             <option *ngFor="let example of htmlCssExamples" [value]="example.id">{{ example.title }}</option>
           </select>
@@ -63,7 +62,7 @@
 
       <ng-template #typescriptSidebar>
         <label class="select-group">
-          <span>Ejemplos TypeScript</span>
+          <span>{{ 'CODING.TYPESCRIPT_EXAMPLES' | translate }}</span>
           <select [ngModel]="selectedTypeScriptId" (ngModelChange)="onTypeScriptSelectionChange($event)">
             <option *ngFor="let example of typeScriptExamples" [value]="example.id">{{ example.title }}</option>
           </select>
@@ -80,7 +79,7 @@
     <main class="editor-panel">
       <div class="panel-head">
         <div>
-          <p class="panel-label">Editor</p>
+          <p class="panel-label">{{ 'CODING.EDITOR' | translate }}</p>
           <h2>{{ activeSheet.title }}</h2>
         </div>
 
@@ -96,25 +95,25 @@
 
       <ng-container *ngIf="activeSheetId === 'html-css'; else typeScriptEditor">
         <label class="editor-block">
-          <span>{{ activeEditorTab === 'html' ? 'HTML' : 'CSS' }}</span>
+          <span>{{ activeEditorTab === 'html' ? ('CODING.HTML' | translate) : ('CODING.CSS' | translate) }}</span>
           <textarea *ngIf="activeEditorTab === 'html'" [(ngModel)]="layoutHtml"></textarea>
           <textarea *ngIf="activeEditorTab === 'css'" [(ngModel)]="layoutCss"></textarea>
         </label>
 
         <div class="editor-hint">
-          <p>Puedes cambiar el marcado o los estilos y pulsar ejecutar para ver el resultado.</p>
-          <button type="button" class="run-btn" (click)="executeHtmlCss()">Ejecutar</button>
+          <p>{{ 'CODING.HTML_HINT' | translate }}</p>
+          <button type="button" class="run-btn" (click)="executeHtmlCss()">{{ 'CODING.EXECUTE' | translate }}</button>
         </div>
       </ng-container>
 
       <ng-template #typeScriptEditor>
         <label class="editor-block">
-          <span>TypeScript</span>
+          <span>{{ 'CODING.TYPESCRIPT' | translate }}</span>
           <textarea [(ngModel)]="typeScriptCode"></textarea>
         </label>
         <div class="editor-hint">
-          <p>Modifica el ejemplo y pulsa ejecutar para volver a renderizarlo.</p>
-          <button type="button" class="run-btn" (click)="executeTypeScript()">Ejecutar</button>
+          <p>{{ 'CODING.TS_HINT' | translate }}</p>
+          <button type="button" class="run-btn" (click)="executeTypeScript()">{{ 'CODING.EXECUTE' | translate }}</button>
         </div>
       </ng-template>
     </main>
@@ -122,7 +121,7 @@
     <section class="preview-panel">
       <div class="panel-head">
         <div>
-          <p class="panel-label">Preview</p>
+          <p class="panel-label">{{ 'CODING.PREVIEW' | translate }}</p>
           <h2>{{ activeSheet.title }}</h2>
         </div>
       </div>
