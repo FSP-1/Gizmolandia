@@ -10,6 +10,7 @@ public interface UsuarioService {
     UsuarioResponseDTO crear(UsuarioRequestDTO dto);
     List<UsuarioResponseDTO> listarTodos();
     UsuarioResponseDTO buscarPorId(Long id);
+    UsuarioResponseDTO buscarPerfilPublico(String userProfile);
     UsuarioResponseDTO buscarPorPerfil(String userProfile);
     UsuarioResponseDTO actualizar(Long id, UsuarioRequestDTO dto);
     UsuarioResponseDTO actualizarPersonalizacion(Long id, UsuarioPersonalizacionDTO dto);

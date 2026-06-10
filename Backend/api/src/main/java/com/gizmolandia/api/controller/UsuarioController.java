@@ -37,6 +37,12 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.buscarPorId(id));
     }
 
+    // GET /api/usuarios/perfil-publico/{userProfile} → home publico de un usuario
+    @GetMapping("/perfil-publico/{userProfile}")
+    public ResponseEntity<UsuarioResponseDTO> buscarPerfilPublico(@PathVariable String userProfile) {
+        return ResponseEntity.ok(usuarioService.buscarPerfilPublico(userProfile));
+    }
+
     // GET /api/usuarios/perfil/{userProfile}  → buscar por perfil
     @GetMapping("/perfil/{userProfile}")
     public ResponseEntity<UsuarioResponseDTO> buscarPorPerfil(@PathVariable String userProfile) {

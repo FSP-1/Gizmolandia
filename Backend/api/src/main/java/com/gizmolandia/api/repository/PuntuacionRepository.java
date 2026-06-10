@@ -26,10 +26,10 @@ public interface PuntuacionRepository extends JpaRepository<Puntuacion, Long> {
     List<Puntuacion> findTopByJuego(String juego);
 
     @Query("""
-            SELECT p.usuario.id, p.usuario.nombre, p.usuario.foto, COUNT(p.id)
+            SELECT p.usuario.id, p.usuario.nombre, p.usuario.userProfile, p.usuario.foto, COUNT(p.id)
             FROM Puntuacion p
             WHERE p.juego = 'PING_PONG'
-            GROUP BY p.usuario.id, p.usuario.nombre, p.usuario.foto
+            GROUP BY p.usuario.id, p.usuario.nombre, p.usuario.userProfile, p.usuario.foto
             ORDER BY COUNT(p.id) DESC
             """)
     List<Object[]> findPingPongWinsRanking();

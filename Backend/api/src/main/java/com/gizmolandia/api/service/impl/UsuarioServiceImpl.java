@@ -60,6 +60,17 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional(readOnly = true)
+    public UsuarioResponseDTO buscarPerfilPublico(String userProfile) {
+        UsuarioResponseDTO dto = usuarioRepository.findByUserProfile(userProfile)
+                .map(this::toDTO)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Usuario no encontrado con perfil: " + userProfile));
+        dto.setFoto(toPublicAvatarUrl(dto.getId(), dto.getFoto()));
+        return dto;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public UsuarioResponseDTO buscarPorPerfil(String userProfile) {
         return usuarioRepository.findByUserProfile(userProfile)
                 .map(this::toDTO)
@@ -144,5 +155,17 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .preferredLanguage(u.getPreferredLanguage())
                 .fechaRegistro(u.getFechaRegistro())
                 .build();
+    }
+
+    private String toPublicAvatarUrl(Long usuarioId, String avatar) {
+        if (avatar == null || avatar.isBlank()) {
+            return "";
+        }
+
+        if (avatar.trim().toLowerCase().startsWith("data:")) {
+            return "/api/chat/avatars/" + usuarioId;
+        }
+
+        return avatar;
     }
 }
