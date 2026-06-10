@@ -501,6 +501,7 @@ public class ChatServiceImpl implements ChatService {
             return ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path("/api/chat/avatars/")
                     .path(String.valueOf(usuarioId))
+                    .queryParam("v", System.currentTimeMillis())
                     .toUriString();
         }
 

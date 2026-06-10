@@ -7,6 +7,7 @@ import { UsuarioResponse } from '../../services/api.models';
 import { SessionStateService } from '../../services/session-state.service';
 import { UsuarioApiService } from '../../services/usuario-api.service';
 
+
 @Component({
   selector: 'app-public-profile',
   standalone: true,
@@ -28,31 +29,75 @@ export class PublicProfileComponent implements OnInit {
     private readonly cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void {
-    const currentUser = this.sessionStateService.getUser();
-    if (!currentUser) {
-      this.router.navigate(['/auth']);
-      return;
-    }
+ngOnInit(): void {
 
-    const userProfile = (this.route.snapshot.paramMap.get('userProfile') || '').trim();
+  this.route.paramMap.subscribe(params => {
+
+    const userProfile =
+      (params.get('userProfile') || '').trim();
+
     if (!userProfile || /^\d+$/.test(userProfile)) {
+
       this.loading = false;
+      this.profile = null;
       this.errorMessage = 'Perfil no válido.';
+
       this.cdr.detectChanges();
+
       return;
     }
 
-    if (userProfile.toLowerCase() === currentUser.userProfile.toLowerCase()) {
-      this.router.navigate(['/home']);
-      return;
-    }
+    this.loadProfile(userProfile);
 
-    this.usuarioApiService.buscarPerfilPublico(userProfile).subscribe({
+  });
+
+}
+
+  goBack(): void {
+    this.location.back();
+  }
+
+private loadProfile(userProfile: string): void {
+
+  const currentUser = this.sessionStateService.getUser();
+
+  if (!currentUser) {
+    this.router.navigate(['/auth']);
+    return;
+  }
+
+  if (userProfile.toLowerCase() === currentUser.userProfile.toLowerCase()) {
+    this.router.navigate(['/home']);
+    return;
+  }
+
+  this.loading = true;
+  this.profile = null;
+  this.errorMessage = '';
+
+  this.usuarioApiService.buscarPerfilPublico(userProfile)
+    .subscribe({
       next: (profile) => {
+
+        if (profile.foto) {
+
+          const separator =
+            profile.foto.includes('?')
+              ? '&'
+              : '?';
+
+          profile.foto =
+            profile.foto +
+            separator +
+            'v=' +
+            Date.now();
+        }
+
         this.profile = profile;
+
         this.loading = false;
         this.errorMessage = '';
+
         this.cdr.detectChanges();
       },
       error: () => {
@@ -61,9 +106,6 @@ export class PublicProfileComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
-  }
+}
 
-  goBack(): void {
-    this.location.back();
-  }
 }

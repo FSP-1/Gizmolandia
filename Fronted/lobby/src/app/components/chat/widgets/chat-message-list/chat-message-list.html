@@ -14,7 +14,7 @@
         [class.disabled]="isOwnMessage(msg)"
         [disabled]="isOwnMessage(msg)"
         (click)="openProfile(msg)">
-        <img *ngIf="msg.fotoUsuario" [src]="msg.fotoUsuario" alt="profile" class="author-avatar" width="36" height="36" loading="lazy" decoding="async">
+        <img *ngIf="msg.fotoUsuario"  [src]="msg.fotoUsuario + '?v=' + msg.usuarioId" alt="profile" class="author-avatar" width="36" height="36" loading="lazy" decoding="async">
         <div *ngIf="!msg.fotoUsuario" class="author-avatar fallback">👤</div>
 
         <div>
