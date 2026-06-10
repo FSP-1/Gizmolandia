@@ -1,0 +1,21 @@
+<section class="public-profile-state" *ngIf="loading || (!profile && errorMessage)">
+  <p *ngIf="loading">{{ 'CUSTOMIZATION.LOADING' | translate }}</p>
+  <p *ngIf="errorMessage">{{ errorMessage }}</p>
+  <button type="button" (click)="goBack()">{{ 'CHAT.BACK' | translate }}</button>
+</section>
+
+<app-home
+  *ngIf="profile"
+  [publicView]="true"
+  [userId]="profile.id"
+  [userName]="profile.nombre"
+  [userProfile]="profile.userProfile"
+  [userPhoto]="profile.foto || ''"
+  [nationality]="profile.nacionalidad"
+  [initialBackgroundColor]="profile.homeBackgroundColor || ''"
+  [initialLeftImage]="profile.homeLeftImage || ''"
+  [initialRightImage]="profile.homeRightImage || ''"
+  [initialUserStatus]="profile.homeStatus || ''"
+  [initialNameColor]="profile.homeNameColor || ''"
+  [initialLanguage]="profile.preferredLanguage || ''">
+</app-home>

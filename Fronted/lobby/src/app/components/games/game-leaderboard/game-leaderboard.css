@@ -60,6 +60,25 @@ ul {
   min-width: 0;
 }
 
+.profile-trigger {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.profile-trigger:not(.disabled):hover .name {
+  color: #7dd3fc;
+  text-decoration: underline;
+}
+
+.profile-trigger.disabled {
+  cursor: default;
+}
+
 .avatar {
   width: 28px;
   height: 28px;

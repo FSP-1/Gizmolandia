@@ -8,7 +8,12 @@
     class="message-card"
     [class.own]="isOwnMessage(msg)">
     <header class="message-header">
-      <div class="author-block">
+      <button
+        type="button"
+        class="author-block profile-trigger"
+        [class.disabled]="isOwnMessage(msg)"
+        [disabled]="isOwnMessage(msg)"
+        (click)="openProfile(msg)">
         <img *ngIf="msg.fotoUsuario" [src]="msg.fotoUsuario" alt="profile" class="author-avatar" width="36" height="36" loading="lazy" decoding="async">
         <div *ngIf="!msg.fotoUsuario" class="author-avatar fallback">👤</div>
 
@@ -16,7 +21,7 @@
           <p class="author-name">{{ msg.userProfile || msg.nombreUsuario }}</p>
           <p class="message-time">{{ formatDate(msg.createdAt) }}</p>
         </div>
-      </div>
+      </button>
 
       <div *ngIf="msg.scoreGame && msg.scoreValue !== null" class="score-badge">
         {{ msg.scoreGame }} · {{ msg.scoreValue }}

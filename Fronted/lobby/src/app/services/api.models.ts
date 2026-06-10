@@ -43,6 +43,7 @@ export interface PuntuacionResponse {
   id: number;
   usuarioId: number;
   nombreUsuario: string;
+  userProfile: string;
   fotoUsuario: string;
   juego: string;
   puntuacion: number;

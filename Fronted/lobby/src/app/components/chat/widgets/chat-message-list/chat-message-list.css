@@ -39,6 +39,25 @@
   gap: 0.55rem;
 }
 
+.profile-trigger {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.profile-trigger:not(.disabled):hover .author-name {
+  color: #7dd3fc;
+  text-decoration: underline;
+}
+
+.profile-trigger.disabled {
+  cursor: default;
+}
+
 .author-avatar {
   width: 36px;
   height: 36px;

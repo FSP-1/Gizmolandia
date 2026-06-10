@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
+import { Router } from '@angular/router';
 import { ChatMessageResponse } from '../../../../services/api.models';
 
 @Component({
@@ -16,6 +17,8 @@ export class ChatMessageListComponent implements OnChanges, AfterViewInit {
   @Input() currentUserId: number | null = null;
 
   private readonly bottomThresholdPx = 80;
+
+  constructor(private readonly router: Router) {}
 
   ngAfterViewInit(): void {
     this.scrollToBottom();
@@ -38,6 +41,14 @@ export class ChatMessageListComponent implements OnChanges, AfterViewInit {
 
   isOwnMessage(msg: ChatMessageResponse): boolean {
     return this.currentUserId !== null && msg.usuarioId === this.currentUserId;
+  }
+
+  openProfile(msg: ChatMessageResponse): void {
+    if (this.isOwnMessage(msg)) {
+      return;
+    }
+
+    this.router.navigate(['/home/profile', msg.userProfile || msg.nombreUsuario]);
   }
 
   private scrollToBottom(): void {

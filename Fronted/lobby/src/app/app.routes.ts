@@ -5,6 +5,7 @@ import { CodingComponent } from './components/coding/coding';
 import { GeneralChatComponent } from './components/chat/general-chat/general-chat';
 import { GamesComponent } from './components/games/games';
 import { MusicCreationComponent } from './components/music-creation/music-creation';
+import { PublicProfileComponent } from './components/public-profile/public-profile';
 export const routes: Routes = [
   {
     path: '',
@@ -20,6 +21,11 @@ export const routes: Routes = [
     path: 'home',
     component: HomeComponent,
     title: 'Gizmolandia | Home'
+  },
+  {
+    path: 'home/profile/:userProfile',
+    component: PublicProfileComponent,
+    title: 'Gizmolandia | Perfil'
   },
   {
     path: 'home/games',

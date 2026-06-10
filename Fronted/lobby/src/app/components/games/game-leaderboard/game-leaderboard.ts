@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
+import { Router } from '@angular/router';
 import { PuntuacionResponse } from '../../../services/api.models';
 import { PuntuacionApiService } from '../../../services/puntuacion-api.service';
+import { SessionStateService } from '../../../services/session-state.service';
 
 @Component({
   selector: 'app-game-leaderboard',
@@ -17,13 +19,17 @@ export class GameLeaderboardComponent implements OnInit, OnChanges {
 
   loading = false;
   ranking: PuntuacionResponse[] = [];
+  currentUserId: number | null = null;
 
   constructor(
     private puntuacionApiService: PuntuacionApiService,
+    private sessionStateService: SessionStateService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    this.currentUserId = this.sessionStateService.getUser()?.id ?? null;
     this.loadRanking();
   }
 
@@ -39,6 +45,18 @@ export class GameLeaderboardComponent implements OnInit, OnChanges {
 
   initials(name: string): string {
     return (name || '?').slice(0, 1).toUpperCase();
+  }
+
+  canOpenProfile(usuarioId: number): boolean {
+    return !!usuarioId && usuarioId !== this.currentUserId;
+  }
+
+  openProfile(item: PuntuacionResponse): void {
+    if (!this.canOpenProfile(item.usuarioId) || !item.userProfile) {
+      return;
+    }
+
+    this.router.navigate(['/home/profile', item.userProfile]);
   }
 
   private loadRanking(): void {

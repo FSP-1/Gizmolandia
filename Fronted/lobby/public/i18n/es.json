@@ -4,7 +4,8 @@
   },
   "COMMON": {
     "CANCEL": "Cancelar",
-    "APPLY": "Aplicar"
+    "APPLY": "Aplicar",
+    "BACK": "Atrás"
   },
   "FORM": {
     "TITLE": "Registro de Usuario",

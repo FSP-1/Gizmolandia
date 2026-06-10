@@ -6,6 +6,7 @@ import { UsuarioApiService } from '../../services/usuario-api.service';
 import { UsuarioPersonalizacionRequest, UsuarioResponse } from '../../services/api.models';
 import { SessionStateService } from '../../services/session-state.service';
 import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 interface HomeCustomizationConfig {
   backgroundColor: string;
@@ -36,6 +37,7 @@ export class HomeComponent implements OnInit, OnChanges {
   @Input() initialUserStatus = '';
   @Input() initialNameColor = '';
   @Input() initialLanguage: 'es' | 'en' | '' = '';
+  @Input() publicView = false;
   
   showCustomization = false;
   backgroundColor = '#667eea';
@@ -69,14 +71,17 @@ export class HomeComponent implements OnInit, OnChanges {
     private translate: TranslateService,
     private usuarioApiService: UsuarioApiService,
     private sessionStateService: SessionStateService,
-    private router: Router
+    private router: Router,
+    private location: Location
   ) {
     const savedLanguage = localStorage.getItem('appLanguage');
     this.currentLanguage = savedLanguage === 'en' ? 'en' : 'es';
   }
 
   ngOnInit(): void {
-    this.hydrateFromSession();
+    if (!this.publicView) {
+      this.hydrateFromSession();
+    }
     this.applyCustomizationFromInputs();
   }
 
@@ -89,7 +94,8 @@ export class HomeComponent implements OnInit, OnChanges {
       changes['initialRightImage'] ||
       changes['initialUserStatus'] ||
       changes['initialNameColor'] ||
-      changes['initialLanguage']
+      changes['initialLanguage'] ||
+      changes['publicView']
     ) {
       this.applyCustomizationFromInputs();
     }
@@ -135,6 +141,10 @@ export class HomeComponent implements OnInit, OnChanges {
   }
 
   toggleCustomization() {
+    if (this.publicView) {
+      return;
+    }
+
     if (!this.showCustomization) {
       this.customizationSnapshot = {
         backgroundColor: this.backgroundColor,
@@ -166,12 +176,20 @@ export class HomeComponent implements OnInit, OnChanges {
   }
   
   logout(): void {
+    if (this.publicView) {
+      return;
+    }
+
     this.showCustomization = false;
 
     this.sessionStateService.clear();
     this.clearLegacySessionKeys();
 
     this.router.navigate(['/auth']);
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 
   onCustomizationChange(config: any) {
@@ -316,7 +334,7 @@ export class HomeComponent implements OnInit, OnChanges {
     this.userStatus = this.initialUserStatus || 'Listo para jugar';
     this.nameColor = this.initialNameColor || '#ffffff';
 
-    if (this.initialLanguage) {
+    if (this.initialLanguage && !this.publicView) {
       this.currentLanguage = this.initialLanguage === 'en' ? 'en' : 'es';
       localStorage.setItem('appLanguage', this.currentLanguage);
       this.translate.use(this.currentLanguage);

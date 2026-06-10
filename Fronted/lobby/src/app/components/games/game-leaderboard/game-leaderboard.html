@@ -10,11 +10,16 @@
   <ul *ngIf="!loading && ranking.length > 0">
     <li *ngFor="let item of ranking; let i = index" class="rank-row">
       <span class="rank">#{{ i + 1 }}</span>
-      <div class="player">
+      <button
+        type="button"
+        class="player profile-trigger"
+        [class.disabled]="!canOpenProfile(item.usuarioId)"
+        [disabled]="!canOpenProfile(item.usuarioId)"
+        (click)="openProfile(item)">
         <img *ngIf="item.fotoUsuario" [src]="item.fotoUsuario" [alt]="item.nombreUsuario" class="avatar" loading="lazy" />
         <span *ngIf="!item.fotoUsuario" class="avatar placeholder">{{ initials(item.nombreUsuario) }}</span>
         <span class="name">{{ item.nombreUsuario }}</span>
-      </div>
+      </button>
       <span class="points">{{ item.puntuacion }}</span>
     </li>
   </ul>
