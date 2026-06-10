@@ -8,6 +8,7 @@ Gizmolandia es una app de lobby para jugadores hecha con Angular, Spring Boot y 
 - Backend Spring Boot con API REST para usuarios, autenticacion, puntuaciones y chat.
 - Juegos arcade como Snake, Tetris, Brick Breaker y Ping Pong, incluyendo modo en tiempo real para Ping Pong.
 - Chat por salas con mensajes, presencia, puntuaciones compartidas y media upload.
+- Perfiles publicos de otros usuarios accesibles desde chat y rankings.
 - Playground de codigo con previews aislados en iframe sandbox.
 - Internacionalizacion en espanol e ingles.
 

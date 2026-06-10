@@ -304,6 +304,49 @@ curl http://localhost:8080/api/usuarios/1
 
 ---
 
+### GET /api/usuarios/perfil-publico/{userProfile}
+
+**Descripción**: Obtener los datos necesarios para renderizar el home publico de otro usuario usando su nombre de perfil publico, no su ID.
+
+**Parámetros**:
+
+- `userProfile` (path): nombre publico del perfil.
+
+**Response (200 OK)**:
+
+```json
+{
+  "id": 2,
+  "nombre": "player_2",
+  "userProfile": "Player Two",
+  "nacionalidad": "ES",
+  "edad": 25,
+  "foto": "data:image/png;base64,...",
+  "homeBackgroundColor": "#667eea",
+  "homeLeftImage": "",
+  "homeRightImage": "",
+  "homeStatus": "Listo para jugar",
+  "homeNameColor": "#ffffff",
+  "preferredLanguage": "es",
+  "fechaRegistro": "2026-06-10T10:30:00"
+}
+```
+
+**Uso frontend**:
+
+- Ruta: `/home/profile/{userProfile}`
+- No se abre para el usuario de la sesion actual.
+- La ruta publica rechaza valores numericos puros para evitar recorrer perfiles con `/profile/1`, `/profile/2`, etc.
+- La vista no muestra acciones privadas como personalizar, juegos, coding, chat, music creation o logout.
+
+**cURL**:
+
+```bash
+curl http://localhost:8080/api/usuarios/perfil-publico/PlayerTwo
+```
+
+---
+
 ### GET /api/usuarios/perfil/
 
 **Descripción**: Obtener usuario por nombre de perfil (username)

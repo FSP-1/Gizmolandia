@@ -116,6 +116,21 @@ Cuando quieras entender o extender el componente `coding`.
 
 ---
 
+### 8. [07 - Perfiles Publicos](07-perfiles-publicos.md) 👤
+**Vista de home publico para usuarios ajenos**
+
+Aqui encontraras:
+- ✅ Ruta `/home/profile/:userProfile`
+- ✅ Endpoint publico de perfil por nombre publico, no por ID
+- ✅ Bloqueo de rutas numericas para evitar recorrer perfiles por URL
+- ✅ Navegacion desde chat y rankings
+- ✅ Diferencia entre home propio y home publico
+
+**¿Cuándo leerlo?**
+Cuando quieras entender como se abre el perfil de otro usuario o añadir nuevos puntos de entrada.
+
+---
+
 ## 🎯 Guía Rápida por Escenario
 
 ### "Acabo de descargar el proyecto, ¿por dónde empiezo?"
@@ -278,5 +293,8 @@ documentacion/
 ├── 01-arquitectura-angular-spring.md      🏗️ Cómo se comunican
 ├── 02-api-rest-endpoints.md               🔌 Referencia de APIs
 ├── 03-estructura-spring-boot.md           📦 Estructura interna
-└── 04-chat-general-media-upload.md         💬 Chat y media
+├── 04-chat-general-media-upload.md         💬 Chat y media
+├── 05-optimizacion-chat-incremental-inp.md ⚡ Rendimiento chat
+├── 06-coding-playground.md                 💻 Playground coding
+└── 07-perfiles-publicos.md                 👤 Perfiles publicos
 ```
